@@ -149,23 +149,34 @@ if (Test-Path $ToolboxDir) {
     Write-Host "[OK] kitt-toolbox ready." -ForegroundColor Green
 }
 
+# 11. Install and Start Background Service Natively
+Write-Host "[INFO] Installing and starting K.I.T.T. native background service..." -ForegroundColor Cyan
+$KittctlExe = Join-Path $AssistantRepo "target\release\kittctl.exe"
+& $KittctlExe service install
+& $KittctlExe service start
+Write-Host "[OK] K.I.T.T. background service is active." -ForegroundColor Green
+
 Write-Host ""
 Write-Host "================================================================" -ForegroundColor Green
-Write-Host "        K.I.T.T. Ecosystem Installed Successfully!             " -ForegroundColor Green
+Write-Host "        K.I.T.T. Ecosystem Installed & Running!                 " -ForegroundColor Green
 Write-Host "================================================================" -ForegroundColor Green
+Write-Host ""
+Write-Host "The K.I.T.T. daemon is now running natively in the background." -ForegroundColor Green
 Write-Host ""
 Write-Host "Next Steps:" -ForegroundColor Yellow
 Write-Host ""
-Write-Host " 1. Start KITT Daemon & Control Center:"
-Write-Host "    $RootDir\kitt-assistant\target\release\kittd.exe"
-Write-Host ""
-Write-Host " 2. Open KITT Control Center Web GUI:"
+Write-Host " 1. Open KITT Control Center Web GUI:"
 Write-Host "    http://127.0.0.1:41828/" -ForegroundColor Cyan
+Write-Host ""
+Write-Host " 2. Manage Background Service:"
+Write-Host "    $KittctlExe service status"
+Write-Host "    $KittctlExe service restart"
+Write-Host "    $KittctlExe service stop"
 Write-Host ""
 Write-Host " 3. Run Agent CLI:"
 Write-Host "    $RootDir\kitt-agent-cli\.venv\Scripts\Activate.ps1"
 Write-Host "    kitt"
 Write-Host ""
-Write-Host " 4. Interact via CLI hotkey utility:"
-Write-Host "    $RootDir\kitt-assistant\target\release\kittctl.exe ask 'Ola KITT'"
+Write-Host " 4. Query Assistant directly via CLI:"
+Write-Host "    $KittctlExe ask 'Ola KITT'"
 Write-Host ""
