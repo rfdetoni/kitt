@@ -1,0 +1,110 @@
+name: ecosystem-integration
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * *"
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ecosystem:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout meta repository
+        uses: actions/checkout@v4
+        with:
+          path: kitt
+
+      - name: Checkout protocol
+        uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-protocol
+          path: kitt-protocol
+
+      - name: Checkout memory
+        uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-memory
+          path: kitt-memory
+
+      - name: Checkout toolbox
+        uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-toolbox
+          path: kitt-toolbox
+
+      - name: Checkout AI workers
+        uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-ai-workers
+          path: kitt-ai-workers
+
+      - name: Checkout assistant
+        uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-assistant
+          path: kitt-assistant
+
+      - name: Checkout agent CLI
+        uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-agent-cli
+          path: kitt-agent-cli
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Protocol gates
+        working-directory: kitt-protocol
+        run: |
+          cargo fmt --check
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+          PYTHONPATH=sdk/python python -m unittest discover sdk/python/tests
+          npm ci
+          npm test
+
+      - name: Memory gates
+        working-directory: kitt-memory
+        run: |
+          cargo fmt --check
+          cargo clippy --workspace --all-targets -- -D warnings
+          cargo test --workspace
+
+      - name: Toolbox gates
+        working-directory: kitt-toolbox
+        run: |
+          cargo fmt --check
+          cargo clippy --all-targets -- -D warnings
+          cargo test
+
+      - name: AI worker gates
+        working-directory: kitt-ai-workers
+        run: |
+          python -m pip install -e .
+          python -m unittest discover tests
+
+      - name: Agent CLI memory/protocol gates
+        working-directory: kitt-agent-cli
+        run: |
+          python -m pip install -e ".[dev]"
+          pytest -q tests/memory
+
+      - name: Assistant gates
+        working-directory: kitt-assistant
+        run: |
+          cargo fmt --check
+          cargo clippy --workspace --all-targets -- -D warnings
+          cargo test --workspace
