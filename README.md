@@ -68,6 +68,28 @@ defaults < native config files < Control Center overlay < env variables < CLI fl
 - **LLM Provider (Local)**: [Ollama](https://ollama.ai/) with models (e.g., `ollama pull qwen3:4b`, `ollama pull qwen2.5-coder:7b`)
 - **System TTS (Linux optional)**: `espeak-ng` or `speech-dispatcher` for voice synthesis
 
+### Quick Automated Installation (Linux, macOS, Windows)
+
+You can install and configure all modules automatically using the provided installer scripts:
+
+#### Linux & macOS:
+```bash
+# Clone the root repository
+git clone https://github.com/rfdetoni/kitt.git
+cd kitt
+
+# Run universal installer (auto-detects Linux vs macOS)
+./install.sh
+```
+
+#### Windows (PowerShell):
+```powershell
+# In PowerShell (Run as Administrator if needed):
+git clone https://github.com/rfdetoni/kitt.git
+cd kitt
+powershell -ExecutionPolicy Bypass -File scripts/install-windows.ps1
+```
+
 ---
 
 ### Step 1: Clone or Enter the Ecosystem Directory
