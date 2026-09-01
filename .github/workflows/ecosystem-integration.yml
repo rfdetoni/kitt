@@ -1,6 +1,36 @@
 name: ecosystem-integration
+
 on:
   workflow_dispatch:
+    inputs:
+      protocol_ref:
+        description: kitt-protocol ref (branch, tag or SHA)
+        required: false
+        default: main
+      memory_ref:
+        description: kitt-memory ref
+        required: false
+        default: main
+      toolbox_ref:
+        description: kitt-toolbox ref
+        required: false
+        default: main
+      workers_ref:
+        description: kitt-ai-workers ref
+        required: false
+        default: main
+      assistant_ref:
+        description: kitt-assistant ref
+        required: false
+        default: main
+      agent_ref:
+        description: kitt-agent-cli ref
+        required: false
+        default: main
+      reverse_proxy_ref:
+        description: kitt-reverse-proxy ref
+        required: false
+        default: main
   schedule:
     - cron: "17 4 * * *"
   push:
@@ -9,102 +39,164 @@ on:
 permissions:
   contents: read
 
-jobs:
-  ecosystem:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout meta repository
-        uses: actions/checkout@v4
-        with:
-          path: kitt
+concurrency:
+  group: ecosystem-integration-${{ github.ref }}
+  cancel-in-progress: true
 
-      - name: Checkout protocol
-        uses: actions/checkout@v4
+env:
+  PROTOCOL_REF: ${{ github.event.inputs.protocol_ref || 'main' }}
+  MEMORY_REF: ${{ github.event.inputs.memory_ref || 'main' }}
+  TOOLBOX_REF: ${{ github.event.inputs.toolbox_ref || 'main' }}
+  WORKERS_REF: ${{ github.event.inputs.workers_ref || 'main' }}
+  ASSISTANT_REF: ${{ github.event.inputs.assistant_ref || 'main' }}
+  AGENT_REF: ${{ github.event.inputs.agent_ref || 'main' }}
+  REVERSE_PROXY_REF: ${{ github.event.inputs.reverse_proxy_ref || 'main' }}
+
+jobs:
+  protocol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
         with:
           repository: rfdetoni/kitt-protocol
-          path: kitt-protocol
+          ref: ${{ env.PROTOCOL_REF }}
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: rustfmt, clippy }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      - run: PYTHONPATH=sdk/python python -m unittest discover sdk/python/tests
+      - run: npm ci
+      - run: npm test
 
-      - name: Checkout memory
-        uses: actions/checkout@v4
+  memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
         with:
           repository: rfdetoni/kitt-memory
-          path: kitt-memory
+          ref: ${{ env.MEMORY_REF }}
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: rustfmt, clippy }
+      - run: cargo fmt --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
 
-      - name: Checkout toolbox
-        uses: actions/checkout@v4
+  toolbox:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
         with:
           repository: rfdetoni/kitt-toolbox
-          path: kitt-toolbox
+          ref: ${{ env.TOOLBOX_REF }}
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: rustfmt, clippy }
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
 
-      - name: Checkout AI workers
-        uses: actions/checkout@v4
+  workers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
         with:
           repository: rfdetoni/kitt-ai-workers
-          path: kitt-ai-workers
+          ref: ${{ env.WORKERS_REF }}
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.13' }
+      - run: python -m pip install -e .
+      - run: python -m unittest discover tests
 
+  assistant:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
       - name: Checkout assistant
         uses: actions/checkout@v4
         with:
           repository: rfdetoni/kitt-assistant
+          ref: ${{ env.ASSISTANT_REF }}
           path: kitt-assistant
-
-      - name: Checkout agent CLI
+      - name: Checkout protocol sibling
         uses: actions/checkout@v4
         with:
-          repository: rfdetoni/kitt-agent-cli
-          path: kitt-agent-cli
-
+          repository: rfdetoni/kitt-protocol
+          ref: ${{ env.PROTOCOL_REF }}
+          path: kitt-protocol
+      - name: Install Linux audio build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev pkg-config
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
+        with: { components: rustfmt, clippy }
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
+          cache-dependency-path: kitt-assistant/apps/kitt-hud/package-lock.json
+      - working-directory: kitt-assistant
+        run: cargo fmt --all --check
+      - working-directory: kitt-assistant
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - working-directory: kitt-assistant
+        run: cargo test --workspace
+      - working-directory: kitt-assistant
+        run: node --test tests/control_center_r3.test.mjs
+      - working-directory: kitt-assistant/apps/kitt-hud
+        run: npm ci
+      - working-directory: kitt-assistant/apps/kitt-hud
+        run: npm run build
 
-      - name: Protocol gates
-        working-directory: kitt-protocol
-        run: |
-          cargo fmt --check
-          cargo clippy --all-targets -- -D warnings
-          cargo test
-          PYTHONPATH=sdk/python python -m unittest discover sdk/python/tests
-          npm ci
-          npm test
+  agent_cli:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-agent-cli
+          ref: ${{ env.AGENT_REF }}
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.14' }
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m unittest discover -s tests -v
+      - run: python -m unittest discover -s tests/prime_architecture -v
 
-      - name: Memory gates
-        working-directory: kitt-memory
-        run: |
-          cargo fmt --check
-          cargo clippy --workspace --all-targets -- -D warnings
-          cargo test --workspace
+  reverse_proxy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: rfdetoni/kitt-reverse-proxy
+          ref: ${{ env.REVERSE_PROXY_REF }}
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - run: npm run verify
 
-      - name: Toolbox gates
-        working-directory: kitt-toolbox
+  ecosystem:
+    if: always()
+    needs: [protocol, memory, toolbox, workers, assistant, agent_cli, reverse_proxy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every component gate
+        shell: bash
         run: |
-          cargo fmt --check
-          cargo clippy --all-targets -- -D warnings
-          cargo test
-
-      - name: AI worker gates
-        working-directory: kitt-ai-workers
-        run: |
-          python -m pip install -e .
-          python -m unittest discover tests
-
-      - name: Agent CLI memory/protocol gates
-        working-directory: kitt-agent-cli
-        run: |
-          python -m pip install -e ".[dev]"
-          pytest -q tests/memory
-
-      - name: Assistant gates
-        working-directory: kitt-assistant
-        run: |
-          cargo fmt --check
-          cargo clippy --workspace --all-targets -- -D warnings
-          cargo test --workspace
+          set -euo pipefail
+          test "${{ needs.protocol.result }}" = success
+          test "${{ needs.memory.result }}" = success
+          test "${{ needs.toolbox.result }}" = success
+          test "${{ needs.workers.result }}" = success
+          test "${{ needs.assistant.result }}" = success
+          test "${{ needs.agent_cli.result }}" = success
+          test "${{ needs.reverse_proxy.result }}" = success
