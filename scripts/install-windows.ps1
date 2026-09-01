@@ -149,6 +149,22 @@ if (Test-Path $ToolboxDir) {
     Write-Host "[OK] kitt-toolbox ready." -ForegroundColor Green
 }
 
+# 11. Setup kitt-ai-workers
+$WorkersDir = Join-Path $RootDir "kitt-ai-workers"
+if (Test-Path $WorkersDir) {
+    Write-Host "[INFO] Setting up kitt-ai-workers..." -ForegroundColor Cyan
+    Push-Location $WorkersDir
+    try {
+        $AgentPip = Join-Path $RootDir "kitt-agent-cli\.venv\Scripts\pip.exe"
+        if (Test-Path $AgentPip) {
+            & $AgentPip install -e ".[stt]" --quiet
+        }
+    } finally {
+        Pop-Location
+    }
+    Write-Host "[OK] kitt-ai-workers ready." -ForegroundColor Green
+}
+
 # 11. Install and Start Background Service Natively
 Write-Host "[INFO] Installing and starting K.I.T.T. native background service..." -ForegroundColor Cyan
 $KittctlExe = Join-Path $AssistantRepo "target\release\kittctl.exe"

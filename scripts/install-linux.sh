@@ -138,7 +138,21 @@ if [ -d "$ROOT_DIR/kitt-toolbox" ]; then
     log_info "Building kitt-toolbox..."
     ( cd "$ROOT_DIR/kitt-toolbox" && cargo build --release )
     log_ok "kitt-toolbox ready."
-# 11. Install and Start Background Service Natively
+fi
+
+# 11. Setup kitt-ai-workers
+if [ -d "$ROOT_DIR/kitt-ai-workers" ]; then
+    log_info "Setting up kitt-ai-workers (STT & ML workers)..."
+    (
+        cd "$ROOT_DIR/kitt-ai-workers"
+        if [ -f "$ROOT_DIR/kitt-agent-cli/.venv/bin/pip" ]; then
+            "$ROOT_DIR/kitt-agent-cli/.venv/bin/pip" install -e ".[stt]" --quiet
+        fi
+    )
+    log_ok "kitt-ai-workers ready."
+fi
+
+# 12. Install and Start Background Service Natively
 log_info "Installing and starting K.I.T.T. native background service..."
 "$ROOT_DIR/kitt-assistant/target/release/kittctl" service install
 "$ROOT_DIR/kitt-assistant/target/release/kittctl" service start || true
