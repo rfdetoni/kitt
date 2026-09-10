@@ -18,12 +18,10 @@ find_python() {
 
 PYTHON="$(find_python || true)"
 if [ -z "$PYTHON" ]; then
-  echo "Python 3.10+ is required to run the K.I.T.T. installer (Agent requires Python 3.12+)." >&2
+  echo "K.I.T.T. requires Python 3.10+ for the installer (Agent requires Python 3.12+)." >&2
   exit 1
 fi
 
-# A checked-out repository can run without network bootstrap. When this script is
-# piped from curl, $0 is the shell and this path check intentionally fails.
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd || pwd)
 if [ -f "$SCRIPT_DIR/installer/__main__.py" ] && [ -f "$SCRIPT_DIR/ecosystem.json" ]; then
   cd "$SCRIPT_DIR"
@@ -31,7 +29,7 @@ if [ -f "$SCRIPT_DIR/installer/__main__.py" ] && [ -f "$SCRIPT_DIR/ecosystem.jso
 fi
 
 command -v git >/dev/null 2>&1 || {
-  echo "git is required to bootstrap the K.I.T.T. ecosystem installer." >&2
+  echo "K.I.T.T. requires git." >&2
   exit 1
 }
 
@@ -46,9 +44,18 @@ cleanup() { rm -rf "$WORKDIR"; }
 trap cleanup EXIT HUP INT TERM
 
 SRC="$WORKDIR/kitt"
-git clone --filter=blob:none --no-checkout "$INSTALLER_REPO" "$SRC" >/dev/null
-git -C "$SRC" fetch --force --depth 1 origin "$INSTALLER_REF" >/dev/null
-git -C "$SRC" checkout --detach --force FETCH_HEAD >/dev/null
+if ! git clone --filter=blob:none --no-checkout "$INSTALLER_REPO" "$SRC" >/dev/null 2>&1; then
+  echo "Failed to download the K.I.T.T. installer." >&2
+  exit 1
+fi
+if ! git -C "$SRC" fetch --force --depth 1 origin "$INSTALLER_REF" >/dev/null 2>&1; then
+  echo "Failed to resolve K.I.T.T. installer ref: $INSTALLER_REF" >&2
+  exit 1
+fi
+if ! git -C "$SRC" checkout --detach --force FETCH_HEAD >/dev/null 2>&1; then
+  echo "Failed to prepare the K.I.T.T. installer." >&2
+  exit 1
+fi
 
 cd "$SRC"
 "$PYTHON" -m installer "$@"
