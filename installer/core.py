@@ -249,13 +249,22 @@ class EcosystemInstaller:
         proc = self._run(argv, cwd=cwd, quiet=True)
         return (proc.stdout or "").strip()
 
+    @staticmethod
+    def _has_blocking_toolbox_changes(status: str) -> bool:
+        return any(line != "?? Cargo.lock" for line in status.splitlines())
+
     def _sync_repository(self, module: ModuleSpec) -> None:
         path = self._repo_dir(module)
         ref = self.catalog.locked_ref(module, self.options.ref)
         url = f"https://github.com/{module.repository}.git"
         print(f"\nSync {module.name} -> {ref}")
         if (path / ".git").is_dir():
-            dirty = self._capture(["git", "status", "--porcelain"], cwd=path)
+            status = self._capture(["git", "status", "--porcelain"], cwd=path)
+            dirty = (
+                self._has_blocking_toolbox_changes(status)
+                if module.strategy == "toolbox"
+                else bool(status)
+            )
             if dirty and not self.options.force:
                 raise InstallerError(
                     f"{module.repository} has local changes at {path}; commit/stash them or use --force"
@@ -295,10 +304,16 @@ class EcosystemInstaller:
                 pass
 
     def _cargo_build(self, path: Path) -> None:
+        lock = path / "Cargo.lock"
+        generated_lock = not lock.exists()
         command = ["cargo", "build", "--release"]
-        if (path / "Cargo.lock").is_file():
+        if not generated_lock:
             command.append("--locked")
-        self._run(command, cwd=path)
+        try:
+            self._run(command, cwd=path)
+        finally:
+            if generated_lock:
+                lock.unlink(missing_ok=True)
 
     def _build_native_components(self, resolution: Resolution) -> None:
         if self.options.portable:

@@ -207,5 +207,31 @@ class RequirementTests(unittest.TestCase):
         self.assertEqual(EcosystemInstaller._parse_requirement("git"), ("git", ()))
 
 
+class RepositoryStateTests(unittest.TestCase):
+    def test_only_generated_cargo_lock_does_not_block_update(self) -> None:
+        self.assertFalse(EcosystemInstaller._has_blocking_toolbox_changes("?? Cargo.lock\n"))
+        self.assertTrue(
+            EcosystemInstaller._has_blocking_toolbox_changes("?? Cargo.lock\n M src/lib.rs\n")
+        )
+        self.assertTrue(EcosystemInstaller._has_blocking_toolbox_changes(" M Cargo.lock\n"))
+
+    def test_cargo_build_removes_lock_it_generated_on_failure(self) -> None:
+        installer = object.__new__(EcosystemInstaller)
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp)
+
+            def build(*args, **kwargs):
+                (path / "Cargo.lock").write_text("generated", encoding="utf-8")
+                raise RuntimeError("build failed")
+
+            with (
+                patch.object(installer, "_run", side_effect=build),
+                self.assertRaisesRegex(RuntimeError, "build failed"),
+            ):
+                installer._cargo_build(path)
+
+            self.assertFalse((path / "Cargo.lock").exists())
+
+
 if __name__ == "__main__":
     unittest.main()
