@@ -125,10 +125,15 @@ try {
   if ($LASTEXITCODE -ne 0) { throw 'Reverse proxy npm install failed' }
   & npm run build
   if ($LASTEXITCODE -ne 0) { throw 'Reverse proxy build failed' }
+  $Chrome = @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+  if (-not $Chrome) {
+    $Playwright = Join-Path $Proxy 'node_modules\.bin\playwright.cmd'
+    if (-not (Test-Path $Playwright)) { throw 'Locked Playwright binary is missing after npm ci' }
+    & $Playwright install chromium
+    if ($LASTEXITCODE -ne 0) { throw 'Playwright Chromium install failed' }
+  }
   & npm prune --omit=dev --no-audit --no-fund
   if ($LASTEXITCODE -ne 0) { throw 'Reverse proxy prune failed' }
-  $Chrome = @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
-  if (-not $Chrome) { & npx --yes playwright install chromium }
 } finally { Pop-Location }
 
 $KittExe = Join-Path $Venv 'Scripts\kitt.exe'
