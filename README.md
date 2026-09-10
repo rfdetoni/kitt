@@ -36,7 +36,7 @@ Windows PowerShell:
 irm https://raw.githubusercontent.com/rfdetoni/kitt/main/install.ps1 | iex
 ```
 
-The installer opens a terminal list of KITT modules. Explicit selections are marked `[x]`; technologies pulled transitively by the selection are marked `[+]`.
+The installer opens a terminal list of KITT modules. Explicit selections are marked `[x]`; technologies pulled transitively by the selection are marked `[+]`. After selection, normal installation output is intentionally concise: repository sync, package-manager and build logs are hidden unless verbose mode is enabled.
 
 ### Complete Agent guarantee
 
@@ -56,19 +56,27 @@ This is enforced by the catalog resolver and CI. The Agent is never silently ins
 
 Heavy STT/ML dependencies remain opt-in because they are hardware/workload-specific rather than part of normal Agent execution. Enable them with `--with-ai-workers`.
 
-### Non-interactive examples
+### Non-interactive and verbose modes
 
-Install the complete Agent stack:
+Install the default complete Agent stack without prompts, using the same pipe-friendly pattern as other standalone CLI installers:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh -s -- --modules agent-cli --yes
+curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | KITT_NON_INTERACTIVE=1 sh
 ```
 
 PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/rfdetoni/kitt/main/install.ps1))) --modules agent-cli --yes
+$env:KITT_NON_INTERACTIVE='1'; irm https://raw.githubusercontent.com/rfdetoni/kitt/main/install.ps1 | iex
 ```
+
+Show repository, build and package-manager output while diagnosing an installation:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | KITT_VERBOSE=1 sh
+```
+
+The CLI equivalents are `--yes` and `--verbose` / `-v`.
 
 Resolve without changing the machine:
 
@@ -86,6 +94,7 @@ Other useful options:
 --no-start-services
 --portable
 --ref <branch|tag|sha>
+--verbose
 --uninstall
 ```
 
