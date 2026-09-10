@@ -138,14 +138,18 @@ if [[ $WITH_WORKERS -eq 1 ]]; then
   "$AGENT_PY" -m pip install --disable-pip-version-check -e "$ROOT/kitt-ai-workers[stt]"
 fi
 
-(cd "$ROOT/kitt-reverse-proxy" && npm ci --no-audit --no-fund && npm run build && npm prune --omit=dev --no-audit --no-fund)
+PROXY_DIR="$ROOT/kitt-reverse-proxy"
+(cd "$PROXY_DIR" && npm ci --no-audit --no-fund && npm run build)
 has_browser=0
 for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
   command -v "$candidate" >/dev/null 2>&1 && has_browser=1 && break
 done
 if [[ $has_browser -eq 0 ]]; then
-  (cd "$ROOT/kitt-reverse-proxy" && npx --yes playwright install chromium)
+  PLAYWRIGHT_BIN="$PROXY_DIR/node_modules/.bin/playwright"
+  [[ -x "$PLAYWRIGHT_BIN" ]] || { echo "Locked Playwright binary is missing after npm ci" >&2; exit 1; }
+  (cd "$PROXY_DIR" && "$PLAYWRIGHT_BIN" install chromium)
 fi
+(cd "$PROXY_DIR" && npm prune --omit=dev --no-audit --no-fund)
 
 ln -sfn "$AGENT_VENV/bin/kitt" "$BIN_DIR/kitt"
 cat >"$BIN_DIR/kitt-reverse-proxy" <<EOF
