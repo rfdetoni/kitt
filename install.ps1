@@ -3,6 +3,22 @@ $ForwardArgs = @($args)
 $InstallerRepo = if ($env:KITT_INSTALLER_REPO) { $env:KITT_INSTALLER_REPO } else { 'https://github.com/rfdetoni/kitt.git' }
 $InstallerRef = if ($env:KITT_INSTALLER_REF) { $env:KITT_INSTALLER_REF } else { 'main' }
 
+function Show-KittBootstrapProgress {
+  param(
+    [int]$Percent,
+    [string]$Status
+  )
+  if (-not [Console]::IsOutputRedirected) {
+    Write-Progress -Id 1 -Activity 'Preparing K.I.T.T. installer' -Status $Status -PercentComplete $Percent
+  }
+}
+
+function Complete-KittBootstrapProgress {
+  if (-not [Console]::IsOutputRedirected) {
+    Write-Progress -Id 1 -Activity 'Preparing K.I.T.T. installer' -Completed
+  }
+}
+
 function Find-KittPython {
   $Candidates = @()
   $Py = Get-Command py -ErrorAction SilentlyContinue
@@ -48,12 +64,21 @@ try {
     $TempRoot = Join-Path ([IO.Path]::GetTempPath()) ("kitt-installer-" + [guid]::NewGuid().ToString('N'))
     $LocalRoot = Join-Path $TempRoot 'kitt'
     New-Item -ItemType Directory -Force -Path $TempRoot | Out-Null
+
+    Show-KittBootstrapProgress -Percent 10 -Status 'Downloading'
     & git clone --filter=blob:none --no-checkout $InstallerRepo $LocalRoot *> $null
     if ($LASTEXITCODE -ne 0) { throw 'Failed to download the K.I.T.T. installer.' }
+
+    Show-KittBootstrapProgress -Percent 55 -Status 'Resolving version'
     & git -C $LocalRoot fetch --force --depth 1 origin $InstallerRef *> $null
-    if ($LASTEXITCODE -ne 0) { throw "Failed to resolve K.I.T.T. installer ref: $InstallerRef" }
+    if ($LASTEXITCODE -ne 0) { throw "Failed to resolve K.I.T.T. installer ref $InstallerRef." }
+
+    Show-KittBootstrapProgress -Percent 85 -Status 'Preparing files'
     & git -C $LocalRoot checkout --detach --force FETCH_HEAD *> $null
     if ($LASTEXITCODE -ne 0) { throw 'Failed to prepare the K.I.T.T. installer.' }
+
+    Show-KittBootstrapProgress -Percent 100 -Status 'Ready'
+    Complete-KittBootstrapProgress
   }
 
   Push-Location $LocalRoot
@@ -65,6 +90,7 @@ try {
     Pop-Location
   }
 } finally {
+  Complete-KittBootstrapProgress
   if ($TempRoot -and (Test-Path $TempRoot)) {
     Remove-Item -LiteralPath $TempRoot -Recurse -Force -ErrorAction SilentlyContinue
   }
