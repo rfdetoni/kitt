@@ -372,14 +372,6 @@ class EcosystemInstaller:
             return venv / "Scripts" / "python.exe"
         return venv / "bin" / "python"
 
-    def _venv_executable(self, venv: Path, name: str) -> Path:
-        if self.platform.name == "windows":
-            exe = venv / "Scripts" / f"{name}.exe"
-            if exe.exists():
-                return exe
-            return venv / "Scripts" / name
-        return venv / "bin" / name
-
     def _needs_python_env(self, resolution: Resolution) -> bool:
         return bool({"agent-cli", "ai-workers", "toolbox"} & set(resolution.ids))
 
@@ -500,10 +492,12 @@ class EcosystemInstaller:
         if "agent-cli" in selected:
             if venv is None:
                 raise InstallerError("Agent CLI selected but Python runtime was not created")
-            kitt = self._venv_executable(venv, "kitt")
-            if not kitt.exists():
-                raise InstallerError(f"Agent CLI executable not found at {kitt}")
-            launchers.append(self._write_launcher("kitt", [str(kitt)]))
+            python = self._venv_python(venv)
+            if not python.exists():
+                raise InstallerError(f"Agent CLI Python runtime not found at {python}")
+            launchers.append(
+                self._write_launcher("kitt", [str(python), "-m", "kitt.cli.main"])
+            )
 
         if "reverse-proxy" in selected:
             proxy = self._repo_dir(self.catalog.modules["reverse-proxy"])
@@ -551,8 +545,8 @@ class EcosystemInstaller:
         if "agent-cli" in selected:
             if venv is None:
                 raise InstallerError("Agent CLI runtime missing")
-            self._run([str(self._venv_executable(venv, "kitt")), "--help"], quiet=True)
             python = self._venv_python(venv)
+            self._run([str(python), "-m", "kitt.cli.main", "--help"], quiet=True)
             imports = []
             if "assistant" in selected:
                 imports.extend(["kitt.daemon.client", "kitt.remote.server"])

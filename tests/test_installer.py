@@ -7,9 +7,9 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from installer.catalog import CatalogError, EcosystemCatalog
+from installer.catalog import CatalogError, EcosystemCatalog, Resolution
 from installer.cli import _env_flag, _quiet_install_output, build_parser
-from installer.core import EcosystemInstaller
+from installer.core import EcosystemInstaller, InstallerOptions
 from installer.platforms import PlatformAdapter
 from installer.ui import _SelectionState, _handle_key
 
@@ -231,6 +231,33 @@ class RepositoryStateTests(unittest.TestCase):
                 installer._cargo_build(path)
 
             self.assertFalse((path / "Cargo.lock").exists())
+
+
+class LauncherTests(unittest.TestCase):
+    def test_agent_launcher_uses_stable_venv_python_path(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            bin_dir = root / "bin"
+            venv = root / ".venv-agent"
+            python = venv / "bin" / "python"
+            python.parent.mkdir(parents=True)
+            python.touch()
+            installer = EcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(root=root, bin_dir=bin_dir),
+            )
+            resolution = Resolution(
+                requested=("agent-cli",),
+                modules=(catalog.modules["agent-cli"],),
+                auto_selected_by={},
+            )
+
+            installer._install_launchers(resolution, venv)
+
+            launcher = (bin_dir / "kitt").read_text(encoding="utf-8")
+            self.assertIn(f"exec '{python}' '-m' 'kitt.cli.main'", launcher)
 
 
 if __name__ == "__main__":
