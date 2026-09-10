@@ -1,0 +1,52 @@
+name: fix-ecosystem-windows
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-ecosystem-windows.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Make composed namespace check cross-platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/ecosystem-integration.yml')
+          text = path.read_text()
+          old = '''      - name: Verify composed namespace
+        run: |
+          python - <<'PY'
+          import kitt.core.runtime
+          import kitt.daemon.client
+          import kitt.remote.server
+          import kitt.evolution
+          import kitt.evals.corpus
+          print('frozen composed namespace: ok')
+          PY
+'''
+          new = '''      - name: Verify composed namespace
+        run: >-
+          python -c "import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; print('frozen composed namespace: ok')"
+'''
+          if old not in text:
+              raise SystemExit('expected composed namespace block not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+          git diff --check
+          git diff -- .github/workflows/ecosystem-integration.yml
+          git config user.name 'KITT Migration Bot'
+          git config user.email '85571449+rfdetoni@users.noreply.github.com'
+          git add .github/workflows/ecosystem-integration.yml
+          git commit -m 'ci(ecosystem): make namespace check cross-platform'
+          git push origin HEAD:main
