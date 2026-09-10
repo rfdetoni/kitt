@@ -18,6 +18,18 @@ class InstallerError(RuntimeError):
     pass
 
 
+_GENERATED_ARTIFACTS = {
+    "protocol": ("sdk/python/build",),
+    "toolbox": ("Cargo.lock",),
+    "assistant": ("packages/kitt-assistant-runtime/build",),
+    "ai-workers": (
+        "build",
+        "packages/kitt-evals/build",
+        "packages/kitt-evolution/build",
+    ),
+}
+
+
 @dataclass(frozen=True)
 class InstallerOptions:
     root: Path
@@ -93,6 +105,7 @@ class EcosystemInstaller:
             launchers = self._install_launchers(resolution, venv)
             self._write_state(resolution, launchers)
             self._start_services(resolution)
+            self._cleanup_generated_artifacts(resolution)
             self._finalize_runtime()
         except Exception:
             self._rollback_runtime()
@@ -250,8 +263,12 @@ class EcosystemInstaller:
         return (proc.stdout or "").strip()
 
     @staticmethod
-    def _has_blocking_toolbox_changes(status: str) -> bool:
-        return any(line != "?? Cargo.lock" for line in status.splitlines())
+    def _has_blocking_changes(module_id: str, status: str) -> bool:
+        allowed = set(_GENERATED_ARTIFACTS.get(module_id, ()))
+        return any(
+            not line.startswith("?? ") or line[3:].rstrip("/") not in allowed
+            for line in status.splitlines()
+        )
 
     def _sync_repository(self, module: ModuleSpec) -> None:
         path = self._repo_dir(module)
@@ -260,11 +277,7 @@ class EcosystemInstaller:
         print(f"\nSync {module.name} -> {ref}")
         if (path / ".git").is_dir():
             status = self._capture(["git", "status", "--porcelain"], cwd=path)
-            dirty = (
-                self._has_blocking_toolbox_changes(status)
-                if module.strategy == "toolbox"
-                else bool(status)
-            )
+            dirty = self._has_blocking_changes(module.id, status)
             if dirty and not self.options.force:
                 raise InstallerError(
                     f"{module.repository} has local changes at {path}; commit/stash them or use --force"
@@ -599,6 +612,16 @@ class EcosystemInstaller:
         self._venv_backup = None
         self._venv_final = None
         self._launcher_backups.clear()
+
+    def _cleanup_generated_artifacts(self, resolution: Resolution) -> None:
+        for module in resolution.modules:
+            root = self._repo_dir(module)
+            for relative in _GENERATED_ARTIFACTS.get(module.id, ()):
+                artifact = root / relative
+                if artifact.is_symlink() or artifact.is_file():
+                    artifact.unlink()
+                elif artifact.is_dir():
+                    shutil.rmtree(artifact)
 
     def _write_state(self, resolution: Resolution, launchers: list[Path]) -> None:
         payload = {

@@ -208,12 +208,18 @@ class RequirementTests(unittest.TestCase):
 
 
 class RepositoryStateTests(unittest.TestCase):
-    def test_only_generated_cargo_lock_does_not_block_update(self) -> None:
-        self.assertFalse(EcosystemInstaller._has_blocking_toolbox_changes("?? Cargo.lock\n"))
-        self.assertTrue(
-            EcosystemInstaller._has_blocking_toolbox_changes("?? Cargo.lock\n M src/lib.rs\n")
+    def test_only_known_generated_artifacts_do_not_block_update(self) -> None:
+        self.assertFalse(EcosystemInstaller._has_blocking_changes("toolbox", "?? Cargo.lock\n"))
+        self.assertFalse(
+            EcosystemInstaller._has_blocking_changes("protocol", "?? sdk/python/build/\n")
         )
-        self.assertTrue(EcosystemInstaller._has_blocking_toolbox_changes(" M Cargo.lock\n"))
+        self.assertTrue(
+            EcosystemInstaller._has_blocking_changes(
+                "toolbox", "?? Cargo.lock\n M src/lib.rs\n"
+            )
+        )
+        self.assertTrue(EcosystemInstaller._has_blocking_changes("toolbox", " M Cargo.lock\n"))
+        self.assertTrue(EcosystemInstaller._has_blocking_changes("protocol", "?? notes.txt\n"))
 
     def test_cargo_build_removes_lock_it_generated_on_failure(self) -> None:
         installer = object.__new__(EcosystemInstaller)
@@ -231,6 +237,26 @@ class RepositoryStateTests(unittest.TestCase):
                 installer._cargo_build(path)
 
             self.assertFalse((path / "Cargo.lock").exists())
+
+    def test_success_cleanup_removes_only_known_generated_artifacts(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = EcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(root=root, bin_dir=root / "bin"),
+            )
+            resolution = catalog.resolve(("agent-cli",))
+            generated = root / "kitt-protocol" / "sdk/python/build"
+            generated.mkdir(parents=True)
+            unrelated = root / "kitt-protocol" / "notes.txt"
+            unrelated.write_text("keep", encoding="utf-8")
+
+            installer._cleanup_generated_artifacts(resolution)
+
+            self.assertFalse(generated.exists())
+            self.assertTrue(unrelated.exists())
 
 
 class LauncherTests(unittest.TestCase):
