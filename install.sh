@@ -13,7 +13,9 @@ usage() {
 K.I.T.T. ecosystem installer/updater
 Usage: install.sh [--ref REF] [--with-ai-workers] [--force] [--uninstall]
 
-Defaults to a resource-conscious core installation. AI/STT workers are optional.
+Installs the lightweight KITT core, native acceleration when Rust is available,
+and optional evolution/eval modules. Heavy AI/STT workers are installed only
+with --with-ai-workers.
 EOF
 }
 while [[ $# -gt 0 ]]; do
@@ -70,21 +72,32 @@ sync_repo() {
   printf '%-22s %s\n' "$name" "$(git -C "$dir" rev-parse --short HEAD)"
 }
 
-components=(kitt-protocol kitt-memory kitt-assistant kitt-toolbox kitt-agent-cli kitt-reverse-proxy)
-[[ $WITH_WORKERS -eq 1 ]] && components+=(kitt-ai-workers)
+components=(
+  kitt-protocol
+  kitt-memory
+  kitt-assistant
+  kitt-toolbox
+  kitt-agent-cli
+  kitt-ai-workers
+  kitt-reverse-proxy
+)
 for component in "${components[@]}"; do sync_repo "$component"; done
 
 build_rust() {
   local dir="$1"
   command -v cargo >/dev/null 2>&1 || return 1
-  if [[ -f "$dir/Cargo.lock" ]]; then (cd "$dir" && cargo build --release --locked); else (cd "$dir" && cargo build --release); fi
+  if [[ -f "$dir/Cargo.lock" ]]; then
+    (cd "$dir" && cargo build --release --locked)
+  else
+    (cd "$dir" && cargo build --release)
+  fi
 }
 
 if command -v cargo >/dev/null 2>&1; then
   for component in kitt-protocol kitt-memory kitt-toolbox; do build_rust "$ROOT/$component"; done
   build_rust "$ROOT/kitt-assistant"
 else
-  echo "Rust/Cargo not found: native daemon, memory/toolbox and Agent native backend will be skipped." >&2
+  echo "Rust/Cargo not found: native daemon/services and Agent native acceleration will be skipped." >&2
 fi
 
 if [[ -d "$ROOT/kitt-assistant/apps/kitt-hud" ]]; then
@@ -95,20 +108,33 @@ AGENT_VENV="$ROOT/.venv-agent"
 [[ -x "$AGENT_VENV/bin/python" ]] || python3 -m venv "$AGENT_VENV"
 AGENT_PY="$AGENT_VENV/bin/python"
 "$AGENT_PY" -m pip install --disable-pip-version-check -U pip wheel >/dev/null
+
+# The Python control plane is always installed independently. Native acceleration
+# is a shared kitt-toolbox wheel and can fail closed to the Python fallback.
+"$AGENT_PY" -m pip install \
+  --disable-pip-version-check --upgrade --force-reinstall \
+  "$ROOT/kitt-agent-cli"
+
 native_ok=0
 if command -v cargo >/dev/null 2>&1; then
   "$AGENT_PY" -m pip install --disable-pip-version-check -U 'maturin>=1.8,<2' >/dev/null
-  NATIVE_DIST="$ROOT/.cache/agent-native"
+  NATIVE_DIST="$ROOT/.cache/toolbox-native"
   rm -rf "$NATIVE_DIST"; mkdir -p "$NATIVE_DIST"
-  if "$AGENT_PY" "$ROOT/kitt-agent-cli/packaging/build_native_release.py" --out "$NATIVE_DIST" \
+  if "$AGENT_PY" "$ROOT/kitt-toolbox/packaging/build_native_release.py" --out "$NATIVE_DIST" \
      && compgen -G "$NATIVE_DIST/*.whl" >/dev/null \
-     && "$AGENT_PY" -m pip install --disable-pip-version-check --force-reinstall "$NATIVE_DIST"/*.whl; then
+     && "$AGENT_PY" -m pip install --disable-pip-version-check --no-deps --force-reinstall "$NATIVE_DIST"/*.whl; then
     native_ok=1
+  else
+    echo "Native acceleration build/install failed; keeping the safe Python fallback." >&2
   fi
 fi
-if [[ $native_ok -eq 0 ]]; then
-  "$AGENT_PY" -m pip install --disable-pip-version-check --upgrade --force-reinstall "$ROOT/kitt-agent-cli"
-fi
+
+# Evolution and evals are lightweight optional capabilities hosted separately
+# from the Agent CLI. Dependencies are already satisfied by the ecosystem venv.
+"$AGENT_PY" -m pip install \
+  --disable-pip-version-check --no-deps --upgrade --force-reinstall \
+  "$ROOT/kitt-ai-workers/packages/kitt-evolution" \
+  "$ROOT/kitt-ai-workers/packages/kitt-evals"
 
 if [[ $WITH_WORKERS -eq 1 ]]; then
   "$AGENT_PY" -m pip install --disable-pip-version-check -e "$ROOT/kitt-ai-workers[stt]"
@@ -116,8 +142,12 @@ fi
 
 (cd "$ROOT/kitt-reverse-proxy" && npm ci --no-audit --no-fund && npm run build && npm prune --omit=dev --no-audit --no-fund)
 has_browser=0
-for candidate in google-chrome google-chrome-stable chromium chromium-browser; do command -v "$candidate" >/dev/null 2>&1 && has_browser=1 && break; done
-if [[ $has_browser -eq 0 ]]; then (cd "$ROOT/kitt-reverse-proxy" && npx --yes playwright install chromium); fi
+for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
+  command -v "$candidate" >/dev/null 2>&1 && has_browser=1 && break
+done
+if [[ $has_browser -eq 0 ]]; then
+  (cd "$ROOT/kitt-reverse-proxy" && npx --yes playwright install chromium)
+fi
 
 ln -sfn "$AGENT_VENV/bin/kitt" "$BIN_DIR/kitt"
 cat >"$BIN_DIR/kitt-reverse-proxy" <<EOF
@@ -139,6 +169,7 @@ fi
 
 "$BIN_DIR/kitt" --help >/dev/null
 "$BIN_DIR/kitt-reverse-proxy" --help >/dev/null
+"$AGENT_PY" -c "from kitt.evolution import SkillEvolutionService; from kitt.evals.corpus import EvalRunner" >/dev/null
 backend="$($AGENT_PY -c "from kitt.native.bridge import NativeCodeEngine; print(NativeCodeEngine(r'$ROOT/kitt-agent-cli').status.backend)")"
-echo "K.I.T.T. ecosystem installed/updated at $ROOT (Agent backend: $backend)."
+echo "K.I.T.T. ecosystem installed/updated at $ROOT (Agent backend: $backend; native wheel: $native_ok)."
 case ":$PATH:" in *":$BIN_DIR:"*) ;; *) echo "Add $BIN_DIR to PATH." ;; esac
