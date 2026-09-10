@@ -171,6 +171,35 @@ class PlatformTests(unittest.TestCase):
             self.assertEqual(path.suffix, ".cmd")
             self.assertIn("%*", path.read_text(encoding="ascii"))
 
+    def test_python_selection_falls_back_when_newer_python_lacks_venv(self) -> None:
+        adapter = PlatformAdapter("linux", posix=True)
+        with (
+            patch.object(adapter, "_python_candidates", return_value=[("python3.14",), ("python3.13",)]),
+            patch("installer.platforms._run_capture", side_effect=[(0, "3.14.4"), (0, "3.13.9")]),
+            patch.object(adapter, "_python_supports_venv", side_effect=[False, True]),
+        ):
+            info = adapter.find_python((3, 12))
+        self.assertIsNotNone(info)
+        assert info is not None
+        self.assertEqual(info.argv, ("python3.13",))
+        self.assertEqual(info.version[:2], (3, 13))
+        self.assertIsNotNone(adapter._python_without_venv)
+        assert adapter._python_without_venv is not None
+        self.assertEqual(adapter._python_without_venv.version[:2], (3, 14))
+
+    def test_missing_venv_produces_actionable_linux_hint(self) -> None:
+        adapter = PlatformAdapter("linux", posix=True)
+        with (
+            patch.object(adapter, "_python_candidates", return_value=[("python3.14",)]),
+            patch("installer.platforms._run_capture", return_value=(0, "3.14.4")),
+            patch.object(adapter, "_python_supports_venv", return_value=False),
+        ):
+            info = adapter.find_python((3, 12))
+        self.assertIsNone(info)
+        hint = adapter.prerequisite_hint(("python",))
+        self.assertIn("python3.14-venv", hint)
+        self.assertIn("venv/ensurepip", hint)
+
 
 class RequirementTests(unittest.TestCase):
     def test_requirement_parser(self) -> None:
