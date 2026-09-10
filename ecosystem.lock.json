@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-10",
+  "components": {
+    "rfdetoni/kitt-protocol": "be3875a8325b7bb230c5a60178e9958c6ebcb380",
+    "rfdetoni/kitt-memory": "c09f3fc6bd471520b41d6bbab92f5a7b761f2274",
+    "rfdetoni/kitt-toolbox": "e81e8cb944b8fc1dedb78a6c60a1c6c8e9a3370e",
+    "rfdetoni/kitt-ai-workers": "f3a347a19c3079d0072f44efc271f37a9cd75054",
+    "rfdetoni/kitt-assistant": "f58376ace3e93b5a4fbdbc74ebd90e0ce7204f7b",
+    "rfdetoni/kitt-agent-cli": "bb85273ddd5aaff6faa8b4ef7f26a59163326616",
+    "rfdetoni/kitt-reverse-proxy": "0d4611f724f1818f42027b6fd372e38e89daddaf"
+  }
+}
