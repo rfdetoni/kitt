@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import os
 import re
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from installer.catalog import CatalogError, EcosystemCatalog
+from installer.cli import _env_flag, build_parser
 from installer.core import EcosystemInstaller
 from installer.platforms import PlatformAdapter
 from installer.ui import _SelectionState, _handle_key
@@ -46,6 +49,21 @@ class CatalogTests(unittest.TestCase):
     def test_unknown_module_fails_closed(self) -> None:
         with self.assertRaises(CatalogError):
             self.catalog.resolve(["not-a-kitt-module"])
+
+
+class InstallerCliTests(unittest.TestCase):
+    def test_verbose_is_opt_in(self) -> None:
+        parser = build_parser()
+        self.assertFalse(parser.parse_args([]).verbose)
+        self.assertTrue(parser.parse_args(["--verbose"]).verbose)
+        self.assertTrue(parser.parse_args(["-v"]).verbose)
+
+    def test_environment_flags_accept_common_truthy_values(self) -> None:
+        for value in ("1", "true", "TRUE", "yes", "on"):
+            with self.subTest(value=value), patch.dict(os.environ, {"KITT_TEST_FLAG": value}):
+                self.assertTrue(_env_flag("KITT_TEST_FLAG"))
+        with patch.dict(os.environ, {"KITT_TEST_FLAG": "0"}):
+            self.assertFalse(_env_flag("KITT_TEST_FLAG"))
 
 
 class InstallerUiTests(unittest.TestCase):
