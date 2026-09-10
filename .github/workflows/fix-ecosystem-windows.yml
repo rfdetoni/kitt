@@ -20,31 +20,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('.github/workflows/ecosystem-integration.yml')
-          text = path.read_text()
-          old = '''      - name: Verify composed namespace
-        run: |
-          python - <<'PY'
-          import kitt.core.runtime
-          import kitt.daemon.client
-          import kitt.remote.server
-          import kitt.evolution
-          import kitt.evals.corpus
-          print('frozen composed namespace: ok')
-          PY
-'''
-          new = '''      - name: Verify composed namespace
-        run: >-
-          python -c "import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; print('frozen composed namespace: ok')"
-'''
-          if old not in text:
-              raise SystemExit('expected composed namespace block not found')
-          path.write_text(text.replace(old, new, 1))
-          PY
+          python -c 'from pathlib import Path; p=Path(".github/workflows/ecosystem-integration.yml"); s=p.read_text(); old="      - name: Verify composed namespace\n        run: |\n          python - <<'"'"'PY'"'"'\n          import kitt.core.runtime\n          import kitt.daemon.client\n          import kitt.remote.server\n          import kitt.evolution\n          import kitt.evals.corpus\n          print('"'"'frozen composed namespace: ok'"'"')\n          PY\n"; new="      - name: Verify composed namespace\n        run: >-\n          python -c \\"import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; print('"'"'frozen composed namespace: ok'"'"')\\"\n"; assert old in s, "expected block not found"; p.write_text(s.replace(old,new,1))'
           git diff --check
-          git diff -- .github/workflows/ecosystem-integration.yml
           git config user.name 'KITT Migration Bot'
           git config user.email '85571449+rfdetoni@users.noreply.github.com'
           git add .github/workflows/ecosystem-integration.yml
