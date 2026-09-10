@@ -44,8 +44,15 @@ function Sync-Repo([string]$Name) {
   Write-Host ("{0,-22} {1}" -f $Name, (& git -C $Dir rev-parse --short HEAD))
 }
 
-$Components = @('kitt-protocol','kitt-memory','kitt-assistant','kitt-toolbox','kitt-agent-cli','kitt-reverse-proxy')
-if ($WithAiWorkers) { $Components += 'kitt-ai-workers' }
+$Components = @(
+  'kitt-protocol',
+  'kitt-memory',
+  'kitt-assistant',
+  'kitt-toolbox',
+  'kitt-agent-cli',
+  'kitt-ai-workers',
+  'kitt-reverse-proxy'
+)
 foreach ($Component in $Components) { Sync-Repo $Component }
 
 $Cargo = Get-Command cargo -ErrorAction SilentlyContinue
@@ -58,7 +65,7 @@ if ($Cargo) {
       if ($LASTEXITCODE -ne 0) { throw "$Component build failed" }
     } finally { Pop-Location }
   }
-} else { Write-Warning 'Rust/Cargo not found; native services and Agent native backend will be skipped.' }
+} else { Write-Warning 'Rust/Cargo not found; native services and Agent native acceleration will be skipped.' }
 
 $Hud = Join-Path $Root 'kitt-assistant\apps\kitt-hud'
 if (Test-Path $Hud) {
@@ -70,24 +77,37 @@ $Venv = Join-Path $Root '.venv-agent'
 $Vpy = Join-Path $Venv 'Scripts\python.exe'
 if (-not (Test-Path $Vpy)) { & python -m venv $Venv }
 & $Vpy -m pip install --disable-pip-version-check -U pip wheel | Out-Null
+
+# The Python control plane is independent from the shared native accelerator.
+& $Vpy -m pip install --disable-pip-version-check --upgrade --force-reinstall (Join-Path $Root 'kitt-agent-cli')
+if ($LASTEXITCODE -ne 0) { throw 'Agent CLI install failed' }
+
 $Native = $false
 if ($Cargo) {
   try {
     & $Vpy -m pip install --disable-pip-version-check -U 'maturin>=1.8,<2' | Out-Null
-    $Dist = Join-Path $Root '.cache\agent-native'
+    $Dist = Join-Path $Root '.cache\toolbox-native'
     Remove-Item $Dist -Recurse -Force -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Force -Path $Dist | Out-Null
-    & $Vpy (Join-Path $Root 'kitt-agent-cli\packaging\build_native_release.py') --out $Dist
+    & $Vpy (Join-Path $Root 'kitt-toolbox\packaging\build_native_release.py') --out $Dist
     if ($LASTEXITCODE -ne 0) { throw 'native build failed' }
     $Wheel = Get-ChildItem $Dist -Filter '*.whl' | Select-Object -First 1
     if (-not $Wheel) { throw 'native wheel missing' }
-    & $Vpy -m pip install --disable-pip-version-check --force-reinstall $Wheel.FullName
+    & $Vpy -m pip install --disable-pip-version-check --no-deps --force-reinstall $Wheel.FullName
     if ($LASTEXITCODE -ne 0) { throw 'native install failed' }
     $Native = $true
-  } catch { Write-Warning $_ }
+  } catch { Write-Warning "Native acceleration unavailable; using Python fallback. $_" }
 }
-if (-not $Native) { & $Vpy -m pip install --disable-pip-version-check --upgrade --force-reinstall (Join-Path $Root 'kitt-agent-cli') }
-if ($WithAiWorkers) { & $Vpy -m pip install --disable-pip-version-check -e "$(Join-Path $Root 'kitt-ai-workers')[stt]" }
+
+$Evolution = Join-Path $Root 'kitt-ai-workers\packages\kitt-evolution'
+$Evals = Join-Path $Root 'kitt-ai-workers\packages\kitt-evals'
+& $Vpy -m pip install --disable-pip-version-check --no-deps --upgrade --force-reinstall $Evolution $Evals
+if ($LASTEXITCODE -ne 0) { throw 'Evolution/eval module install failed' }
+
+if ($WithAiWorkers) {
+  & $Vpy -m pip install --disable-pip-version-check -e "$(Join-Path $Root 'kitt-ai-workers')[stt]"
+  if ($LASTEXITCODE -ne 0) { throw 'AI/STT worker install failed' }
+}
 
 $Proxy = Join-Path $Root 'kitt-reverse-proxy'
 Push-Location $Proxy
@@ -112,6 +132,8 @@ $UserPath = [Environment]::GetEnvironmentVariable('Path','User')
 $Parts = @($UserPath -split ';' | Where-Object { $_ })
 if ($Parts -notcontains $Bin) { [Environment]::SetEnvironmentVariable('Path', (($Parts + $Bin) -join ';'), 'User'); $env:Path = "$Bin;$env:Path" }
 & $KittExe --help | Out-Null
+& $Vpy -c "from kitt.evolution import SkillEvolutionService; from kitt.evals.corpus import EvalRunner" | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Split module smoke test failed' }
 $Backend = & $Vpy -c "from kitt.native.bridge import NativeCodeEngine; print(NativeCodeEngine(r'$(Join-Path $Root 'kitt-agent-cli')').status.backend)"
-Write-Host "K.I.T.T. ecosystem installed/updated at $Root (Agent backend: $Backend)."
+Write-Host "K.I.T.T. ecosystem installed/updated at $Root (Agent backend: $Backend; native wheel: $Native)."
 Write-Host 'Open a new terminal and run: kitt'
