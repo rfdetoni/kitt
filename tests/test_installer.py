@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from installer.catalog import CatalogError, EcosystemCatalog
-from installer.cli import _env_flag, build_parser
+from installer.cli import _env_flag, _quiet_install_output, build_parser
 from installer.core import EcosystemInstaller
 from installer.platforms import PlatformAdapter
 from installer.ui import _SelectionState, _handle_key
@@ -64,6 +64,17 @@ class InstallerCliTests(unittest.TestCase):
                 self.assertTrue(_env_flag("KITT_TEST_FLAG"))
         with patch.dict(os.environ, {"KITT_TEST_FLAG": "0"}):
             self.assertFalse(_env_flag("KITT_TEST_FLAG"))
+
+    def test_quiet_mode_redirects_process_stdout_and_stderr(self) -> None:
+        with _quiet_install_output() as path:
+            os.write(1, b"hidden stdout\n")
+            os.write(2, b"hidden stderr\n")
+        try:
+            captured = path.read_text(encoding="utf-8")
+            self.assertIn("hidden stdout", captured)
+            self.assertIn("hidden stderr", captured)
+        finally:
+            path.unlink(missing_ok=True)
 
 
 class InstallerUiTests(unittest.TestCase):
