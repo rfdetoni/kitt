@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "name": "K.I.T.T. Ecosystem",
+  "default_preset": "agent",
+  "presets": {
+    "agent": {
+      "name": "Complete Agent",
+      "description": "KITT Agent CLI with every ecosystem technology it integrates with",
+      "modules": ["agent-cli"]
+    },
+    "assistant": {
+      "name": "Assistant",
+      "description": "Resident assistant stack with shared protocol and memory services",
+      "modules": ["assistant"]
+    },
+    "web": {
+      "name": "Web Bridge",
+      "description": "Authorized browser reverse proxy and shared protocol",
+      "modules": ["reverse-proxy"]
+    },
+    "full": {
+      "name": "Full Ecosystem",
+      "description": "All KITT modules",
+      "modules": ["protocol", "memory", "toolbox", "assistant", "agent-cli", "ai-workers", "reverse-proxy"]
+    }
+  },
+  "modules": {
+    "protocol": {
+      "name": "KITT Protocol",
+      "repository": "rfdetoni/kitt-protocol",
+      "description": "Cross-component contracts and Python/TypeScript/Rust SDKs",
+      "strategy": "protocol",
+      "order": 10,
+      "requires": [],
+      "companions": [],
+      "platforms": ["windows", "linux", "macos", "posix"],
+      "prerequisites": ["git"]
+    },
+    "memory": {
+      "name": "KITT Memory",
+      "repository": "rfdetoni/kitt-memory",
+      "description": "Shared local memory service",
+      "strategy": "rust",
+      "order": 20,
+      "requires": [],
+      "companions": ["protocol"],
+      "platforms": ["windows", "linux", "macos", "posix"],
+      "prerequisites": ["git", "rust>=1.85"]
+    },
+    "toolbox": {
+      "name": "KITT Toolbox",
+      "repository": "rfdetoni/kitt-toolbox",
+      "description": "Native code-intelligence and Python acceleration data plane",
+      "strategy": "toolbox",
+      "order": 30,
+      "requires": [],
+      "companions": ["protocol"],
+      "platforms": ["windows", "linux", "macos", "posix"],
+      "prerequisites": ["git", "python>=3.12", "rust>=1.85"]
+    },
+    "assistant": {
+      "name": "KITT Assistant",
+      "repository": "rfdetoni/kitt-assistant",
+      "description": "Resident daemon, control center and Python assistant runtime",
+      "strategy": "assistant",
+      "order": 40,
+      "requires": [],
+      "companions": ["protocol", "memory"],
+      "platforms": ["windows", "linux", "macos", "posix"],
+      "prerequisites": ["git", "python>=3.12", "node>=20", "npm", "rust>=1.85"]
+    },
+    "agent-cli": {
+      "name": "KITT Agent CLI",
+      "repository": "rfdetoni/kitt-agent-cli",
+      "description": "Autonomous coding-agent control plane",
+      "strategy": "agent",
+      "order": 50,
+      "requires": ["protocol"],
+      "companions": ["memory", "toolbox", "assistant", "ai-workers", "reverse-proxy"],
+      "platforms": ["windows", "linux", "macos", "posix"],
+      "prerequisites": ["git", "python>=3.12"]
+    },
+    "ai-workers": {
+      "name": "KITT AI Workers",
+      "repository": "rfdetoni/kitt-ai-workers",
+      "description": "Evolution, Evals and optional AI/STT worker processes",
+      "strategy": "ai-workers",
+      "order": 60,
+      "requires": ["protocol"],
+      "companions": [],
+      "platforms": ["windows", "linux", "macos", "posix"],
+      "prerequisites": ["git", "python>=3.12"]
+    },
+    "reverse-proxy": {
+      "name": "KITT Reverse Proxy",
+      "repository": "rfdetoni/kitt-reverse-proxy",
+      "description": "Authorized browser/API gateway and session bridge",
+      "strategy": "node-proxy",
+      "order": 70,
+      "requires": [],
+      "companions": ["protocol"],
+      "platforms": ["windows", "linux", "macos", "posix"],
+      "prerequisites": ["git", "node>=20", "npm"]
+    }
+  }
+}
