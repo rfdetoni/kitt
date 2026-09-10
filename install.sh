@@ -4,6 +4,18 @@ set -eu
 INSTALLER_REPO="${KITT_INSTALLER_REPO:-https://github.com/rfdetoni/kitt.git}"
 INSTALLER_REF="${KITT_INSTALLER_REF:-main}"
 
+show_progress() {
+  [ -t 1 ] || return 0
+  percent="$1"
+  bar="$2"
+  printf '\rPreparing K.I.T.T. installer  [%s] %3s%%' "$bar" "$percent"
+}
+
+finish_progress() {
+  [ -t 1 ] || return 0
+  printf '\n'
+}
+
 find_python() {
   for candidate in python3.14 python3.13 python3.12 python3.11 python3.10 python3 python; do
     if command -v "$candidate" >/dev/null 2>&1; then
@@ -44,18 +56,26 @@ cleanup() { rm -rf "$WORKDIR"; }
 trap cleanup EXIT HUP INT TERM
 
 SRC="$WORKDIR/kitt"
+show_progress 10 "##------------------"
 if ! git clone --filter=blob:none --no-checkout "$INSTALLER_REPO" "$SRC" >/dev/null 2>&1; then
+  finish_progress
   echo "Failed to download the K.I.T.T. installer." >&2
   exit 1
 fi
+show_progress 55 "###########---------"
 if ! git -C "$SRC" fetch --force --depth 1 origin "$INSTALLER_REF" >/dev/null 2>&1; then
+  finish_progress
   echo "Failed to resolve K.I.T.T. installer ref: $INSTALLER_REF" >&2
   exit 1
 fi
+show_progress 85 "#################---"
 if ! git -C "$SRC" checkout --detach --force FETCH_HEAD >/dev/null 2>&1; then
+  finish_progress
   echo "Failed to prepare the K.I.T.T. installer." >&2
   exit 1
 fi
+show_progress 100 "####################"
+finish_progress
 
 cd "$SRC"
 "$PYTHON" -m installer "$@"
