@@ -31,7 +31,7 @@ function Find-KittPython {
 
 $Python = Find-KittPython
 if (-not $Python) {
-  throw 'Python 3.10+ is required to run the K.I.T.T. installer (Agent requires Python 3.12+).'
+  throw 'K.I.T.T. requires Python 3.10+ for the installer (Agent requires Python 3.12+).'
 }
 
 $LocalRoot = $null
@@ -43,17 +43,17 @@ $TempRoot = $null
 try {
   if (-not $LocalRoot) {
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-      throw 'git is required to bootstrap the K.I.T.T. ecosystem installer.'
+      throw 'K.I.T.T. requires git.'
     }
     $TempRoot = Join-Path ([IO.Path]::GetTempPath()) ("kitt-installer-" + [guid]::NewGuid().ToString('N'))
     $LocalRoot = Join-Path $TempRoot 'kitt'
     New-Item -ItemType Directory -Force -Path $TempRoot | Out-Null
-    & git clone --filter=blob:none --no-checkout $InstallerRepo $LocalRoot | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw 'Failed to clone the K.I.T.T. installer repository.' }
-    & git -C $LocalRoot fetch --force --depth 1 origin $InstallerRef | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw "Failed to fetch installer ref $InstallerRef." }
-    & git -C $LocalRoot checkout --detach --force FETCH_HEAD | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw 'Failed to check out the K.I.T.T. installer.' }
+    & git clone --filter=blob:none --no-checkout $InstallerRepo $LocalRoot *> $null
+    if ($LASTEXITCODE -ne 0) { throw 'Failed to download the K.I.T.T. installer.' }
+    & git -C $LocalRoot fetch --force --depth 1 origin $InstallerRef *> $null
+    if ($LASTEXITCODE -ne 0) { throw "Failed to resolve K.I.T.T. installer ref: $InstallerRef" }
+    & git -C $LocalRoot checkout --detach --force FETCH_HEAD *> $null
+    if ($LASTEXITCODE -ne 0) { throw 'Failed to prepare the K.I.T.T. installer.' }
   }
 
   Push-Location $LocalRoot
