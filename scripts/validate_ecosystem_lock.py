@@ -1,45 +1,41 @@
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
 
-EXPECTED = {
-    "rfdetoni/kitt-protocol",
-    "rfdetoni/kitt-memory",
-    "rfdetoni/kitt-toolbox",
-    "rfdetoni/kitt-ai-workers",
-    "rfdetoni/kitt-assistant",
-    "rfdetoni/kitt-agent-cli",
-    "rfdetoni/kitt-reverse-proxy",
-}
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from installer.catalog import CatalogError, EcosystemCatalog
+
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
-def validate(path: str | Path = "ecosystem.lock.json") -> dict[str, str]:
-    payload = json.loads(Path(path).read_text(encoding="utf-8"))
-    if payload.get("schema_version") != 1:
-        raise ValueError("ecosystem lock schema_version must be 1")
-    components = payload.get("components")
-    if not isinstance(components, dict):
-        raise ValueError("ecosystem lock components must be an object")
-    names = set(components)
-    if names != EXPECTED:
-        missing = sorted(EXPECTED - names)
-        extra = sorted(names - EXPECTED)
-        raise ValueError(f"ecosystem lock component mismatch; missing={missing}, extra={extra}")
-    for repository, sha in components.items():
-        if not isinstance(sha, str) or not SHA_RE.fullmatch(sha):
+def validate(root: str | Path = ROOT) -> dict[str, str]:
+    catalog = EcosystemCatalog.load(root)
+    for repository, sha in catalog.locks.items():
+        if not SHA_RE.fullmatch(sha):
             raise ValueError(f"{repository} is not pinned to an immutable 40-char SHA")
-    return {str(key): str(value) for key, value in components.items()}
+
+    # Product invariant: selecting the Agent means the complete integrated KITT
+    # technology stack, never a silently degraded Agent-only install.
+    agent = catalog.resolve(["agent-cli"])
+    if set(agent.ids) != set(catalog.modules):
+        missing = sorted(set(catalog.modules) - set(agent.ids))
+        raise ValueError(
+            "agent-cli must resolve the complete integrated ecosystem; "
+            f"missing={missing}"
+        )
+    return dict(catalog.locks)
 
 
 def main() -> int:
     try:
-        components = validate(sys.argv[1] if len(sys.argv) > 1 else "ecosystem.lock.json")
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        print(f"ecosystem lock invalid: {exc}", file=sys.stderr)
+        components = validate(sys.argv[1] if len(sys.argv) > 1 else ROOT)
+    except (OSError, ValueError, CatalogError) as exc:
+        print(f"ecosystem catalog/lock invalid: {exc}", file=sys.stderr)
         return 1
     for repository, sha in sorted(components.items()):
         print(f"{repository} {sha}")

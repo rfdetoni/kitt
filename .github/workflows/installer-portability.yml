@@ -1,0 +1,73 @@
+name: installer-portability
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ecosystem.json
+      - ecosystem.lock.json
+      - install.sh
+      - install.ps1
+      - installer/**
+      - tests/**
+      - scripts/validate_ecosystem_lock.py
+      - .github/workflows/installer-portability.yml
+  pull_request:
+    paths:
+      - ecosystem.json
+      - ecosystem.lock.json
+      - install.sh
+      - install.ps1
+      - installer/**
+      - tests/**
+      - scripts/validate_ecosystem_lock.py
+      - .github/workflows/installer-portability.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable-installer:
+    name: ${{ matrix.os }} installer
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Validate catalog and immutable lock
+        run: python scripts/validate_ecosystem_lock.py
+      - name: Run installer unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Validate complete Agent dependency closure
+        run: python -m installer --modules agent-cli --dry-run --portable
+      - name: List public installer surface
+        run: python -m installer --list
+      - name: Validate POSIX bootstrap syntax
+        if: runner.os != 'Windows'
+        shell: sh
+        run: sh -n install.sh
+      - name: Validate PowerShell bootstrap syntax
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $Tokens = $null
+          $Errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path ./install.ps1), [ref]$Tokens, [ref]$Errors
+          ) | Out-Null
+          if ($Errors.Count -gt 0) {
+            $Errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
