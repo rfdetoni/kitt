@@ -36,10 +36,13 @@ function Sync-Repo([string]$Name) {
   } else {
     Remove-Item $Dir -Recurse -Force -ErrorAction SilentlyContinue
     & git clone --filter=blob:none --no-checkout "https://github.com/rfdetoni/$Name.git" $Dir
+    if ($LASTEXITCODE -ne 0) { throw "$Name clone failed" }
   }
   & git -C $Dir remote set-url origin "https://github.com/rfdetoni/$Name.git"
   & git -C $Dir fetch --force --depth 1 origin $Ref
+  if ($LASTEXITCODE -ne 0) { throw "$Name fetch failed" }
   & git -C $Dir checkout --detach --force FETCH_HEAD
+  if ($LASTEXITCODE -ne 0) { throw "$Name checkout failed" }
   & git -C $Dir clean -ffd
   Write-Host ("{0,-22} {1}" -f $Name, (& git -C $Dir rev-parse --short HEAD))
 }
@@ -70,7 +73,12 @@ if ($Cargo) {
 $Hud = Join-Path $Root 'kitt-assistant\apps\kitt-hud'
 if (Test-Path $Hud) {
   Push-Location $Hud
-  try { & npm ci --no-audit --no-fund; & npm run build } finally { Pop-Location }
+  try {
+    & npm ci --no-audit --no-fund
+    if ($LASTEXITCODE -ne 0) { throw 'HUD npm install failed' }
+    & npm run build
+    if ($LASTEXITCODE -ne 0) { throw 'HUD build failed' }
+  } finally { Pop-Location }
 }
 
 $Venv = Join-Path $Root '.venv-agent'
@@ -78,9 +86,15 @@ $Vpy = Join-Path $Venv 'Scripts\python.exe'
 if (-not (Test-Path $Vpy)) { & python -m venv $Venv }
 & $Vpy -m pip install --disable-pip-version-check -U pip wheel | Out-Null
 
-# The Python control plane is independent from the shared native accelerator.
+# Install the portable control plane first. Separately owned Python companions
+# extend the same kitt namespace without vendoring code back into Agent.
 & $Vpy -m pip install --disable-pip-version-check --upgrade --force-reinstall (Join-Path $Root 'kitt-agent-cli')
 if ($LASTEXITCODE -ne 0) { throw 'Agent CLI install failed' }
+$AssistantRuntime = Join-Path $Root 'kitt-assistant\packages\kitt-assistant-runtime'
+$Evolution = Join-Path $Root 'kitt-ai-workers\packages\kitt-evolution'
+$Evals = Join-Path $Root 'kitt-ai-workers\packages\kitt-evals'
+& $Vpy -m pip install --disable-pip-version-check --no-deps --upgrade --force-reinstall $AssistantRuntime $Evolution $Evals
+if ($LASTEXITCODE -ne 0) { throw 'Assistant runtime/Evolution/Evals install failed' }
 
 $Native = $false
 if ($Cargo) {
@@ -99,11 +113,6 @@ if ($Cargo) {
   } catch { Write-Warning "Native acceleration unavailable; using Python fallback. $_" }
 }
 
-$Evolution = Join-Path $Root 'kitt-ai-workers\packages\kitt-evolution'
-$Evals = Join-Path $Root 'kitt-ai-workers\packages\kitt-evals'
-& $Vpy -m pip install --disable-pip-version-check --no-deps --upgrade --force-reinstall $Evolution $Evals
-if ($LASTEXITCODE -ne 0) { throw 'Evolution/eval module install failed' }
-
 if ($WithAiWorkers) {
   & $Vpy -m pip install --disable-pip-version-check -e "$(Join-Path $Root 'kitt-ai-workers')[stt]"
   if ($LASTEXITCODE -ne 0) { throw 'AI/STT worker install failed' }
@@ -113,8 +122,11 @@ $Proxy = Join-Path $Root 'kitt-reverse-proxy'
 Push-Location $Proxy
 try {
   & npm ci --no-audit --no-fund
+  if ($LASTEXITCODE -ne 0) { throw 'Reverse proxy npm install failed' }
   & npm run build
+  if ($LASTEXITCODE -ne 0) { throw 'Reverse proxy build failed' }
   & npm prune --omit=dev --no-audit --no-fund
+  if ($LASTEXITCODE -ne 0) { throw 'Reverse proxy prune failed' }
   $Chrome = @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
   if (-not $Chrome) { & npx --yes playwright install chromium }
 } finally { Pop-Location }
@@ -132,7 +144,7 @@ $UserPath = [Environment]::GetEnvironmentVariable('Path','User')
 $Parts = @($UserPath -split ';' | Where-Object { $_ })
 if ($Parts -notcontains $Bin) { [Environment]::SetEnvironmentVariable('Path', (($Parts + $Bin) -join ';'), 'User'); $env:Path = "$Bin;$env:Path" }
 & $KittExe --help | Out-Null
-& $Vpy -c "from kitt.evolution import SkillEvolutionService; from kitt.evals.corpus import EvalRunner" | Out-Null
+& $Vpy -c "import kitt.daemon.client, kitt.remote.server, kitt.evolution, kitt.evals.corpus; print('split KITT namespace: ok')" | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Split module smoke test failed' }
 $Backend = & $Vpy -c "from kitt.native.bridge import NativeCodeEngine; print(NativeCodeEngine(r'$(Join-Path $Root 'kitt-agent-cli')').status.backend)"
 Write-Host "K.I.T.T. ecosystem installed/updated at $Root (Agent backend: $Backend; native wheel: $Native)."
