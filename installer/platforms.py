@@ -5,6 +5,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
@@ -31,7 +32,7 @@ def _run_capture(argv: Sequence[str]) -> tuple[int, str]:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            timeout=10,
+            timeout=30,
             check=False,
         )
     except (OSError, subprocess.SubprocessError):
@@ -45,6 +46,7 @@ class PlatformAdapter:
     def __init__(self, name: str, *, posix: bool):
         self.name = name
         self.posix = posix
+        self._python_without_venv: CommandInfo | None = None
 
     @classmethod
     def detect(cls) -> "PlatformAdapter":
@@ -85,7 +87,7 @@ class PlatformAdapter:
         base = os.environ.get("XDG_BIN_HOME")
         return Path(base).expanduser() if base else Path.home() / ".local" / "bin"
 
-    def find_python(self, minimum: tuple[int, int] = (3, 12)) -> CommandInfo | None:
+    def _python_candidates(self) -> list[tuple[str, ...]]:
         candidates: list[tuple[str, ...]] = []
         if self.name == "windows" and shutil.which("py"):
             for minor in (14, 13, 12, 11, 10):
@@ -97,18 +99,55 @@ class PlatformAdapter:
         current = Path(sys.executable)
         if current.exists():
             candidates.insert(0, (str(current),))
+        return candidates
 
+    def _python_supports_venv(self, candidate: tuple[str, ...]) -> bool:
+        """Prove that Python can create a pip-enabled venv before expensive builds."""
+        code, _ = _run_capture((*candidate, "-c", "import ensurepip, venv"))
+        if code != 0:
+            return False
+        try:
+            with tempfile.TemporaryDirectory(prefix="kitt-venv-probe-") as temp:
+                target = Path(temp) / "venv"
+                code, _ = _run_capture((*candidate, "-m", "venv", str(target)))
+                if code != 0:
+                    return False
+                python = (
+                    target / "Scripts" / "python.exe"
+                    if self.name == "windows"
+                    else target / "bin" / "python"
+                )
+                code, _ = _run_capture((str(python), "-m", "pip", "--version"))
+                return code == 0
+        except OSError:
+            return False
+
+    def find_python(
+        self,
+        minimum: tuple[int, int] = (3, 12),
+        *,
+        require_venv: bool = True,
+    ) -> CommandInfo | None:
+        self._python_without_venv = None
         seen: set[tuple[str, ...]] = set()
-        for candidate in candidates:
+        for candidate in self._python_candidates():
             if candidate in seen:
                 continue
             seen.add(candidate)
-            code, output = _run_capture((*candidate, "-c", "import sys;print('.'.join(map(str,sys.version_info[:3])))"))
+            code, output = _run_capture(
+                (*candidate, "-c", "import sys;print('.'.join(map(str,sys.version_info[:3])))")
+            )
             if code != 0:
                 continue
             version = _version_tuple(output)
-            if version[:2] >= minimum:
-                return CommandInfo(candidate, version, output)
+            if version[:2] < minimum:
+                continue
+            info = CommandInfo(candidate, version, output)
+            if require_venv and not self._python_supports_venv(candidate):
+                if self._python_without_venv is None or version > self._python_without_venv.version:
+                    self._python_without_venv = info
+                continue
+            return info
         return None
 
     def command_info(self, name: str) -> CommandInfo | None:
@@ -129,8 +168,41 @@ class PlatformAdapter:
             return CommandInfo((executable,), (), "")
         return CommandInfo((executable,), _version_tuple(output), output)
 
+    def _python_venv_hint(self) -> str:
+        info = self._python_without_venv
+        version = info.version[:2] if info else ()
+        version_text = ".".join(map(str, version)) if version else "3.12+"
+        if self.name == "linux":
+            package = f"python{version_text}-venv" if version else "python3-venv"
+            return (
+                f"Python {version_text} was found but cannot create pip-enabled virtual environments.\n"
+                f"Debian/Ubuntu: sudo apt install {package}\n"
+                "Other distributions: install the package that provides Python venv/ensurepip."
+            )
+        if self.name == "macos":
+            return (
+                f"Python {version_text} was found without a working venv/ensurepip. "
+                "Install/reinstall Python with Homebrew: brew install python@3.12"
+            )
+        if self.name == "windows":
+            return (
+                f"Python {version_text} was found without a working venv/ensurepip. "
+                "Repair/reinstall Python and include pip/venv support."
+            )
+        if self.name == "haiku":
+            return (
+                f"Python {version_text} was found without a working venv/ensurepip. "
+                "Install the Haiku package that provides Python venv/pip support."
+            )
+        return f"Python {version_text} was found but venv/ensurepip is unavailable."
+
     def prerequisite_hint(self, missing: Iterable[str]) -> str:
         missing_set = set(missing)
+        hints: list[str] = []
+        if "python" in missing_set and self._python_without_venv is not None:
+            hints.append(self._python_venv_hint())
+            missing_set.remove("python")
+
         if self.name == "windows":
             commands = []
             if "git" in missing_set:
@@ -141,7 +213,9 @@ class PlatformAdapter:
                 commands.append("winget install --id OpenJS.NodeJS.LTS -e")
             if {"rust", "cargo", "rustc"} & missing_set:
                 commands.append("winget install --id Rustlang.Rustup -e")
-            return "\n".join(commands)
+            if commands:
+                hints.append("\n".join(commands))
+            return "\n".join(hints)
         if self.name == "macos":
             packages = []
             if "git" in missing_set:
@@ -151,9 +225,11 @@ class PlatformAdapter:
             if {"node", "npm"} & missing_set:
                 packages.append("node")
             hint = f"brew install {' '.join(dict.fromkeys(packages))}" if packages else ""
+            if hint:
+                hints.append(hint)
             if {"rust", "cargo", "rustc"} & missing_set:
-                hint += ("\n" if hint else "") + "Install Rust with rustup: https://rustup.rs"
-            return hint
+                hints.append("Install Rust with rustup: https://rustup.rs")
+            return "\n".join(hints)
         if self.name == "haiku":
             packages = []
             if "git" in missing_set:
@@ -164,11 +240,15 @@ class PlatformAdapter:
                 packages.append("nodejs")
             if {"rust", "cargo", "rustc"} & missing_set:
                 packages.append("rust")
-            return f"pkgman install {' '.join(dict.fromkeys(packages))}" if packages else ""
-        return (
-            "Install the missing prerequisites with your distribution package manager: "
-            + ", ".join(sorted(missing_set))
-        )
+            if packages:
+                hints.append(f"pkgman install {' '.join(dict.fromkeys(packages))}")
+            return "\n".join(hints)
+        if missing_set:
+            hints.append(
+                "Install the missing prerequisites with your distribution package manager: "
+                + ", ".join(sorted(missing_set))
+            )
+        return "\n".join(hints)
 
     def ensure_user_path(self, bin_dir: Path) -> bool:
         """Persist PATH only on Windows; POSIX shells remain user-owned."""
