@@ -3,12 +3,18 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import tempfile
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator
 
 from .catalog import CatalogError, EcosystemCatalog
 from .core import EcosystemInstaller, InstallerError, InstallerOptions
 from .platforms import PlatformAdapter
 from .ui import UserCancelled, choose_modules
+
+
+_TRUTHY = {"1", "true", "yes", "on"}
 
 
 def _source_root() -> Path:
@@ -23,6 +29,36 @@ def _split_modules(values: list[str] | None) -> list[str]:
             if item and item not in result:
                 result.append(item)
     return result
+
+
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in _TRUTHY
+
+
+@contextmanager
+def _quiet_install_output() -> Iterator[Path]:
+    """Redirect installer/build chatter to a temporary log while keeping the UI clean."""
+    fd, raw_path = tempfile.mkstemp(prefix="kitt-install-", suffix=".log")
+    os.close(fd)
+    path = Path(raw_path)
+    saved_stdout = os.dup(1)
+    saved_stderr = os.dup(2)
+    try:
+        sys.stdout.flush()
+        sys.stderr.flush()
+        with path.open("ab", buffering=0) as sink:
+            os.dup2(sink.fileno(), 1)
+            os.dup2(sink.fileno(), 2)
+            try:
+                yield path
+            finally:
+                sys.stdout.flush()
+                sys.stderr.flush()
+    finally:
+        os.dup2(saved_stdout, 1)
+        os.dup2(saved_stderr, 2)
+        os.close(saved_stdout)
+        os.close(saved_stderr)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -54,7 +90,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="explicitly skip Rust/native builds and use portable fallbacks where available",
     )
     parser.add_argument("--force", action="store_true", help="discard local changes in managed component checkouts")
-    parser.add_argument("--yes", "-y", action="store_true", help="non-interactive; use --modules/--preset or the default agent preset")
+    parser.add_argument(
+        "--yes",
+        "-y",
+        action="store_true",
+        help="non-interactive; use --modules/--preset or the default agent preset",
+    )
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="show repository, build and package-manager output",
+    )
     parser.add_argument("--dry-run", "--plan", action="store_true", help="resolve and validate the plan without changing the system")
     parser.add_argument("--no-start-services", action="store_true", help="install services without starting them")
     parser.add_argument("--uninstall", action="store_true", help="remove the complete managed K.I.T.T. installation")
@@ -81,6 +128,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     source_root = _source_root()
+    quiet_log: Path | None = None
+    verbose = bool(args.verbose or _env_flag("KITT_VERBOSE"))
+    non_interactive = bool(args.yes or _env_flag("KITT_NON_INTERACTIVE"))
 
     try:
         catalog = EcosystemCatalog.load(source_root)
@@ -119,23 +169,36 @@ def main(argv: list[str] | None = None) -> int:
             requested.append("ai-workers")
 
         if not requested:
-            if args.yes:
+            if non_interactive:
                 requested = list(catalog.preset(catalog.default_preset))
             else:
                 requested = list(choose_modules(catalog))
-        elif not args.yes and not args.dry_run:
-            # Explicit module arguments are already an intentional selection; avoid a
-            # second menu so automation and shell history stay predictable.
-            pass
 
         resolution = catalog.resolve(requested)
-        installer.install(resolution)
+        concise = not verbose and not args.dry_run
+        if concise:
+            print("Installing K.I.T.T...", flush=True)
+            with _quiet_install_output() as log_path:
+                quiet_log = log_path
+                installer.install(resolution)
+            quiet_log.unlink(missing_ok=True)
+            quiet_log = None
+            print("K.I.T.T. installed.")
+            if not platform.ensure_user_path(bin_dir):
+                print(f"Add {bin_dir} to PATH.")
+            if "agent-cli" in resolution.ids:
+                print("Run: kitt")
+        else:
+            installer.install(resolution)
         return 0
     except UserCancelled as exc:
         print(str(exc), file=sys.stderr)
         return 130
     except (CatalogError, InstallerError, OSError, ValueError) as exc:
-        print(f"K.I.T.T. installer error: {exc}", file=sys.stderr)
+        print(f"K.I.T.T. install failed: {exc}", file=sys.stderr)
+        if quiet_log is not None and quiet_log.exists():
+            print(f"Details: {quiet_log}", file=sys.stderr)
+            print("Re-run with KITT_VERBOSE=1 for live output.", file=sys.stderr)
         return 1
 
 
