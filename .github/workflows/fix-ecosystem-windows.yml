@@ -20,8 +20,27 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -c 'from pathlib import Path; p=Path(".github/workflows/ecosystem-integration.yml"); s=p.read_text(); old="      - name: Verify composed namespace\n        run: |\n          python - <<'"'"'PY'"'"'\n          import kitt.core.runtime\n          import kitt.daemon.client\n          import kitt.remote.server\n          import kitt.evolution\n          import kitt.evals.corpus\n          print('"'"'frozen composed namespace: ok'"'"')\n          PY\n"; new="      - name: Verify composed namespace\n        run: >-\n          python -c \\"import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; print('"'"'frozen composed namespace: ok'"'"')\\"\n"; assert old in s, "expected block not found"; p.write_text(s.replace(old,new,1))'
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/ecosystem-integration.yml')
+          lines = path.read_text(encoding='utf-8').splitlines()
+          marker = '      - name: Verify composed namespace'
+          starts = [i for i, line in enumerate(lines) if line == marker]
+          if len(starts) != 1:
+              raise SystemExit(f'expected one namespace step, found {len(starts)}')
+          start = starts[0]
+          end = start + 1
+          while end < len(lines) and not (lines[end].startswith('      - name: ') and end > start):
+              end += 1
+          replacement = [
+              marker,
+              '        run: >-',
+              '          python -c "import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; print(\'frozen composed namespace: ok\')"',
+          ]
+          path.write_text('\n'.join(lines[:start] + replacement + lines[end:]) + '\n', encoding='utf-8')
+          PY
           git diff --check
+          git diff -- .github/workflows/ecosystem-integration.yml
           git config user.name 'KITT Migration Bot'
           git config user.email '85571449+rfdetoni@users.noreply.github.com'
           git add .github/workflows/ecosystem-integration.yml
