@@ -13,9 +13,9 @@ usage() {
 K.I.T.T. ecosystem installer/updater
 Usage: install.sh [--ref REF] [--with-ai-workers] [--force] [--uninstall]
 
-Installs the lightweight KITT core, native acceleration when Rust is available,
-and optional evolution/eval modules. Heavy AI/STT workers are installed only
-with --with-ai-workers.
+Installs the lightweight Agent control plane, Assistant runtime, Evolution/Evals,
+and native acceleration when Rust is available. Heavy AI/STT workers are
+installed only with --with-ai-workers.
 EOF
 }
 while [[ $# -gt 0 ]]; do
@@ -109,11 +109,16 @@ AGENT_VENV="$ROOT/.venv-agent"
 AGENT_PY="$AGENT_VENV/bin/python"
 "$AGENT_PY" -m pip install --disable-pip-version-check -U pip wheel >/dev/null
 
-# The Python control plane is always installed independently. Native acceleration
-# is a shared kitt-toolbox wheel and can fail closed to the Python fallback.
+# Install the portable control plane first. Separately owned Python companions
+# then extend the same kitt namespace without vendoring code back into Agent.
 "$AGENT_PY" -m pip install \
   --disable-pip-version-check --upgrade --force-reinstall \
   "$ROOT/kitt-agent-cli"
+"$AGENT_PY" -m pip install \
+  --disable-pip-version-check --no-deps --upgrade --force-reinstall \
+  "$ROOT/kitt-assistant/packages/kitt-assistant-runtime" \
+  "$ROOT/kitt-ai-workers/packages/kitt-evolution" \
+  "$ROOT/kitt-ai-workers/packages/kitt-evals"
 
 native_ok=0
 if command -v cargo >/dev/null 2>&1; then
@@ -128,13 +133,6 @@ if command -v cargo >/dev/null 2>&1; then
     echo "Native acceleration build/install failed; keeping the safe Python fallback." >&2
   fi
 fi
-
-# Evolution and evals are lightweight optional capabilities hosted separately
-# from the Agent CLI. Dependencies are already satisfied by the ecosystem venv.
-"$AGENT_PY" -m pip install \
-  --disable-pip-version-check --no-deps --upgrade --force-reinstall \
-  "$ROOT/kitt-ai-workers/packages/kitt-evolution" \
-  "$ROOT/kitt-ai-workers/packages/kitt-evals"
 
 if [[ $WITH_WORKERS -eq 1 ]]; then
   "$AGENT_PY" -m pip install --disable-pip-version-check -e "$ROOT/kitt-ai-workers[stt]"
@@ -169,7 +167,13 @@ fi
 
 "$BIN_DIR/kitt" --help >/dev/null
 "$BIN_DIR/kitt-reverse-proxy" --help >/dev/null
-"$AGENT_PY" -c "from kitt.evolution import SkillEvolutionService; from kitt.evals.corpus import EvalRunner" >/dev/null
+"$AGENT_PY" - <<'PY'
+import kitt.daemon.client
+import kitt.remote.server
+import kitt.evolution
+import kitt.evals.corpus
+print('split KITT namespace: ok')
+PY
 backend="$($AGENT_PY -c "from kitt.native.bridge import NativeCodeEngine; print(NativeCodeEngine(r'$ROOT/kitt-agent-cli').status.backend)")"
 echo "K.I.T.T. ecosystem installed/updated at $ROOT (Agent backend: $backend; native wheel: $native_ok)."
 case ":$PATH:" in *":$BIN_DIR:"*) ;; *) echo "Add $BIN_DIR to PATH." ;; esac
