@@ -377,15 +377,7 @@ jobs:
       - working-directory: kitt-agent-cli
         run: python -m unittest discover -s tests/prime_architecture -v
       - name: Verify composed namespace
-        run: |
-          python - <<'PY'
-          import kitt.core.runtime
-          import kitt.daemon.client
-          import kitt.remote.server
-          import kitt.evolution
-          import kitt.evals.corpus
-          print('frozen composed namespace: ok')
-          PY
+        run: python -c "import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; print('frozen composed namespace: ok')"
 
   reverse_proxy:
     needs: resolve_refs
