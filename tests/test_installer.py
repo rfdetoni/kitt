@@ -8,6 +8,7 @@ from pathlib import Path
 from installer.catalog import CatalogError, EcosystemCatalog
 from installer.core import EcosystemInstaller
 from installer.platforms import PlatformAdapter
+from installer.ui import _SelectionState, _handle_key
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,6 +46,78 @@ class CatalogTests(unittest.TestCase):
     def test_unknown_module_fails_closed(self) -> None:
         with self.assertRaises(CatalogError):
             self.catalog.resolve(["not-a-kitt-module"])
+
+
+class InstallerUiTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.catalog = EcosystemCatalog.load(ROOT)
+
+    def test_recommended_selection_starts_on_agent_cli(self) -> None:
+        state = _SelectionState.create(self.catalog)
+        self.assertEqual(state.ordered_direct(), ("agent-cli",))
+        self.assertEqual(set(state.resolution.ids), set(self.catalog.modules))
+        self.assertEqual(state.current_id, "agent-cli")
+
+    def test_space_toggles_current_module(self) -> None:
+        state = _SelectionState.create(self.catalog, ("protocol",))
+        self.assertIn("protocol", state.direct)
+        self.assertIsNone(_handle_key(state, "space"))
+        self.assertNotIn("protocol", state.direct)
+        self.assertIsNone(_handle_key(state, "space"))
+        self.assertIn("protocol", state.direct)
+
+    def test_arrow_keys_move_cursor_and_wrap(self) -> None:
+        state = _SelectionState.create(self.catalog, ("agent-cli",))
+        first = state.cursor
+        self.assertIsNone(_handle_key(state, "up"))
+        self.assertEqual(state.cursor, (first - 1) % len(state.ordered_ids))
+        self.assertIsNone(_handle_key(state, "down"))
+        self.assertEqual(state.cursor, first)
+
+    def test_automatic_dependency_can_be_promoted_to_explicit_selection(self) -> None:
+        state = _SelectionState.create(self.catalog, ("agent-cli",))
+        automatic_id = next(
+            module_id
+            for module_id in state.resolution.ids
+            if module_id != "agent-cli" and module_id not in state.direct
+        )
+        state.cursor = state.ordered_ids.index(automatic_id)
+        self.assertIsNone(_handle_key(state, "space"))
+        self.assertIn(automatic_id, state.direct)
+        self.assertIn("explicit", state.message.lower())
+
+    def test_promoted_dependency_survives_parent_removal(self) -> None:
+        state = _SelectionState.create(self.catalog, ("agent-cli",))
+        promoted = next(
+            module_id
+            for module_id in state.resolution.ids
+            if module_id != "agent-cli" and module_id not in state.direct
+        )
+        state.cursor = state.ordered_ids.index(promoted)
+        _handle_key(state, "space")
+        state.cursor = state.ordered_ids.index("agent-cli")
+        _handle_key(state, "space")
+        self.assertNotIn("agent-cli", state.direct)
+        self.assertIn(promoted, state.direct)
+        self.assertIn(promoted, state.resolution.ids)
+
+    def test_none_prevents_enter_from_installing(self) -> None:
+        state = _SelectionState.create(self.catalog)
+        self.assertIsNone(_handle_key(state, "n"))
+        self.assertEqual(state.direct, set())
+        self.assertIsNone(_handle_key(state, "enter"))
+        self.assertIn("select at least one", state.message.lower())
+
+    def test_enter_confirms_non_empty_selection(self) -> None:
+        state = _SelectionState.create(self.catalog, ("protocol",))
+        self.assertEqual(_handle_key(state, "enter"), "install")
+
+    def test_shortcuts_select_all_and_restore_recommended(self) -> None:
+        state = _SelectionState.create(self.catalog, ("protocol",))
+        _handle_key(state, "a")
+        self.assertEqual(state.direct, set(state.ordered_ids))
+        _handle_key(state, "r")
+        self.assertEqual(state.ordered_direct(), ("agent-cli",))
 
 
 class PlatformTests(unittest.TestCase):
