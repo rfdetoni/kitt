@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: automatic-release-main
@@ -38,44 +39,31 @@ jobs:
           echo "current=$current" >> "$GITHUB_OUTPUT"
           echo "next=$next" >> "$GITHUB_OUTPUT"
           echo "tag=v$next" >> "$GITHUB_OUTPUT"
-      - name: Update ecosystem version
+      - name: Update ecosystem version in release commit
         if: steps.version.outputs.release == 'true' && steps.version.outputs.next != steps.version.outputs.current
         env:
           NEXT_VERSION: ${{ steps.version.outputs.next }}
         run: printf '%s\n' "$NEXT_VERSION" > VERSION
-      - name: Commit version bump
+      - name: Create immutable release tag
         if: steps.version.outputs.release == 'true'
         env:
           RELEASE_TAG: ${{ steps.version.outputs.tag }}
         shell: bash
         run: |
           set -euo pipefail
+          if git rev-parse -q --verify "refs/tags/$RELEASE_TAG" >/dev/null; then
+            echo "Tag $RELEASE_TAG already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add VERSION
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(release): ${RELEASE_TAG}"
-            git push origin HEAD:main
-          fi
-          echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-      - name: Publish GitHub release
+          git commit --allow-empty -m "chore(release): ${RELEASE_TAG}"
+          git tag -a "$RELEASE_TAG" -m "Release ${RELEASE_TAG}"
+          git push origin "refs/tags/$RELEASE_TAG"
+      - name: Dispatch validated release pipeline
         if: steps.version.outputs.release == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.version.outputs.tag }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $RELEASE_TAG already exists; nothing to do."
-            exit 0
-          fi
-          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" >/dev/null 2>&1; then
-            echo "Tag $RELEASE_TAG already exists without a release; refusing to retarget it." >&2
-            exit 1
-          fi
-          gh release create "$RELEASE_TAG" \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$release_sha" \
-            --generate-notes \
-            --title "$RELEASE_TAG"
+        run: gh workflow run release.yml --ref "$RELEASE_TAG" -f tag="$RELEASE_TAG"
