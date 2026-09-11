@@ -85,14 +85,20 @@ class InstallerUpdateRegressionTests(unittest.TestCase):
             old = old_bin / "kitt"
             old.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
             old.chmod(0o755)
-            adapter.write_launcher(new_bin, "kitt", ["/new/python", "-m", "kitt.cli.main"])
+            new = adapter.write_launcher(new_bin, "kitt", ["/new/python", "-m", "kitt.cli.main"])
 
-            with patch.dict(os.environ, {"PATH": os.pathsep.join([str(old_bin), str(new_bin)])}):
+            with (
+                patch.dict(os.environ, {"PATH": os.pathsep.join([str(old_bin), str(new_bin)])}),
+                patch("installer.platforms.shutil.which", side_effect=lambda name: str(old) if name == "kitt" else None),
+            ):
                 conflicts = adapter.launcher_shadow_conflicts(new_bin)
                 self.assertEqual(Path(conflicts["kitt"]), old)
                 self.assertFalse(adapter.ensure_user_path(new_bin))
 
-            with patch.dict(os.environ, {"PATH": os.pathsep.join([str(new_bin), str(old_bin)])}):
+            with (
+                patch.dict(os.environ, {"PATH": os.pathsep.join([str(new_bin), str(old_bin)])}),
+                patch("installer.platforms.shutil.which", side_effect=lambda name: str(new) if name == "kitt" else None),
+            ):
                 self.assertEqual(adapter.launcher_shadow_conflicts(new_bin), {})
                 self.assertTrue(adapter.ensure_user_path(new_bin))
 
