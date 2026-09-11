@@ -39,9 +39,7 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 - **Install the complete Agent stack:** use the installer below.
 - **Run the coding agent:** `kitt`
 - **Run the browser/API gateway:** `kitt-reverse-proxy start chatgpt`
-- **Agent container:** https://github.com/rfdetoni/kitt-agent-cli/pkgs/container/kitt-agent-cli
-- **Reverse-proxy container:** https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy
-- **Browser container:** https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy-browser
+- **GHCR packages:** https://github.com/rfdetoni?tab=packages
 - **Inspect the resident service:** `kittctl service status`
 - **Evolution runs:** `kitt evolve runs`
 - **Security:** [SECURITY.md](SECURITY.md)
@@ -126,12 +124,9 @@ ghcr.io/rfdetoni/kitt-reverse-proxy-browser
 ghcr.io/rfdetoni/kitt-reverse-proxy-standalone
 ```
 
-Package pages:
+GHCR packages index: https://github.com/rfdetoni?tab=packages
 
-- https://github.com/rfdetoni/kitt-agent-cli/pkgs/container/kitt-agent-cli
-- https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy
-- https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy-browser
-- https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy-standalone
+GitHub creates each direct package page after that image is pushed for the first time, so the README links to the stable packages index rather than to package-specific pages that may not exist before the first release.
 
 Stable releases publish `vMAJOR.MINOR.PATCH`, `MAJOR.MINOR.PATCH`, `MAJOR.MINOR`, `MAJOR` and `latest` aliases. `latest` follows the newest stable component release. For reproducible environments, pin `KITT_AGENT_VERSION` and `KITT_REVERSE_PROXY_VERSION` to complete release tags; the browser sidecar intentionally uses the same version as the reverse proxy.
 
