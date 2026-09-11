@@ -39,6 +39,9 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 - **Install the complete Agent stack:** use the installer below.
 - **Run the coding agent:** `kitt`
 - **Run the browser/API gateway:** `kitt-reverse-proxy start chatgpt`
+- **Agent container:** https://github.com/rfdetoni/kitt-agent-cli/pkgs/container/kitt-agent-cli
+- **Reverse-proxy container:** https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy
+- **Browser container:** https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy-browser
 - **Inspect the resident service:** `kittctl service status`
 - **Evolution runs:** `kitt evolve runs`
 - **Security:** [SECURITY.md](SECURITY.md)
@@ -99,7 +102,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ## Docker
 
-Docker is an optional execution path, not a requirement for K.I.T.T. The root `compose.yaml` currently isolates the hot-path Agent control plane, reverse proxy and browser into separate containers while keeping native installation available for the complete resident/native stack.
+Docker is an optional execution path, not a requirement for K.I.T.T. The root `compose.yaml` isolates the hot-path Agent control plane, reverse proxy and browser into separate containers while keeping native installation available for the complete resident/native stack.
 
 The default topology is:
 
@@ -112,6 +115,26 @@ Agent CLI ──HTTP──> Reverse Proxy ──CDP──> Chromium sidecar
 
 The browser runs **headless by default**. CDP port `9222` stays private to the Compose network; only the proxy API and optional noVNC UI are published on host loopback.
 
+### Published images
+
+Component release workflows publish the Docker images to GitHub Container Registry:
+
+```text
+ghcr.io/rfdetoni/kitt-agent-cli
+ghcr.io/rfdetoni/kitt-reverse-proxy
+ghcr.io/rfdetoni/kitt-reverse-proxy-browser
+ghcr.io/rfdetoni/kitt-reverse-proxy-standalone
+```
+
+Package pages:
+
+- https://github.com/rfdetoni/kitt-agent-cli/pkgs/container/kitt-agent-cli
+- https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy
+- https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy-browser
+- https://github.com/rfdetoni/kitt-reverse-proxy/pkgs/container/kitt-reverse-proxy-standalone
+
+Stable releases publish `vMAJOR.MINOR.PATCH`, `MAJOR.MINOR.PATCH`, `MAJOR.MINOR`, `MAJOR` and `latest` aliases. `latest` follows the newest stable component release. For reproducible environments, pin `KITT_AGENT_VERSION` and `KITT_REVERSE_PROXY_VERSION` to complete release tags; the browser sidecar intentionally uses the same version as the reverse proxy.
+
 ### Start the Docker stack
 
 ```bash
@@ -119,9 +142,16 @@ cp .env.docker.example .env
 # Replace KITT_PROXY_API_KEY with a strong local secret, for example:
 openssl rand -hex 32
 
-docker compose build
 docker compose up -d browser reverse-proxy
 docker compose run --rm agent
+```
+
+The Compose services contain both `image:` and `build:` definitions. Docker Compose therefore prefers the GHCR release image and falls back to building the corresponding repository source if that image is not available yet. A separate `docker compose build` is not required for normal startup.
+
+To pre-fetch already-published images explicitly:
+
+```bash
+docker compose --profile agent pull browser reverse-proxy agent
 ```
 
 Inside the Agent container, the OpenAI-compatible reverse-proxy endpoint is `http://reverse-proxy:3000/v1`. Use the same API key configured as `KITT_PROXY_API_KEY` in `.env`.
@@ -129,6 +159,29 @@ Inside the Agent container, the OpenAI-compatible reverse-proxy endpoint is `htt
 The Agent service mounts `KITT_WORKSPACE` at `/workspace` and persists its state in a named volume. The container deliberately does not mount the Docker socket, host root filesystem or run privileged. Project-specific toolchains are also not injected automatically; derive a project image or prefer native K.I.T.T. when the Agent must execute SDKs not present in the base image.
 
 Host services such as Ollama or LM Studio can be reached through `host.docker.internal`; the Compose file adds the Linux `host-gateway` mapping to the Agent container.
+
+### Pin component releases
+
+The Agent and reverse proxy evolve independently, so their release versions do not need to match. For example:
+
+```env
+KITT_AGENT_VERSION=v0.4.0
+KITT_REVERSE_PROXY_VERSION=v3.1.0
+```
+
+You can also override the image repository through `KITT_AGENT_IMAGE`, `KITT_REVERSE_PROXY_IMAGE` and `KITT_BROWSER_IMAGE`, for example when mirroring GHCR into a private registry.
+
+### Build unreleased source
+
+`compose.dev.yaml` keeps development image names separate from release images while reusing the source build definitions:
+
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml --profile agent build
+docker compose -f compose.yaml -f compose.dev.yaml up -d browser reverse-proxy
+docker compose -f compose.yaml -f compose.dev.yaml run --rm agent
+```
+
+`KITT_AGENT_REF` and `KITT_REVERSE_PROXY_REF` select the branch, tag or commit used for those source builds.
 
 ### Manual browser authentication
 
@@ -152,7 +205,7 @@ docker compose up -d --force-recreate browser
 
 The browser profile is stored in `kitt-browser-profile`, so authenticated state survives normal container replacement. Treat that volume as credential material. `docker compose down` keeps it; `docker compose down -v` deletes it together with the Agent state volume.
 
-`KITT_AGENT_REF` and `KITT_REVERSE_PROXY_REF` can pin a branch, tag or commit for Docker builds. The native installer remains the canonical path when you need the complete Assistant/Memory/Toolbox/AI-Workers composition and native acceleration in one local installation.
+The native installer remains the canonical path when you need the complete Assistant/Memory/Toolbox/AI-Workers composition and native acceleration in one local installation.
 
 ---
 
