@@ -97,6 +97,65 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ---
 
+## Docker
+
+Docker is an optional execution path, not a requirement for K.I.T.T. The root `compose.yaml` currently isolates the hot-path Agent control plane, reverse proxy and browser into separate containers while keeping native installation available for the complete resident/native stack.
+
+The default topology is:
+
+```text
+Agent CLI ──HTTP──> Reverse Proxy ──CDP──> Chromium sidecar
+    │                    │                    │
+/workspace          localhost:3000      persistent profile
+                                         + optional noVNC
+```
+
+The browser runs **headless by default**. CDP port `9222` stays private to the Compose network; only the proxy API and optional noVNC UI are published on host loopback.
+
+### Start the Docker stack
+
+```bash
+cp .env.docker.example .env
+# Replace KITT_PROXY_API_KEY with a strong local secret, for example:
+openssl rand -hex 32
+
+docker compose build
+docker compose up -d browser reverse-proxy
+docker compose run --rm agent
+```
+
+Inside the Agent container, the OpenAI-compatible reverse-proxy endpoint is `http://reverse-proxy:3000/v1`. Use the same API key configured as `KITT_PROXY_API_KEY` in `.env`.
+
+The Agent service mounts `KITT_WORKSPACE` at `/workspace` and persists its state in a named volume. The container deliberately does not mount the Docker socket, host root filesystem or run privileged. Project-specific toolchains are also not injected automatically; derive a project image or prefer native K.I.T.T. when the Agent must execute SDKs not present in the base image.
+
+Host services such as Ollama or LM Studio can be reached through `host.docker.internal`; the Compose file adds the Linux `host-gateway` mapping to the Agent container.
+
+### Manual browser authentication
+
+When a provider needs login, CAPTCHA or another manual browser step, temporarily enable headed mode:
+
+```bash
+KITT_BROWSER_MODE=headed docker compose up -d browser reverse-proxy
+```
+
+Open:
+
+```text
+http://127.0.0.1:6080/vnc.html?autoconnect=1&resize=remote
+```
+
+Complete authentication manually, return `KITT_BROWSER_MODE` to `headless`, and recreate the browser container:
+
+```bash
+docker compose up -d --force-recreate browser
+```
+
+The browser profile is stored in `kitt-browser-profile`, so authenticated state survives normal container replacement. Treat that volume as credential material. `docker compose down` keeps it; `docker compose down -v` deletes it together with the Agent state volume.
+
+`KITT_AGENT_REF` and `KITT_REVERSE_PROXY_REF` can pin a branch, tag or commit for Docker builds. The native installer remains the canonical path when you need the complete Assistant/Memory/Toolbox/AI-Workers composition and native acceleration in one local installation.
+
+---
+
 ## Non-interactive & advanced installation
 
 Install the default complete Agent stack without prompts:
