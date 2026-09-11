@@ -78,8 +78,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preset", help="catalog preset (agent, assistant, web, full)")
     parser.add_argument(
         "--ref",
-        default=os.environ.get("KITT_REF") or None,
-        help="override ecosystem.lock.json and install the same branch/tag/SHA from every selected repository",
+        default=os.environ.get("KITT_REF") or "main",
+        help=(
+            "component branch/tag/SHA installed from every selected repository "
+            "(default: main); use 'locked' for ecosystem.lock.json revisions"
+        ),
     )
     parser.add_argument("--root", type=Path, help="installation root")
     parser.add_argument("--bin-dir", type=Path, help="command launcher directory")
@@ -121,6 +124,24 @@ def _print_catalog(catalog: EcosystemCatalog) -> None:
         print(
             f"  {preset_id:<14} {catalog.preset_names[preset_id]:<22} "
             f"{catalog.preset_descriptions[preset_id]}"
+        )
+
+
+def _print_path_status(platform: PlatformAdapter, bin_dir: Path) -> None:
+    conflicts = platform.launcher_shadow_conflicts(bin_dir)
+    if conflicts:
+        print("K.I.T.T. launchers were installed, but older commands shadow them in PATH:")
+        for name, active in sorted(conflicts.items()):
+            print(f"  - {name}: {active}")
+        print(
+            f"Put {bin_dir} before those command directories in PATH, then open a new shell "
+            "(or run `hash -r` in POSIX shells)."
+        )
+        return
+    if not platform.ensure_user_path(bin_dir):
+        print(
+            f"Ensure {bin_dir} is in PATH before any older K.I.T.T. command directory, "
+            "then open a new shell."
         )
 
 
@@ -184,12 +205,12 @@ def main(argv: list[str] | None = None) -> int:
             quiet_log.unlink(missing_ok=True)
             quiet_log = None
             print("K.I.T.T. installed.")
-            if not platform.ensure_user_path(bin_dir):
-                print(f"Add {bin_dir} to PATH.")
+            _print_path_status(platform, bin_dir)
             if "agent-cli" in resolution.ids:
                 print("Run: kitt")
         else:
             installer.install(resolution)
+            _print_path_status(platform, bin_dir)
         return 0
     except UserCancelled as exc:
         print(str(exc), file=sys.stderr)

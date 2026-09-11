@@ -43,6 +43,14 @@ def _run_capture(argv: Sequence[str]) -> tuple[int, str]:
 class PlatformAdapter:
     """Small OS seam. All install orchestration stays platform-independent."""
 
+    _KNOWN_LAUNCHERS = (
+        "kitt",
+        "kittctl",
+        "kittd",
+        "kitt-reverse-proxy",
+        "kitt-agent-gateway",
+    )
+
     def __init__(self, name: str, *, posix: bool):
         self.name = name
         self.posix = posix
@@ -250,10 +258,37 @@ class PlatformAdapter:
             )
         return "\n".join(hints)
 
+    @staticmethod
+    def _same_path(left: str | Path, right: str | Path) -> bool:
+        left_path = os.path.normcase(os.path.abspath(os.path.expanduser(str(left))))
+        right_path = os.path.normcase(os.path.abspath(os.path.expanduser(str(right))))
+        return left_path == right_path
+
+    def _launcher_path(self, bin_dir: Path, name: str) -> Path:
+        suffix = ".cmd" if self.name == "windows" else ""
+        return bin_dir / f"{name}{suffix}"
+
+    def launcher_shadow_conflicts(self, bin_dir: Path) -> dict[str, str]:
+        """Return installed K.I.T.T. launchers shadowed by another PATH entry."""
+        conflicts: dict[str, str] = {}
+        for name in self._KNOWN_LAUNCHERS:
+            expected = self._launcher_path(bin_dir, name)
+            if not expected.exists():
+                continue
+            active = shutil.which(name)
+            if active and not self._same_path(active, expected):
+                conflicts[name] = active
+        return conflicts
+
     def ensure_user_path(self, bin_dir: Path) -> bool:
-        """Persist PATH only on Windows; POSIX shells remain user-owned."""
+        """Persist PATH on Windows and verify installed launchers are not shadowed."""
         if self.name != "windows":
-            return str(bin_dir) in os.environ.get("PATH", "").split(os.pathsep)
+            in_path = any(
+                self._same_path(part, bin_dir)
+                for part in os.environ.get("PATH", "").split(os.pathsep)
+                if part
+            )
+            return in_path and not self.launcher_shadow_conflicts(bin_dir)
         try:
             import winreg  # type: ignore
 
@@ -276,12 +311,40 @@ class PlatformAdapter:
                         "Path",
                         0,
                         winreg.REG_EXPAND_SZ,
-                        ";".join([*parts, str(bin_dir)]),
+                        ";".join([str(bin_dir), *parts]),
                     )
-            os.environ["PATH"] = str(bin_dir) + os.pathsep + os.environ.get("PATH", "")
-            return True
+            current_parts = [
+                part
+                for part in os.environ.get("PATH", "").split(os.pathsep)
+                if part and not self._same_path(part, bin_dir)
+            ]
+            os.environ["PATH"] = os.pathsep.join([str(bin_dir), *current_parts])
+            return not self.launcher_shadow_conflicts(bin_dir)
         except Exception:
             return False
+
+    @staticmethod
+    def _atomic_write_text(
+        path: Path,
+        content: str,
+        *,
+        encoding: str,
+        mode: int | None = None,
+    ) -> None:
+        """Replace a launcher atomically so reinstalls never leave a partial executable."""
+        fd, temp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+        temp_path = Path(temp_name)
+        try:
+            with os.fdopen(fd, "w", encoding=encoding, newline="") as handle:
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+            if mode is not None:
+                temp_path.chmod(mode)
+            os.replace(temp_path, path)
+        except Exception:
+            temp_path.unlink(missing_ok=True)
+            raise
 
     def write_launcher(self, bin_dir: Path, name: str, argv: Sequence[str]) -> Path:
         bin_dir.mkdir(parents=True, exist_ok=True)
@@ -292,7 +355,11 @@ class PlatformAdapter:
                 return '"' + value.replace('"', '""') + '"'
 
             command = " ".join(quote(str(v)) for v in argv)
-            path.write_text(f"@echo off\r\n{command} %*\r\n", encoding="ascii")
+            self._atomic_write_text(
+                path,
+                f"@echo off\r\n{command} %*\r\n",
+                encoding="ascii",
+            )
             return path
 
         path = bin_dir / name
@@ -301,6 +368,10 @@ class PlatformAdapter:
             return "'" + value.replace("'", "'\\''") + "'"
 
         command = " ".join(shell_quote(str(v)) for v in argv)
-        path.write_text(f"#!/bin/sh\nexec {command} \"$@\"\n", encoding="utf-8")
-        path.chmod(0o755)
+        self._atomic_write_text(
+            path,
+            f"#!/bin/sh\nexec {command} \"$@\"\n",
+            encoding="utf-8",
+            mode=0o755,
+        )
         return path

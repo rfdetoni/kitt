@@ -168,6 +168,9 @@ class EcosystemCatalog:
         return Resolution(requested=requested_ids, modules=ordered, auto_selected_by=reasons)
 
     def locked_ref(self, module: ModuleSpec, override_ref: str | None = None) -> str:
+        """Resolve the component ref, keeping the lockfile available as an explicit mode."""
         if override_ref:
-            return override_ref
+            requested = override_ref.strip()
+            if requested.lower() not in {"lock", "locked"}:
+                return requested
         return self.locks[module.repository]
