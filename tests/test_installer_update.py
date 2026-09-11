@@ -55,6 +55,7 @@ class InstallerUpdateRegressionTests(unittest.TestCase):
             self.assertNotIn("/old/python", current)
             self.assertTrue(os.access(path, os.X_OK))
 
+    @unittest.skipIf(os.name == "nt", "symlink replacement requires POSIX symlink semantics")
     def test_reinstall_replaces_symlink_instead_of_overwriting_its_target(self) -> None:
         adapter = PlatformAdapter("linux", posix=True)
         with tempfile.TemporaryDirectory() as temp:
