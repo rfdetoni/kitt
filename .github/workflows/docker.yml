@@ -19,9 +19,12 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      KITT_PROXY_API_KEY: ci-only-not-a-secret
     steps:
       - uses: actions/checkout@v4
       - name: Validate Compose model
-        env:
-          KITT_PROXY_API_KEY: ci-only-not-a-secret
         run: docker compose --profile agent config --quiet
+      - name: Build composed services
+        run: docker compose --profile agent build browser reverse-proxy agent
