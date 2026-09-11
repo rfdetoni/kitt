@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - compose.yaml
+      - compose.dev.yaml
       - .env.docker.example
       - .github/workflows/docker.yml
   pull_request:
     paths:
       - compose.yaml
+      - compose.dev.yaml
       - .env.docker.example
       - .github/workflows/docker.yml
 
@@ -24,7 +26,9 @@ jobs:
       KITT_PROXY_API_KEY: ci-only-not-a-secret
     steps:
       - uses: actions/checkout@v4
-      - name: Validate Compose model
+      - name: Validate release Compose model
         run: docker compose --profile agent config --quiet
-      - name: Build composed services
+      - name: Validate development Compose override
+        run: docker compose -f compose.yaml -f compose.dev.yaml --profile agent config --quiet
+      - name: Build composed services from source fallback
         run: docker compose --profile agent build browser reverse-proxy agent
