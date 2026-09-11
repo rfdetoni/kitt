@@ -1,0 +1,62 @@
+name: kitt
+
+services:
+  browser:
+    build:
+      context: "https://github.com/rfdetoni/kitt-reverse-proxy.git#${KITT_REVERSE_PROXY_REF:-main}"
+      dockerfile: docker/browser.Dockerfile
+    image: kitt/browser:local
+    environment:
+      KITT_BROWSER_MODE: "${KITT_BROWSER_MODE:-headless}"
+      KITT_BROWSER_PROFILE: /data/browser
+    volumes:
+      - kitt-browser-profile:/data/browser
+    shm_size: "1gb"
+    ports:
+      - "127.0.0.1:${KITT_BROWSER_UI_PORT:-6080}:6080"
+    restart: unless-stopped
+
+  reverse-proxy:
+    build:
+      context: "https://github.com/rfdetoni/kitt-reverse-proxy.git#${KITT_REVERSE_PROXY_REF:-main}"
+      target: runtime
+    image: kitt/reverse-proxy:local
+    environment:
+      PROXY_API_KEY: "${KITT_PROXY_API_KEY:?Set KITT_PROXY_API_KEY in .env before starting K.I.T.T.}"
+      CDP_URL: http://browser:9222
+    command:
+      - start
+      - "${KITT_PROXY_PROVIDER:-chatgpt}"
+      - --host
+      - 0.0.0.0
+      - --port
+      - "3000"
+      - --user-data-dir
+      - /data/browser
+    ports:
+      - "127.0.0.1:${KITT_PROXY_PORT:-3000}:3000"
+    depends_on:
+      browser:
+        condition: service_healthy
+    restart: unless-stopped
+
+  agent:
+    profiles: ["agent"]
+    build:
+      context: "https://github.com/rfdetoni/kitt-agent-cli.git#${KITT_AGENT_REF:-main}"
+    image: kitt/agent-cli:local
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    volumes:
+      - "${KITT_WORKSPACE:-.}:/workspace"
+      - kitt-agent-state:/home/kitt/.kitt
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      reverse-proxy:
+        condition: service_started
+
+volumes:
+  kitt-agent-state:
+  kitt-browser-profile:
