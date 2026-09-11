@@ -1,0 +1,17 @@
+# Local environment / secrets
+.env
+.env.*
+!.env.docker.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local editor / OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
