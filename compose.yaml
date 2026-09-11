@@ -2,10 +2,10 @@ name: kitt
 
 services:
   browser:
+    image: "${KITT_BROWSER_IMAGE:-ghcr.io/rfdetoni/kitt-reverse-proxy-browser}:${KITT_REVERSE_PROXY_VERSION:-latest}"
     build:
       context: "https://github.com/rfdetoni/kitt-reverse-proxy.git#${KITT_REVERSE_PROXY_REF:-main}"
       dockerfile: docker/browser.Dockerfile
-    image: kitt/browser:local
     environment:
       KITT_BROWSER_MODE: "${KITT_BROWSER_MODE:-headless}"
       KITT_BROWSER_PROFILE: /data/browser
@@ -17,10 +17,10 @@ services:
     restart: unless-stopped
 
   reverse-proxy:
+    image: "${KITT_REVERSE_PROXY_IMAGE:-ghcr.io/rfdetoni/kitt-reverse-proxy}:${KITT_REVERSE_PROXY_VERSION:-latest}"
     build:
       context: "https://github.com/rfdetoni/kitt-reverse-proxy.git#${KITT_REVERSE_PROXY_REF:-main}"
       target: runtime
-    image: kitt/reverse-proxy:local
     environment:
       PROXY_API_KEY: "${KITT_PROXY_API_KEY:?Set KITT_PROXY_API_KEY in .env before starting K.I.T.T.}"
       CDP_URL: http://browser:9222
@@ -42,9 +42,9 @@ services:
 
   agent:
     profiles: ["agent"]
+    image: "${KITT_AGENT_IMAGE:-ghcr.io/rfdetoni/kitt-agent-cli}:${KITT_AGENT_VERSION:-latest}"
     build:
       context: "https://github.com/rfdetoni/kitt-agent-cli.git#${KITT_AGENT_REF:-main}"
-    image: kitt/agent-cli:local
     stdin_open: true
     tty: true
     working_dir: /workspace
