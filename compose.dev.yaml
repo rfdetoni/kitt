@@ -1,0 +1,9 @@
+services:
+  browser:
+    image: kitt/browser:dev
+
+  reverse-proxy:
+    image: kitt/reverse-proxy:dev
+
+  agent:
+    image: kitt/agent-cli:dev
