@@ -303,15 +303,19 @@ class PlatformAdapter:
                 except FileNotFoundError:
                     value = ""
                 parts = [part for part in str(value).split(";") if part]
-                normalized = {os.path.normcase(os.path.normpath(part)) for part in parts}
-                target = os.path.normcase(os.path.normpath(str(bin_dir)))
-                if target not in normalized:
+                reordered = [
+                    part
+                    for part in parts
+                    if not self._same_path(part, bin_dir)
+                ]
+                reordered.insert(0, str(bin_dir))
+                if reordered != parts:
                     winreg.SetValueEx(
                         key,
                         "Path",
                         0,
                         winreg.REG_EXPAND_SZ,
-                        ";".join([str(bin_dir), *parts]),
+                        ";".join(reordered),
                     )
             current_parts = [
                 part
