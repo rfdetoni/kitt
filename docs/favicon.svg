@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="KITT">
+  <rect width="64" height="64" rx="14" fill="#07090c"/>
+  <rect x="8" y="23" width="48" height="18" rx="9" fill="#020304" stroke="#292f36"/>
+  <rect x="13" y="27" width="16" height="10" rx="5" fill="#ff2738"/>
+  <path d="M15 32h12" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+</svg>
