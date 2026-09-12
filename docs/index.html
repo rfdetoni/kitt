@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07090c">
+  <meta name="description" content="K.I.T.T. is a modular, local-first AI ecosystem for coding, automation, memory, native acceleration and authorized provider access.">
+  <meta property="og:title" content="K.I.T.T. Ecosystem">
+  <meta property="og:description" content="Local-first agent ecosystem for coding, automation, memory and resident AI.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rfdetoni.github.io/kitt/">
+  <meta name="twitter:card" content="summary">
+  <title>K.I.T.T. Ecosystem</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <div class="nav-wrap container">
+      <a class="brand" href="#top" aria-label="K.I.T.T. home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>K.I.T.T.</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#ecosystem">Ecosystem</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#install">Install</a>
+        <a href="#principles">Principles</a>
+        <a class="nav-github" href="https://github.com/rfdetoni/kitt" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero container">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="status-dot"></span> Open source · Local-first · Modular</div>
+        <h1>One ecosystem.<br><span>Many AI capabilities.</span></h1>
+        <p class="hero-lede">K.I.T.T. combines an autonomous coding agent, persistent memory, native acceleration, resident AI, isolated workers and an authorized browser/API gateway — without making a remote provider the center of the architecture.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#install">Get started</a>
+          <a class="button button-secondary" href="https://github.com/rfdetoni/kitt" target="_blank" rel="noreferrer">View source <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-meta" aria-label="Project properties">
+          <span>MIT License</span><span>Linux</span><span>Windows</span><span>macOS</span><span>Python · Rust · TypeScript</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-label="KITT ecosystem visualization">
+        <div class="scanner" aria-hidden="true"><i></i></div>
+        <div class="terminal-card">
+          <div class="terminal-bar"><span></span><span></span><span></span><b>kitt</b></div>
+          <pre><code><span class="prompt">$</span> kitt
+<span class="muted">K.I.T.T. runtime ready</span>
+
+<span class="label">agent</span>      autonomous control plane
+<span class="label">memory</span>     persistent local context
+<span class="label">toolbox</span>    native code intelligence
+<span class="label">assistant</span>  resident AI runtime
+<span class="label">workers</span>    isolated AI workloads
+<span class="label">gateway</span>    authorized provider bridge
+
+<span class="ok">●</span> local-first boundaries active</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="ecosystem">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="section-kicker">The ecosystem</p><h2>Components with clear ownership.</h2></div>
+          <p>K.I.T.T. is split into independently owned modules connected through versioned contracts. The catalog below is loaded from the repository's <code>ecosystem.json</code>, so the site follows the actual distribution manifest.</p>
+        </div>
+        <div class="module-grid" id="module-grid" aria-live="polite">
+          <article class="module-card module-loading"><span class="module-icon">…</span><h3>Loading ecosystem</h3><p>Reading the current module catalog.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="container architecture-layout">
+        <div class="architecture-copy">
+          <p class="section-kicker">Architecture</p>
+          <h2>Local control, explicit boundaries.</h2>
+          <p>The Agent is the control plane. Protocol defines contracts. Toolbox handles native data-plane work. Memory persists context. Assistant provides a resident runtime. AI Workers isolate heavier workloads. Reverse Proxy keeps browser-backed provider access behind its own trust boundary.</p>
+          <a class="text-link" href="https://github.com/rfdetoni/kitt#architecture" target="_blank" rel="noreferrer">Read the architecture notes <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="architecture-map" aria-label="KITT architecture diagram">
+          <div class="arch-node arch-primary"><b>Agent CLI</b><small>control plane</small></div>
+          <div class="arch-line arch-line-a"></div>
+          <div class="arch-row">
+            <div class="arch-node"><b>Protocol</b><small>contracts</small></div>
+            <div class="arch-node"><b>Toolbox</b><small>native data plane</small></div>
+            <div class="arch-node"><b>Memory</b><small>persistent context</small></div>
+          </div>
+          <div class="arch-line arch-line-b"></div>
+          <div class="arch-row arch-row-lower">
+            <div class="arch-node"><b>Assistant</b><small>resident runtime</small></div>
+            <div class="arch-node"><b>AI Workers</b><small>isolated heavy work</small></div>
+            <div class="arch-node"><b>Reverse Proxy</b><small>provider gateway</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-install" id="install">
+      <div class="container">
+        <div class="section-heading install-heading">
+          <div><p class="section-kicker">Getting started</p><h2>Install the ecosystem.</h2></div>
+          <p>The root repository is the distribution and composition point. Select the complete Agent preset or install only the modules you need.</p>
+        </div>
+
+        <div class="install-panel">
+          <div class="install-tabs" role="tablist" aria-label="Installation platform">
+            <button class="install-tab active" role="tab" aria-selected="true" data-install="unix">Linux / macOS</button>
+            <button class="install-tab" role="tab" aria-selected="false" data-install="windows">Windows</button>
+            <button class="install-tab" role="tab" aria-selected="false" data-install="docker">Docker</button>
+          </div>
+          <div class="install-code-wrap">
+            <pre class="install-code"><code id="install-command">curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh</code></pre>
+            <button class="copy-button" id="copy-install" type="button">Copy</button>
+          </div>
+          <p class="install-note" id="install-note">Interactive installer for Linux, macOS and POSIX systems.</p>
+        </div>
+
+        <div class="preset-grid" id="preset-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="reverse-proxy">
+      <div class="container feature-split">
+        <div>
+          <p class="section-kicker">Web bridge</p>
+          <h2>KITT Reverse Proxy</h2>
+          <p class="feature-lede">A dedicated authorized browser/API gateway and session bridge for provider access that needs to remain outside the Agent's core process.</p>
+          <p>This is especially useful when a provider workflow is available through an authenticated web session while direct API access is unavailable or undesirable. Browser authentication, provider sessions and security boundaries remain isolated in the gateway.</p>
+          <p class="warning"><strong>Active development.</strong> The reverse proxy is experimental and provider behavior can change.</p>
+          <a class="button button-secondary" href="https://github.com/rfdetoni/kitt-reverse-proxy" target="_blank" rel="noreferrer">Open repository <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="boundary-card">
+          <span class="boundary-label">Trust boundary</span>
+          <div class="boundary-flow"><b>Agent</b><span>HTTP</span><b>Reverse Proxy</b><span>CDP</span><b>Browser</b></div>
+          <ul>
+            <li>Provider sessions remain separated from the Agent.</li>
+            <li>Manual authentication and security controls are preserved.</li>
+            <li>Docker can isolate proxy and Chromium into separate containers.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="principles">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="section-kicker">Project principles</p><h2>Designed for control, not lock-in.</h2></div>
+          <p>The ecosystem favors measurable performance, explicit authority and components that can evolve independently without duplicating implementation.</p>
+        </div>
+        <div class="principle-grid">
+          <article><span>01</span><h3>Local-first</h3><p>Remote providers are integrations, not the center of the architecture.</p></article>
+          <article><span>02</span><h3>Fast hot path</h3><p>Keep orchestration lightweight and move deterministic heavy work to native components when it materially helps.</p></article>
+          <article><span>03</span><h3>Explicit authority</h3><p>Agents act through capabilities, approvals and workspace boundaries.</p></article>
+          <article><span>04</span><h3>Composable</h3><p>Share contracts and namespaces instead of vendoring copies between repositories.</p></article>
+          <article><span>05</span><h3>Bounded resources</h3><p>Queues, frames, outputs and telemetry have explicit limits where practical.</p></article>
+          <article><span>06</span><h3>Reviewable evolution</h3><p>Self-improvement is evaluated and promoted explicitly, never silently self-deployed.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container cta-card">
+        <div><p class="section-kicker">Build with K.I.T.T.</p><h2>Start with the Agent or compose your own stack.</h2><p>Everything is open source under the MIT License.</p></div>
+        <div class="cta-actions"><a class="button button-primary" href="https://github.com/rfdetoni/kitt" target="_blank" rel="noreferrer">Explore on GitHub <span aria-hidden="true">↗</span></a><a class="text-link" href="#install">Install K.I.T.T. <span aria-hidden="true">↑</span></a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-wrap">
+      <div><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><span></span></span><span>K.I.T.T.</span></a><p>Local-first agent ecosystem for coding, automation, memory and resident AI.</p></div>
+      <div class="footer-links"><a href="https://github.com/rfdetoni/kitt">GitHub</a><a href="https://github.com/rfdetoni/kitt/blob/main/SECURITY.md">Security</a><a href="https://github.com/rfdetoni/kitt/blob/main/LICENSE">MIT License</a></div>
+    </div>
+  </footer>
+</body>
+</html>
