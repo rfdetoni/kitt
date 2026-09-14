@@ -10,7 +10,9 @@ from typing import Iterator
 
 from .catalog import CatalogError, EcosystemCatalog
 from .core import EcosystemInstaller, InstallerError, InstallerOptions
+from .path_priority import ensure_managed_path
 from .platforms import PlatformAdapter
+from .progress import InstallProgress
 from .ui import UserCancelled, choose_modules
 
 
@@ -128,20 +130,21 @@ def _print_catalog(catalog: EcosystemCatalog) -> None:
 
 
 def _print_path_status(platform: PlatformAdapter, bin_dir: Path) -> None:
+    path_ready = ensure_managed_path(platform, bin_dir)
     conflicts = platform.launcher_shadow_conflicts(bin_dir)
     if conflicts:
-        print("K.I.T.T. launchers were installed, but older commands shadow them in PATH:")
+        print("K.I.T.T. launchers were installed, but external commands still shadow them in PATH:")
         for name, active in sorted(conflicts.items()):
             print(f"  - {name}: {active}")
         print(
-            f"Put {bin_dir} before those command directories in PATH, then open a new shell "
-            "(or run `hash -r` in POSIX shells)."
+            f"The installer persisted {bin_dir} as the first managed K.I.T.T. path. "
+            "Open a new terminal; if a system-wide command still wins, remove that external conflict."
         )
         return
-    if not platform.ensure_user_path(bin_dir):
+    if not path_ready:
         print(
-            f"Ensure {bin_dir} is in PATH before any older K.I.T.T. command directory, "
-            "then open a new shell."
+            f"K.I.T.T. could not persist {bin_dir} at the front of PATH automatically. "
+            "Add it before older K.I.T.T. command directories."
         )
 
 
@@ -150,6 +153,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     source_root = _source_root()
     quiet_log: Path | None = None
+    active_progress: InstallProgress | None = None
     verbose = bool(args.verbose or _env_flag("KITT_VERBOSE"))
     non_interactive = bool(args.yes or _env_flag("KITT_NON_INTERACTIVE"))
 
@@ -198,13 +202,20 @@ def main(argv: list[str] | None = None) -> int:
         resolution = catalog.resolve(requested)
         concise = not verbose and not args.dry_run
         if concise:
-            print("Installing K.I.T.T...", flush=True)
-            with _quiet_install_output() as log_path:
-                quiet_log = log_path
-                installer.install(resolution)
+            active_progress = InstallProgress()
+            active_progress.start()
+            try:
+                with _quiet_install_output() as log_path:
+                    quiet_log = log_path
+                    installer.install(resolution)
+            except Exception:
+                active_progress.finish(False)
+                active_progress = None
+                raise
+            active_progress.finish(True)
+            active_progress = None
             quiet_log.unlink(missing_ok=True)
             quiet_log = None
-            print("K.I.T.T. installed.")
             _print_path_status(platform, bin_dir)
             if "agent-cli" in resolution.ids:
                 print("Run: kitt")
@@ -213,9 +224,13 @@ def main(argv: list[str] | None = None) -> int:
             _print_path_status(platform, bin_dir)
         return 0
     except UserCancelled as exc:
+        if active_progress is not None:
+            active_progress.finish(False)
         print(str(exc), file=sys.stderr)
         return 130
     except (CatalogError, InstallerError, OSError, ValueError) as exc:
+        if active_progress is not None:
+            active_progress.finish(False)
         print(f"K.I.T.T. install failed: {exc}", file=sys.stderr)
         if quiet_log is not None and quiet_log.exists():
             print(f"Details: {quiet_log}", file=sys.stderr)
