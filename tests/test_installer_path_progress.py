@@ -13,6 +13,7 @@ from installer.platforms import PlatformAdapter
 from installer.progress import InstallProgress, progress_frame
 
 
+@unittest.skipIf(os.name == "nt", "POSIX shell profile semantics")
 class PathPriorityTests(unittest.TestCase):
     @staticmethod
     def _make_launcher(directory: Path, text: str) -> Path:
