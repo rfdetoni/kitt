@@ -23,6 +23,13 @@ class PathPriorityTests(unittest.TestCase):
         path.chmod(0o755)
         return path
 
+    @staticmethod
+    def _resolved_command(name: str) -> Path:
+        active = shutil.which(name)
+        if not active:
+            return Path()
+        return Path(active).resolve()
+
     def test_posix_install_prepends_managed_bin_for_current_and_new_shells(self) -> None:
         adapter = PlatformAdapter("linux", posix=True)
         with tempfile.TemporaryDirectory() as temp:
@@ -42,8 +49,11 @@ class PathPriorityTests(unittest.TestCase):
                 ),
             ):
                 self.assertTrue(ensure_managed_path(adapter, new_bin))
-                self.assertEqual(Path(shutil.which("kitt") or ""), expected)
-                self.assertEqual(Path(os.environ["PATH"].split(os.pathsep)[0]), new_bin)
+                self.assertEqual(self._resolved_command("kitt"), expected.resolve())
+                self.assertEqual(
+                    Path(os.environ["PATH"].split(os.pathsep)[0]).resolve(),
+                    new_bin.resolve(),
+                )
 
                 profile = (home / ".profile").read_text(encoding="utf-8")
                 bashrc = (home / ".bashrc").read_text(encoding="utf-8")
@@ -94,7 +104,7 @@ class PathPriorityTests(unittest.TestCase):
             ):
                 self.assertTrue(ensure_managed_path(adapter, first_bin))
                 self.assertTrue(ensure_managed_path(adapter, second_bin))
-                self.assertEqual(Path(shutil.which("kitt") or ""), second_launcher)
+                self.assertEqual(self._resolved_command("kitt"), second_launcher.resolve())
 
             for name in (".profile", ".zprofile", ".zshrc"):
                 content = (home / name).read_text(encoding="utf-8")
