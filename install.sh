@@ -3,17 +3,34 @@ set -eu
 
 INSTALLER_REPO="${KITT_INSTALLER_REPO:-https://github.com/rfdetoni/kitt.git}"
 INSTALLER_REF="${KITT_INSTALLER_REF:-main}"
+PROGRESS_WIDTH=28
+
+progress_bar() {
+  percent="$1"
+  filled=$((percent * PROGRESS_WIDTH / 100))
+  empty=$((PROGRESS_WIDTH - filled))
+  bar=""
+  i=0
+  while [ "$i" -lt "$filled" ]; do bar="${bar}#"; i=$((i + 1)); done
+  i=0
+  while [ "$i" -lt "$empty" ]; do bar="${bar}-"; i=$((i + 1)); done
+  printf '%s' "$bar"
+}
 
 show_progress() {
-  [ -t 1 ] || return 0
   percent="$1"
-  bar="$2"
-  printf '\rPreparing K.I.T.T. installer  [%s] %3s%%' "$bar" "$percent"
+  status="$2"
+  bar="$(progress_bar "$percent")"
+  if [ -t 1 ]; then
+    printf '\rPreparing K.I.T.T.  [%s] %3s%%  %-28s' "$bar" "$percent" "$status"
+  else
+    printf 'Preparing K.I.T.T.  %3s%%  %s\n' "$percent" "$status"
+  fi
 }
 
 finish_progress() {
-  [ -t 1 ] || return 0
-  printf '\n'
+  [ -t 1 ] && printf '\n'
+  return 0
 }
 
 find_python() {
@@ -28,24 +45,32 @@ find_python() {
   return 1
 }
 
+show_progress 2 "Checking Python"
 PYTHON="$(find_python || true)"
 if [ -z "$PYTHON" ]; then
+  finish_progress
   echo "K.I.T.T. requires Python 3.10+ for the installer (Agent requires Python 3.12+)." >&2
   exit 1
 fi
+show_progress 10 "Python ready"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd || pwd)
 if [ -f "$SCRIPT_DIR/installer/__main__.py" ] && [ -f "$SCRIPT_DIR/ecosystem.json" ]; then
+  show_progress 100 "Starting local installer"
+  finish_progress
   cd "$SCRIPT_DIR"
   exec "$PYTHON" -m installer "$@"
 fi
 
+show_progress 15 "Checking Git"
 command -v git >/dev/null 2>&1 || {
+  finish_progress
   echo "K.I.T.T. requires git." >&2
   exit 1
 }
 
 TMP_BASE="${TMPDIR:-/tmp}"
+show_progress 20 "Creating workspace"
 if command -v mktemp >/dev/null 2>&1; then
   WORKDIR=$(mktemp -d "$TMP_BASE/kitt-installer.XXXXXX")
 else
@@ -56,25 +81,25 @@ cleanup() { rm -rf "$WORKDIR"; }
 trap cleanup EXIT HUP INT TERM
 
 SRC="$WORKDIR/kitt"
-show_progress 10 "##------------------"
+show_progress 28 "Downloading installer"
 if ! git clone --filter=blob:none --no-checkout "$INSTALLER_REPO" "$SRC" >/dev/null 2>&1; then
   finish_progress
   echo "Failed to download the K.I.T.T. installer." >&2
   exit 1
 fi
-show_progress 55 "###########---------"
+show_progress 58 "Resolving $INSTALLER_REF"
 if ! git -C "$SRC" fetch --force --depth 1 origin "$INSTALLER_REF" >/dev/null 2>&1; then
   finish_progress
   echo "Failed to resolve K.I.T.T. installer ref: $INSTALLER_REF" >&2
   exit 1
 fi
-show_progress 85 "#################---"
+show_progress 82 "Preparing files"
 if ! git -C "$SRC" checkout --detach --force FETCH_HEAD >/dev/null 2>&1; then
   finish_progress
   echo "Failed to prepare the K.I.T.T. installer." >&2
   exit 1
 fi
-show_progress 100 "####################"
+show_progress 100 "Starting installation"
 finish_progress
 
 cd "$SRC"
