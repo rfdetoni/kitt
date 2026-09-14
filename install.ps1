@@ -2,20 +2,27 @@ $ErrorActionPreference = 'Stop'
 $ForwardArgs = @($args)
 $InstallerRepo = if ($env:KITT_INSTALLER_REPO) { $env:KITT_INSTALLER_REPO } else { 'https://github.com/rfdetoni/kitt.git' }
 $InstallerRef = if ($env:KITT_INSTALLER_REF) { $env:KITT_INSTALLER_REF } else { 'main' }
+$ProgressWidth = 28
 
 function Show-KittBootstrapProgress {
   param(
     [int]$Percent,
     [string]$Status
   )
-  if (-not [Console]::IsOutputRedirected) {
-    Write-Progress -Id 1 -Activity 'Preparing K.I.T.T. installer' -Status $Status -PercentComplete $Percent
+  $Clamped = [Math]::Max(0, [Math]::Min(100, $Percent))
+  $Filled = [Math]::Floor($Clamped * $ProgressWidth / 100)
+  $Bar = ('#' * $Filled) + ('-' * ($ProgressWidth - $Filled))
+  $Line = "Preparing K.I.T.T.  [$Bar] {0,3}%  {1}" -f $Clamped, $Status
+  if ([Console]::IsOutputRedirected) {
+    Write-Host $Line
+  } else {
+    Write-Host -NoNewline ("`r" + $Line.PadRight(90))
   }
 }
 
 function Complete-KittBootstrapProgress {
   if (-not [Console]::IsOutputRedirected) {
-    Write-Progress -Id 1 -Activity 'Preparing K.I.T.T. installer' -Completed
+    Write-Host
   }
 }
 
@@ -45,39 +52,47 @@ function Find-KittPython {
   return $null
 }
 
+Show-KittBootstrapProgress -Percent 2 -Status 'Checking Python'
 $Python = Find-KittPython
 if (-not $Python) {
+  Complete-KittBootstrapProgress
   throw 'K.I.T.T. requires Python 3.10+ for the installer (Agent requires Python 3.12+).'
 }
+Show-KittBootstrapProgress -Percent 10 -Status 'Python ready'
 
 $LocalRoot = $null
 if ($PSScriptRoot -and (Test-Path (Join-Path $PSScriptRoot 'installer\__main__.py')) -and (Test-Path (Join-Path $PSScriptRoot 'ecosystem.json'))) {
   $LocalRoot = $PSScriptRoot
+  Show-KittBootstrapProgress -Percent 100 -Status 'Starting local installer'
+  Complete-KittBootstrapProgress
 }
 
 $TempRoot = $null
 try {
   if (-not $LocalRoot) {
+    Show-KittBootstrapProgress -Percent 15 -Status 'Checking Git'
     if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+      Complete-KittBootstrapProgress
       throw 'K.I.T.T. requires git.'
     }
+    Show-KittBootstrapProgress -Percent 20 -Status 'Creating workspace'
     $TempRoot = Join-Path ([IO.Path]::GetTempPath()) ("kitt-installer-" + [guid]::NewGuid().ToString('N'))
     $LocalRoot = Join-Path $TempRoot 'kitt'
     New-Item -ItemType Directory -Force -Path $TempRoot | Out-Null
 
-    Show-KittBootstrapProgress -Percent 10 -Status 'Downloading'
+    Show-KittBootstrapProgress -Percent 28 -Status 'Downloading installer'
     & git clone --filter=blob:none --no-checkout $InstallerRepo $LocalRoot *> $null
     if ($LASTEXITCODE -ne 0) { throw 'Failed to download the K.I.T.T. installer.' }
 
-    Show-KittBootstrapProgress -Percent 55 -Status 'Resolving version'
+    Show-KittBootstrapProgress -Percent 58 -Status "Resolving $InstallerRef"
     & git -C $LocalRoot fetch --force --depth 1 origin $InstallerRef *> $null
     if ($LASTEXITCODE -ne 0) { throw "Failed to resolve K.I.T.T. installer ref $InstallerRef." }
 
-    Show-KittBootstrapProgress -Percent 85 -Status 'Preparing files'
+    Show-KittBootstrapProgress -Percent 82 -Status 'Preparing files'
     & git -C $LocalRoot checkout --detach --force FETCH_HEAD *> $null
     if ($LASTEXITCODE -ne 0) { throw 'Failed to prepare the K.I.T.T. installer.' }
 
-    Show-KittBootstrapProgress -Percent 100 -Status 'Ready'
+    Show-KittBootstrapProgress -Percent 100 -Status 'Starting installation'
     Complete-KittBootstrapProgress
   }
 
@@ -90,7 +105,6 @@ try {
     Pop-Location
   }
 } finally {
-  Complete-KittBootstrapProgress
   if ($TempRoot -and (Test-Path $TempRoot)) {
     Remove-Item -LiteralPath $TempRoot -Recurse -Force -ErrorAction SilentlyContinue
   }
