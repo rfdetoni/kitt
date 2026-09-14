@@ -129,22 +129,20 @@ def _print_catalog(catalog: EcosystemCatalog) -> None:
         )
 
 
-def _print_path_status(platform: PlatformAdapter, bin_dir: Path) -> None:
+def _ensure_launcher_priority(platform: PlatformAdapter, bin_dir: Path) -> None:
+    """Fail installation finalization unless new terminals will prefer managed launchers."""
     path_ready = ensure_managed_path(platform, bin_dir)
     conflicts = platform.launcher_shadow_conflicts(bin_dir)
     if conflicts:
-        print("K.I.T.T. launchers were installed, but external commands still shadow them in PATH:")
-        for name, active in sorted(conflicts.items()):
-            print(f"  - {name}: {active}")
-        print(
-            f"The installer persisted {bin_dir} as the first managed K.I.T.T. path. "
-            "Open a new terminal; if a system-wide command still wins, remove that external conflict."
+        details = ", ".join(f"{name} -> {active}" for name, active in sorted(conflicts.items()))
+        raise InstallerError(
+            "K.I.T.T. installed its launchers but could not guarantee that they are first in PATH: "
+            f"{details}. Managed launcher directory: {bin_dir}"
         )
-        return
     if not path_ready:
-        print(
-            f"K.I.T.T. could not persist {bin_dir} at the front of PATH automatically. "
-            "Add it before older K.I.T.T. command directories."
+        raise InstallerError(
+            "K.I.T.T. installed its launchers but could not persist the managed launcher directory "
+            f"at the front of PATH for new terminals: {bin_dir}"
         )
 
 
@@ -208,6 +206,7 @@ def main(argv: list[str] | None = None) -> int:
                 with _quiet_install_output() as log_path:
                     quiet_log = log_path
                     installer.install(resolution)
+                _ensure_launcher_priority(platform, bin_dir)
             except Exception:
                 active_progress.finish(False)
                 active_progress = None
@@ -216,12 +215,12 @@ def main(argv: list[str] | None = None) -> int:
             active_progress = None
             quiet_log.unlink(missing_ok=True)
             quiet_log = None
-            _print_path_status(platform, bin_dir)
             if "agent-cli" in resolution.ids:
                 print("Run: kitt")
         else:
             installer.install(resolution)
-            _print_path_status(platform, bin_dir)
+            if not args.dry_run:
+                _ensure_launcher_priority(platform, bin_dir)
         return 0
     except UserCancelled as exc:
         if active_progress is not None:
