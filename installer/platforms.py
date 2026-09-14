@@ -260,8 +260,12 @@ class PlatformAdapter:
 
     @staticmethod
     def _same_path(left: str | Path, right: str | Path) -> bool:
-        left_path = os.path.normcase(os.path.abspath(os.path.expanduser(str(left))))
-        right_path = os.path.normcase(os.path.abspath(os.path.expanduser(str(right))))
+        left_path = os.path.normcase(
+            os.path.realpath(os.path.abspath(os.path.expanduser(str(left))))
+        )
+        right_path = os.path.normcase(
+            os.path.realpath(os.path.abspath(os.path.expanduser(str(right))))
+        )
         return left_path == right_path
 
     def _launcher_path(self, bin_dir: Path, name: str) -> Path:
