@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 import unittest
@@ -7,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from installer.catalog import EcosystemCatalog
-from installer.cli import build_parser
+from installer.cli import _record_source_ref, build_parser
 from installer.platforms import PlatformAdapter
 
 
@@ -34,6 +35,34 @@ class InstallerUpdateRegressionTests(unittest.TestCase):
         self.assertEqual(catalog.locked_ref(module, None), expected)
         self.assertEqual(catalog.locked_ref(module, "main"), "main")
         self.assertEqual(catalog.locked_ref(module, "v1.2.3"), "v1.2.3")
+
+    def test_source_ref_is_persisted_for_main_install(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            state = root / "installed-state.json"
+            state.write_text(
+                json.dumps({"schema_version": 1, "repositories": {}}),
+                encoding="utf-8",
+            )
+
+            _record_source_ref(root, "main")
+
+            payload = json.loads(state.read_text(encoding="utf-8"))
+            self.assertEqual(payload["source_ref"], "main")
+
+    def test_lock_alias_is_normalized_when_source_ref_is_persisted(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            state = root / "installed-state.json"
+            state.write_text(
+                json.dumps({"schema_version": 1, "repositories": {}}),
+                encoding="utf-8",
+            )
+
+            _record_source_ref(root, "lock")
+
+            payload = json.loads(state.read_text(encoding="utf-8"))
+            self.assertEqual(payload["source_ref"], "locked")
 
     def test_reinstall_replaces_existing_launcher(self) -> None:
         adapter = PlatformAdapter("linux", posix=True)
