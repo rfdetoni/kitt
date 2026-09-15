@@ -10,10 +10,11 @@ from pathlib import Path
 from typing import Iterator
 
 from .catalog import CatalogError, EcosystemCatalog
-from .core import EcosystemInstaller, InstallerError, InstallerOptions
+from .core import InstallerError, InstallerOptions
 from .path_priority import ensure_managed_path
 from .platforms import PlatformAdapter
 from .progress import InstallProgress
+from .source_free import SourceFreeEcosystemInstaller
 from .ui import UserCancelled, choose_modules
 
 
@@ -95,7 +96,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="explicitly skip Rust/native builds and use portable fallbacks where available",
     )
-    parser.add_argument("--force", action="store_true", help="discard local changes in managed component checkouts")
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="compatibility flag for legacy managed installs",
+    )
     parser.add_argument(
         "--yes",
         "-y",
@@ -202,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
             dry_run=bool(args.dry_run),
             start_services=not bool(args.no_start_services),
         )
-        installer = EcosystemInstaller(catalog, platform, options)
+        installer = SourceFreeEcosystemInstaller(catalog, platform, options)
         if args.uninstall:
             installer.uninstall()
             return 0
