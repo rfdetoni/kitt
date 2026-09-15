@@ -22,6 +22,10 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
 
     def _sync_repository(self, module: ModuleSpec) -> None:
         self._managed_legacy_sources.add(module.repository.split("/", 1)[1])
+        path = self._repo_dir(module)
+        if path.exists():
+            shutil.rmtree(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
         super()._sync_repository(module)
 
     def _runtime_component_dir(self, name: str) -> Path:
