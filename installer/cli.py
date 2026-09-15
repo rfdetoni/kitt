@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import tempfile
@@ -146,6 +147,33 @@ def _ensure_launcher_priority(platform: PlatformAdapter, bin_dir: Path) -> None:
         )
 
 
+def _record_source_ref(root: Path, ref: str | None) -> None:
+    """Persist the update channel used for the completed installation."""
+    state_path = root / "installed-state.json"
+    try:
+        payload = json.loads(state_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise InstallerError(f"could not read installed state at {state_path}") from exc
+    if not isinstance(payload, dict):
+        raise InstallerError(f"installed state at {state_path} is not an object")
+
+    source_ref = (ref or "main").strip() or "main"
+    if source_ref.lower() == "lock":
+        source_ref = "locked"
+    payload["source_ref"] = source_ref
+
+    temporary = state_path.with_suffix(".ref.tmp")
+    try:
+        temporary.write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary, state_path)
+    except OSError as exc:
+        temporary.unlink(missing_ok=True)
+        raise InstallerError(f"could not persist install source ref at {state_path}") from exc
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -206,6 +234,7 @@ def main(argv: list[str] | None = None) -> int:
                 with _quiet_install_output() as log_path:
                     quiet_log = log_path
                     installer.install(resolution)
+                    _record_source_ref(root, args.ref)
                 _ensure_launcher_priority(platform, bin_dir)
             except Exception:
                 active_progress.finish(False)
@@ -220,6 +249,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             installer.install(resolution)
             if not args.dry_run:
+                _record_source_ref(root, args.ref)
                 _ensure_launcher_priority(platform, bin_dir)
         return 0
     except UserCancelled as exc:
