@@ -53,6 +53,37 @@ class SourceFreeInstallerTests(unittest.TestCase):
             self.assertEqual(path, root / ".staging" / "sources" / "kitt-agent-cli")
             self.assertNotEqual(path, root / "kitt-agent-cli")
 
+    def test_source_sync_uses_one_remote_fetch_without_clone_round_trip(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            module = installer.catalog.modules["agent-cli"]
+
+            with (
+                patch.object(installer, "_run") as run,
+                patch.object(installer, "_capture", return_value="a" * 40),
+            ):
+                installer._sync_repository(module)
+
+            commands = [tuple(call.args[0]) for call in run.call_args_list]
+            self.assertTrue(any(command[:2] == ("git", "init") for command in commands))
+            self.assertEqual(
+                sum(1 for command in commands if "fetch" in command),
+                1,
+            )
+            self.assertFalse(any("clone" in command for command in commands))
+
+    def test_source_free_native_build_only_compiles_runtime_assistant(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            resolution = installer.catalog.resolve(("agent-cli",))
+
+            with patch.object(installer, "_cargo_build_cached") as build:
+                installer._build_native_components(resolution)
+
+            build.assert_called_once_with(installer.catalog.modules["assistant"])
+
     def test_reverse_proxy_runtime_keeps_only_installed_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -92,12 +123,12 @@ class SourceFreeInstallerTests(unittest.TestCase):
             self.assertIn(str(root / "runtime" / "reverse-proxy" / "dist" / "cli.js"), launcher)
             self.assertNotIn(".staging/sources", launcher)
 
-    def test_assistant_binaries_are_promoted_outside_source_checkout(self) -> None:
+    def test_assistant_binaries_are_promoted_from_persistent_build_cache(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             installer = self._installer(root)
             source = installer._repo_dir(installer.catalog.modules["assistant"])
-            release = source / "target" / "release"
+            release = installer._cargo_target_dir("assistant") / "release"
             release.mkdir(parents=True)
             for name in ("kittctl", "kittd"):
                 binary = release / name
@@ -115,17 +146,49 @@ class SourceFreeInstallerTests(unittest.TestCase):
             self.assertFalse((runtime / "target").exists())
             self.assertFalse((runtime / "apps").exists())
 
-    def test_staging_cleanup_removes_downloaded_sources(self) -> None:
+    def test_python_stack_batches_local_packages_without_build_isolation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            installer._python = CommandInfo(
+                argv=("python3",), version=(3, 14, 0), version_text="3.14.0"
+            )
+            modules = (
+                installer.catalog.modules["protocol"],
+                installer.catalog.modules["agent-cli"],
+            )
+            resolution = Resolution(
+                requested=("agent-cli",),
+                modules=modules,
+                auto_selected_by={},
+            )
+
+            with patch.object(installer, "_run") as run:
+                installer._install_python_stack(resolution)
+
+            commands = [tuple(str(value) for value in call.args[0]) for call in run.call_args_list]
+            pip_commands = [command for command in commands if "pip" in command]
+            self.assertTrue(any("setuptools>=68" in command for command in pip_commands))
+            local_installs = [command for command in pip_commands if "--no-build-isolation" in command]
+            self.assertEqual(len(local_installs), 1)
+            self.assertIn("--no-deps", local_installs[0])
+            self.assertFalse(any("-U" in command and "pip" in command for command in pip_commands))
+
+    def test_staging_cleanup_removes_sources_but_keeps_build_cache(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             installer = self._installer(root)
             sources = root / ".staging" / "sources" / "kitt-agent-cli"
             sources.mkdir(parents=True)
             (sources / "source.py").write_text("source\n", encoding="utf-8")
+            cached = installer._cargo_target_dir("assistant") / "release" / "cached"
+            cached.parent.mkdir(parents=True, exist_ok=True)
+            cached.write_text("artifact", encoding="utf-8")
 
             installer._cleanup_staging()
 
             self.assertFalse((root / ".staging" / "sources").exists())
+            self.assertTrue(cached.is_file())
 
     def test_success_migration_removes_legacy_managed_checkout(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
