@@ -99,7 +99,7 @@ try {
   Push-Location $LocalRoot
   try {
     $Prefix = @($Python.Prefix)
-    & $Python.Exe @Prefix -m installer @ForwardArgs
+    & $Python.Exe @Prefix -m installer --force @ForwardArgs
     if ($LASTEXITCODE -ne 0) { throw "K.I.T.T. installer failed with exit code $LASTEXITCODE." }
   } finally {
     Pop-Location
