@@ -59,7 +59,7 @@ if [ -f "$SCRIPT_DIR/installer/__main__.py" ] && [ -f "$SCRIPT_DIR/ecosystem.jso
   show_progress 100 "Starting local installer"
   finish_progress
   cd "$SCRIPT_DIR"
-  exec "$PYTHON" -m installer "$@"
+  exec "$PYTHON" -m installer --force "$@"
 fi
 
 show_progress 15 "Checking Git"
@@ -105,4 +105,4 @@ show_progress 100 "Starting installation"
 finish_progress
 
 cd "$SRC"
-"$PYTHON" -m installer "$@"
+"$PYTHON" -m installer --force "$@"
