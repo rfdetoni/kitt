@@ -81,13 +81,15 @@ cleanup() { rm -rf "$WORKDIR"; }
 trap cleanup EXIT HUP INT TERM
 
 SRC="$WORKDIR/kitt"
-show_progress 28 "Downloading installer"
-if ! git clone --filter=blob:none --no-checkout "$INSTALLER_REPO" "$SRC" >/dev/null 2>&1; then
+show_progress 28 "Preparing installer repository"
+mkdir -p "$SRC"
+if ! git init --quiet "$SRC" >/dev/null 2>&1 ||
+   ! git -C "$SRC" remote add origin "$INSTALLER_REPO" >/dev/null 2>&1; then
   finish_progress
-  echo "Failed to download the K.I.T.T. installer." >&2
+  echo "Failed to prepare the K.I.T.T. installer repository." >&2
   exit 1
 fi
-show_progress 58 "Resolving $INSTALLER_REF"
+show_progress 58 "Downloading $INSTALLER_REF"
 if ! git -C "$SRC" fetch --force --depth 1 origin "$INSTALLER_REF" >/dev/null 2>&1; then
   finish_progress
   echo "Failed to resolve K.I.T.T. installer ref: $INSTALLER_REF" >&2
