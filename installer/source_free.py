@@ -284,12 +284,14 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         ])
 
         local_packages: list[Path] = []
+        agent_package: Path | None = None
         if "protocol" in selected:
             local_packages.append(
                 self._repo_dir(self.catalog.modules["protocol"]) / "sdk" / "python"
             )
         if "agent-cli" in selected:
-            local_packages.append(self._repo_dir(self.catalog.modules["agent-cli"]))
+            agent_package = self._repo_dir(self.catalog.modules["agent-cli"])
+            local_packages.append(agent_package)
         if "assistant" in selected and "agent-cli" in selected:
             local_packages.append(
                 self._repo_dir(self.catalog.modules["assistant"])
@@ -314,14 +316,29 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                     "--prefer-binary", "--no-build-isolation", str(package),
                 ])
 
-            # Re-apply every selected KITT package without dependency resolution
+            # Re-apply selected KITT packages without dependency resolution
             # so the requested main/locked checkouts are authoritative even when
             # one package declares another KITT repository through a direct URL.
-            self._run([
-                str(python), "-m", "pip", "install", "--disable-pip-version-check",
-                "--no-deps", "--no-build-isolation", "--upgrade", "--force-reinstall",
-                *map(str, local_packages),
-            ])
+            #
+            # Install the Agent on its own and last. Multiple KITT distributions
+            # intentionally share the kitt namespace, so a single multi-wheel
+            # reinstall must not leave Agent-owned modules from an older install
+            # order in site-packages.
+            non_agent_packages = [
+                package for package in local_packages if package != agent_package
+            ]
+            if non_agent_packages:
+                self._run([
+                    str(python), "-m", "pip", "install", "--disable-pip-version-check",
+                    "--no-deps", "--no-build-isolation", "--upgrade", "--force-reinstall",
+                    *map(str, non_agent_packages),
+                ])
+            if agent_package is not None:
+                self._run([
+                    str(python), "-m", "pip", "install", "--disable-pip-version-check",
+                    "--no-deps", "--no-build-isolation", "--upgrade", "--force-reinstall",
+                    str(agent_package),
+                ])
 
         if "toolbox" in selected and not self.options.portable:
             toolbox = self._repo_dir(self.catalog.modules["toolbox"])
