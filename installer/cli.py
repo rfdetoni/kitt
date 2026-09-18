@@ -82,10 +82,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preset", help="catalog preset (agent, assistant, web, full)")
     parser.add_argument(
         "--ref",
-        default=os.environ.get("KITT_REF") or "main",
+        default=os.environ.get("KITT_REF") or "locked",
         help=(
             "component branch/tag/SHA installed from every selected repository "
-            "(default: main); use 'locked' for ecosystem.lock.json revisions"
+            "(default: locked snapshot from ecosystem.lock.json)"
         ),
     )
     parser.add_argument("--root", type=Path, help="installation root")
@@ -95,11 +95,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--portable",
         action="store_true",
         help="explicitly skip Rust/native builds and use portable fallbacks where available",
-    )
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="compatibility flag for legacy managed installs",
     )
     parser.add_argument(
         "--yes",
@@ -162,7 +157,7 @@ def _record_source_ref(root: Path, ref: str | None) -> None:
     if not isinstance(payload, dict):
         raise InstallerError(f"installed state at {state_path} is not an object")
 
-    source_ref = (ref or "main").strip() or "main"
+    source_ref = (ref or "locked").strip() or "locked"
     if source_ref.lower() == "lock":
         source_ref = "locked"
     payload["source_ref"] = source_ref
@@ -200,7 +195,6 @@ def main(argv: list[str] | None = None) -> int:
         options = InstallerOptions(
             root=root,
             bin_dir=bin_dir,
-            force=bool(args.force),
             ref=args.ref,
             with_ai_workers=bool(args.with_ai_workers),
             portable=bool(args.portable),
