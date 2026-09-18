@@ -1,0 +1,128 @@
+name: agent-proxy-contract
+
+on:
+  pull_request:
+    paths:
+      - ecosystem.lock.json
+      - ecosystem.json
+      - .github/workflows/agent-proxy-contract.yml
+  push:
+    branches: [main]
+    paths:
+      - ecosystem.lock.json
+      - ecosystem.json
+      - .github/workflows/agent-proxy-contract.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout ecosystem
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Resolve locked Agent and reverse-proxy SHAs
+        id: refs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          components = json.load(open("ecosystem.lock.json", encoding="utf-8"))["components"]
+          required = ("rfdetoni/kitt-agent-cli", "rfdetoni/kitt-reverse-proxy")
+          missing = [name for name in required if name not in components]
+          if missing:
+              raise SystemExit(f"missing locked components: {missing}")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"agent_sha={components[required[0]]}\n")
+              output.write(f"proxy_sha={components[required[1]]}\n")
+          PY
+
+      - name: Checkout locked Agent
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: rfdetoni/kitt-agent-cli
+          ref: ${{ steps.refs.outputs.agent_sha }}
+          path: kitt-agent-cli
+          persist-credentials: false
+
+      - name: Checkout locked reverse proxy
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: rfdetoni/kitt-reverse-proxy
+          ref: ${{ steps.refs.outputs.proxy_sha }}
+          path: kitt-reverse-proxy
+          persist-credentials: false
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.14'
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: kitt-reverse-proxy/package-lock.json
+
+      - name: Build reverse-proxy contract module
+        working-directory: kitt-reverse-proxy
+        run: |
+          npm ci
+          npm run build
+
+      - name: Export reverse-proxy Agent contract
+        shell: bash
+        run: |
+          node --input-type=module - <<'NODE' > proxy-agent-contract.json
+          import {
+            AGENT_CONTRACT_HEADER,
+            AGENT_CONTRACT_VERSION,
+            AGENT_ROUTE_HEADER,
+            AGENT_ROUTES
+          } from './kitt-reverse-proxy/dist/runtime/agent-contract.js';
+
+          process.stdout.write(JSON.stringify({
+            contract_header: AGENT_CONTRACT_HEADER,
+            contract_version: AGENT_CONTRACT_VERSION,
+            route_header: AGENT_ROUTE_HEADER,
+            routes: [...AGENT_ROUTES]
+          }));
+          NODE
+
+      - name: Require exact Agent/proxy contract parity
+        env:
+          PYTHONPATH: kitt-agent-cli
+        run: |
+          python - <<'PY'
+          import json
+
+          from kitt.llm.agent_contract import (
+              AGENT_CONTRACT_HEADER,
+              AGENT_CONTRACT_VERSION,
+              AGENT_ROUTE_HEADER,
+              SUPPORTED_ROUTES,
+          )
+
+          actual = json.load(open("proxy-agent-contract.json", encoding="utf-8"))
+          expected = {
+              "contract_header": AGENT_CONTRACT_HEADER,
+              "contract_version": AGENT_CONTRACT_VERSION,
+              "route_header": AGENT_ROUTE_HEADER,
+              "routes": sorted(SUPPORTED_ROUTES),
+          }
+          actual["routes"] = sorted(actual["routes"])
+          if actual != expected:
+              raise SystemExit(
+                  "Agent/reverse-proxy contract drift:\n"
+                  f"expected={expected}\n"
+                  f"actual={actual}"
+              )
+          print("Agent/reverse-proxy contract parity: ok")
+          PY
