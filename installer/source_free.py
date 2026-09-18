@@ -274,8 +274,6 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         selected = set(resolution.ids)
 
         bootstrap = ["setuptools>=68", "wheel"]
-        if "agent-cli" in selected:
-            bootstrap.append("prompt-toolkit>=3.0.52,<4")
         if "toolbox" in selected and not self.options.portable:
             bootstrap.append("maturin>=1.8,<2")
         if "ai-workers" in selected and self.options.with_ai_workers:
@@ -307,9 +305,22 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                 ])
 
         if local_packages:
+            # Resolve declared runtime dependencies from each package's own
+            # pyproject metadata. This prevents installer dependency drift when a
+            # component adds a new mandatory dependency.
+            for package in local_packages:
+                self._run([
+                    str(python), "-m", "pip", "install", "--disable-pip-version-check",
+                    "--prefer-binary", "--no-build-isolation", str(package),
+                ])
+
+            # Re-apply every selected KITT package without dependency resolution
+            # so the requested main/locked checkouts are authoritative even when
+            # one package declares another KITT repository through a direct URL.
             self._run([
                 str(python), "-m", "pip", "install", "--disable-pip-version-check",
-                "--no-deps", "--no-build-isolation", *map(str, local_packages),
+                "--no-deps", "--no-build-isolation", "--upgrade", "--force-reinstall",
+                *map(str, local_packages),
             ])
 
         if "toolbox" in selected and not self.options.portable:
