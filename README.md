@@ -53,7 +53,7 @@ Requirements are calculated from the selected module set rather than globally ha
 
 - Git;
 - Python **3.12+**;
-- Node.js **20+** and npm;
+- Node.js **24+** and npm (required by `kitt-reverse-proxy`);
 - Rust **1.85+** and Cargo.
 
 Windows, Linux and macOS are first-class targets. Other POSIX systems use the generic POSIX adapter when the selected upstream toolchains support the OS.
