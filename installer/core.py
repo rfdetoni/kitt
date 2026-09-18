@@ -561,19 +561,21 @@ class EcosystemInstaller:
             python = self._venv_python(venv)
             self._run([str(python), "-m", "kitt.cli.main", "--help"], quiet=True)
             guard_contract = (
-                "import inspect\n"
                 "from pathlib import Path\n"
+                "from types import SimpleNamespace\n"
                 "from kitt.core.completion_guard import install_completion_guard\n"
+                "from kitt.core.execution_request import ExecutionRequest\n"
                 "class P:\n"
-                "    def _execute_tool_loop(self, cmd, request, exe_profile, exe_client, workspace_id, security_context, agent_route=None):\n"
-                "        if False:\n"
-                "            yield None\n"
+                "    def _execute_tool_loop(self, cmd, request, exe_profile, exe_client, workspace_id, security_context):\n"
+                "        assert request.agent_route == 'code-generation', request.agent_route\n"
+                "        yield None, 'ok', list(request.messages)\n"
                 "p = P()\n"
                 "class R:\n"
                 "    root_path = Path('.')\n"
                 "install_completion_guard(p, R())\n"
-                "params = inspect.signature(p._execute_tool_loop).parameters\n"
-                "assert 'agent_route' in params, params\n"
+                "request = ExecutionRequest(system_prompt='test', messages=[{'role':'user','content':'hello'}], enabled_tools=[], agent_route='code-generation')\n"
+                "cmd = SimpleNamespace(prompt='hello', mode='ask')\n"
+                "list(p._execute_tool_loop(cmd, request, object(), object(), 'workspace', object()))\n"
             )
             self._run([str(python), "-c", guard_contract], quiet=True)
             imports = []
