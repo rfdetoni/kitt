@@ -186,9 +186,10 @@ class SourceFreeInstallerTests(unittest.TestCase):
             authoritative_installs = [
                 command for command in pip_commands if "--force-reinstall" in command
             ]
-            self.assertEqual(len(authoritative_installs), 1)
-            self.assertIn("--no-deps", authoritative_installs[0])
-            self.assertIn(agent_source, authoritative_installs[0])
+            self.assertEqual(len(authoritative_installs), 2)
+            self.assertTrue(all("--no-deps" in command for command in authoritative_installs))
+            self.assertNotIn(agent_source, authoritative_installs[0])
+            self.assertEqual(authoritative_installs[-1][-1], agent_source)
             self.assertFalse(any("-U" in command and "pip" in command for command in pip_commands))
 
     def test_staging_cleanup_removes_sources_but_keeps_build_cache(self) -> None:
