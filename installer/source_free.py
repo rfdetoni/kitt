@@ -494,7 +494,7 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             return
         print("\nInstall/start KITT Assistant service")
         self._run([str(kittctl), "service", "install"], check=False)
-        self._run([str(kittctl), "service", "start"], check=False)
+        self._run([str(kittctl), "service", "restart"], check=False)
 
     def _rollback_runtime(self) -> None:
         super()._rollback_runtime()
