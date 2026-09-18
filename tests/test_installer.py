@@ -52,6 +52,11 @@ class CatalogTests(unittest.TestCase):
 
 
 class InstallerCliTests(unittest.TestCase):
+    def test_locked_snapshot_is_default_ref(self) -> None:
+        parser = build_parser()
+        with patch.dict(os.environ, {}, clear=False):
+            self.assertEqual(parser.parse_args([]).ref, os.environ.get("KITT_REF") or "locked")
+
     def test_verbose_is_opt_in(self) -> None:
         parser = build_parser()
         self.assertFalse(parser.parse_args([]).verbose)
