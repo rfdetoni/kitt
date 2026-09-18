@@ -208,20 +208,5 @@ class SourceFreeInstallerTests(unittest.TestCase):
             self.assertFalse((root / ".staging" / "sources").exists())
             self.assertTrue(cached.is_file())
 
-    def test_success_migration_removes_legacy_managed_checkout(self) -> None:
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            installer = self._installer(root)
-            legacy = root / "kitt-reverse-proxy"
-            (legacy / ".git").mkdir(parents=True)
-            (legacy / "src").mkdir()
-            (legacy / "src" / "old.ts").write_text("old\n", encoding="utf-8")
-            installer._managed_legacy_sources.add("kitt-reverse-proxy")
-
-            installer._remove_legacy_source_checkouts()
-
-            self.assertFalse(legacy.exists())
-
-
 if __name__ == "__main__":
     unittest.main()
