@@ -169,9 +169,26 @@ class SourceFreeInstallerTests(unittest.TestCase):
             commands = [tuple(str(value) for value in call.args[0]) for call in run.call_args_list]
             pip_commands = [command for command in commands if "pip" in command]
             self.assertTrue(any("setuptools>=68" in command for command in pip_commands))
-            local_installs = [command for command in pip_commands if "--no-build-isolation" in command]
-            self.assertEqual(len(local_installs), 1)
-            self.assertIn("--no-deps", local_installs[0])
+            self.assertFalse(
+                any("prompt-toolkit>=3.0.52,<4" in command for command in pip_commands)
+            )
+
+            agent_source = str(installer._repo_dir(installer.catalog.modules["agent-cli"]))
+            dependency_passes = [
+                command
+                for command in pip_commands
+                if agent_source in command
+                and "--prefer-binary" in command
+                and "--no-deps" not in command
+            ]
+            self.assertEqual(len(dependency_passes), 1)
+
+            authoritative_installs = [
+                command for command in pip_commands if "--force-reinstall" in command
+            ]
+            self.assertEqual(len(authoritative_installs), 1)
+            self.assertIn("--no-deps", authoritative_installs[0])
+            self.assertIn(agent_source, authoritative_installs[0])
             self.assertFalse(any("-U" in command and "pip" in command for command in pip_commands))
 
     def test_staging_cleanup_removes_sources_but_keeps_build_cache(self) -> None:
