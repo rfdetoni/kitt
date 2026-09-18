@@ -391,7 +391,7 @@ jobs:
           ref: ${{ needs.resolve_refs.outputs.reverse_proxy_sha }}
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with: { node-version: '22', cache: npm }
+        with: { node-version: '24', cache: npm }
       - run: npm ci
       - run: npm run verify
 
