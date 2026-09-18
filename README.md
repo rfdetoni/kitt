@@ -236,10 +236,9 @@ Useful options:
 --preset agent|assistant|web|full
 --modules <id[,id...]>
 --with-ai-workers
---force
 --no-start-services
 --portable
---ref <branch|tag|sha>
+--ref locked|<branch|tag|sha>
 --verbose
 --uninstall
 ```
@@ -305,7 +304,7 @@ The ownership rule is intentional: components communicate through versioned cont
 
 `ecosystem.json` is the module catalog. `ecosystem.lock.json` pins every repository to an immutable commit SHA.
 
-The installer is idempotent and source-locked by default. It refuses to overwrite local component changes unless `--force` is supplied. Python packages are composed from the locally checked-out locked revisions with `--no-deps` where appropriate so VCS dependency declarations cannot silently replace one component with another revision.
+The installer is idempotent and source-locked by default. Python packages are composed from the locally checked-out locked revisions with `--no-deps` where appropriate so VCS dependency declarations cannot silently replace one component with another revision.
 
 After installation, `<KITT_HOME>/installed-state.json` records requested modules, automatically resolved dependencies, exact repository SHAs, platform and launchers.
 
