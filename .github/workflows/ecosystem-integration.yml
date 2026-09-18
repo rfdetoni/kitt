@@ -231,12 +231,14 @@ jobs:
         with: { python-version: '3.13' }
       - name: Install frozen split packages
         run: |
-          python -m pip install prompt-toolkit pytest pytest-asyncio
+          python -m pip install pytest pytest-asyncio
           python -m pip install --no-deps -e ./kitt-protocol/sdk/python
-          python -m pip install --no-deps -e ./kitt-agent-cli
+          python -m pip install -e ./kitt-agent-cli
+          python -m pip install --no-deps --force-reinstall -e ./kitt-protocol/sdk/python
           python -m pip install --no-deps -e ./kitt-ai-workers
           python -m pip install --no-deps -e ./kitt-ai-workers/packages/kitt-evolution
           python -m pip install --no-deps -e ./kitt-ai-workers/packages/kitt-evals
+          python -m pip check
       - working-directory: kitt-ai-workers
         run: python -m unittest discover tests
       - working-directory: kitt-ai-workers
@@ -297,10 +299,12 @@ jobs:
         run: cargo test --workspace
       - name: Install frozen Python runtime composition
         run: |
-          python -m pip install prompt-toolkit pytest pytest-asyncio
+          python -m pip install pytest pytest-asyncio
           python -m pip install --no-deps -e ./kitt-protocol/sdk/python
-          python -m pip install --no-deps -e ./kitt-agent-cli
+          python -m pip install -e ./kitt-agent-cli
+          python -m pip install --no-deps --force-reinstall -e ./kitt-protocol/sdk/python
           python -m pip install --no-deps -e ./kitt-assistant/packages/kitt-assistant-runtime
+          python -m pip check
       - name: Verify Assistant runtime ownership
         run: |
           python - <<'PY'
@@ -359,12 +363,14 @@ jobs:
         with: { python-version: '3.14' }
       - name: Install frozen composed namespace
         run: |
-          python -m pip install prompt-toolkit pytest pytest-asyncio
+          python -m pip install pytest pytest-asyncio
           python -m pip install --no-deps -e ./kitt-protocol/sdk/python
-          python -m pip install --no-deps -e ./kitt-agent-cli
+          python -m pip install -e ./kitt-agent-cli
+          python -m pip install --no-deps --force-reinstall -e ./kitt-protocol/sdk/python
           python -m pip install --no-deps -e ./kitt-assistant/packages/kitt-assistant-runtime
           python -m pip install --no-deps -e ./kitt-ai-workers/packages/kitt-evolution
           python -m pip install --no-deps -e ./kitt-ai-workers/packages/kitt-evals
+          python -m pip check
       - name: Compile Agent and companions
         run: >-
           python -m compileall -q
@@ -391,7 +397,7 @@ jobs:
           ref: ${{ needs.resolve_refs.outputs.reverse_proxy_sha }}
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with: { node-version: '22', cache: npm }
+        with: { node-version: '24', cache: npm }
       - run: npm ci
       - run: npm run verify
 
