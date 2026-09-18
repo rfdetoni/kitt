@@ -21,7 +21,6 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._runtime_backups: dict[Path, Path | None] = {}
-        self._managed_legacy_sources: set[str] = set()
         self._state_lock = threading.Lock()
         self._jobs = self._resolve_jobs()
         self._native_build_slots = 1
@@ -142,8 +141,6 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         path = self._repo_dir(module)
         ref = self.catalog.locked_ref(module, self.options.ref)
         url = f"https://github.com/{module.repository}.git"
-        with self._state_lock:
-            self._managed_legacy_sources.add(name)
         if path.exists():
             shutil.rmtree(path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -509,19 +506,7 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                 pass
         self._runtime_backups.clear()
 
-    def _remove_legacy_source_checkouts(self) -> None:
-        for name in sorted(self._managed_legacy_sources):
-            legacy = self.options.root / name
-            if legacy == self.options.root or not (legacy / ".git").is_dir():
-                continue
-            try:
-                shutil.rmtree(legacy)
-                print(f"Removed legacy source checkout: {legacy}")
-            except OSError as exc:
-                print(f"Warning: could not remove legacy source checkout {legacy}: {exc}")
-
     def _finalize_runtime(self) -> None:
-        self._remove_legacy_source_checkouts()
         for backup in self._runtime_backups.values():
             if backup is not None and backup.exists():
                 shutil.rmtree(backup, ignore_errors=True)
