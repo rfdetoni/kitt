@@ -100,7 +100,7 @@
       "requires": [],
       "companions": ["protocol"],
       "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git", "node>=20", "npm"]
+      "prerequisites": ["git", "node>=24", "npm"]
     }
   }
 }
