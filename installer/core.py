@@ -560,6 +560,22 @@ class EcosystemInstaller:
                 raise InstallerError("Agent CLI runtime missing")
             python = self._venv_python(venv)
             self._run([str(python), "-m", "kitt.cli.main", "--help"], quiet=True)
+            guard_contract = (
+                "import inspect\n"
+                "from pathlib import Path\n"
+                "from kitt.core.completion_guard import install_completion_guard\n"
+                "class P:\n"
+                "    def _execute_tool_loop(self, cmd, request, exe_profile, exe_client, workspace_id, security_context, agent_route=None):\n"
+                "        if False:\n"
+                "            yield None\n"
+                "p = P()\n"
+                "class R:\n"
+                "    root_path = Path('.')\n"
+                "install_completion_guard(p, R())\n"
+                "params = inspect.signature(p._execute_tool_loop).parameters\n"
+                "assert 'agent_route' in params, params\n"
+            )
+            self._run([str(python), "-c", guard_contract], quiet=True)
             imports = []
             if "assistant" in selected:
                 imports.extend(["kitt.daemon.client", "kitt.remote.server"])
