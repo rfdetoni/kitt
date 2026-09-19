@@ -172,6 +172,14 @@ class InstallerUiTests(unittest.TestCase):
 
 
 class PlatformTests(unittest.TestCase):
+    def test_unusable_command_wrapper_is_not_reported_as_found(self) -> None:
+        adapter = PlatformAdapter("linux", posix=True)
+        with (
+            patch("installer.platforms.shutil.which", return_value="/usr/bin/cargo"),
+            patch("installer.platforms._run_capture", return_value=(1, "rustup has no default toolchain")),
+        ):
+            self.assertIsNone(adapter.command_info("cargo"))
+
     def test_generic_posix_adapter_accepts_posix_modules(self) -> None:
         adapter = PlatformAdapter("haiku", posix=True)
         self.assertTrue(adapter.supports(("windows", "linux", "macos", "posix")))
