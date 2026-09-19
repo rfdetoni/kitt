@@ -408,6 +408,7 @@ jobs:
     timeout-minutes: 60
     env:
       KITT_INSTALL_JOBS: "2"
+      RUSTUP_TOOLCHAIN: "1.85.0"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
