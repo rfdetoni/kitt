@@ -107,6 +107,46 @@ class SourceFreeInstallerTests(unittest.TestCase):
 
             build.assert_called_once_with(installer.catalog.modules["assistant"])
 
+    def test_heavy_assistant_build_finishes_before_parallel_artifact_phase(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            resolution = installer.catalog.resolve(("agent-cli",))
+            events: list[str] = []
+
+            def native(_resolution):
+                events.append("native")
+
+            def after_native(label: str, result=None):
+                self.assertEqual(events[0], "native")
+                events.append(label)
+                return result
+
+            staged = root / ".staging" / "venv-test"
+            with (
+                patch.object(installer, "_build_native_components", side_effect=native),
+                patch.object(
+                    installer,
+                    "_build_assistant_ui",
+                    side_effect=lambda _resolution: after_native("hud"),
+                ),
+                patch.object(
+                    installer,
+                    "_build_reverse_proxy",
+                    side_effect=lambda _resolution: after_native("proxy"),
+                ),
+                patch.object(
+                    installer,
+                    "_install_python_stack",
+                    side_effect=lambda _resolution: after_native("python", staged),
+                ),
+            ):
+                result = installer._build_install_artifacts_parallel(resolution)
+
+            self.assertEqual(result, staged)
+            self.assertEqual(events[0], "native")
+            self.assertCountEqual(events[1:], ["hud", "proxy", "python"])
+
     def test_reverse_proxy_runtime_keeps_only_installed_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
