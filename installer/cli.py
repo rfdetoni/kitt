@@ -82,10 +82,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preset", help="catalog preset (agent, assistant, web, full)")
     parser.add_argument(
         "--ref",
-        default=os.environ.get("KITT_REF") or "main",
+        default=os.environ.get("KITT_REF") or "locked",
         help=(
             "component branch/tag/SHA installed from every selected repository "
-            "(default: main); use 'locked' for ecosystem.lock.json revisions"
+            "(default: locked ecosystem.lock.json snapshot); use 'main' only for development/testing"
         ),
     )
     parser.add_argument("--root", type=Path, help="installation root")
@@ -126,7 +126,8 @@ def _print_catalog(catalog: EcosystemCatalog) -> None:
     for module in sorted(catalog.modules.values(), key=lambda item: (item.order, item.id)):
         companions = [*module.requires, *module.companions]
         suffix = f" -> auto: {', '.join(companions)}" if companions else ""
-        print(f"  {module.id:<14} {module.name:<22} {module.description}{suffix}")
+        visibility = "" if module.selectable else " [internal dependency]"
+        print(f"  {module.id:<14} {module.name:<22} {module.description}{visibility}{suffix}")
     print("\nPresets:")
     for preset_id in sorted(catalog.presets):
         print(
@@ -162,7 +163,7 @@ def _record_source_ref(root: Path, ref: str | None) -> None:
     if not isinstance(payload, dict):
         raise InstallerError(f"installed state at {state_path} is not an object")
 
-    source_ref = (ref or "main").strip() or "main"
+    source_ref = (ref or "locked").strip() or "locked"
     if source_ref.lower() == "lock":
         source_ref = "locked"
     payload["source_ref"] = source_ref

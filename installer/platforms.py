@@ -173,7 +173,7 @@ class PlatformAdapter:
         }.get(name, ("--version",))
         code, output = _run_capture((executable, *version_args))
         if code != 0:
-            return CommandInfo((executable,), (), "")
+            return None
         return CommandInfo((executable,), _version_tuple(output), output)
 
     def _python_venv_hint(self) -> str:

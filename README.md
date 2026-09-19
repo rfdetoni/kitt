@@ -76,7 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh
 irm https://raw.githubusercontent.com/rfdetoni/kitt/main/install.ps1 | iex
 ```
 
-The installer presents K.I.T.T. modules interactively. Explicit selections are marked `[x]`; transitively required technologies are marked `[+]`.
+The installer presents K.I.T.T. modules interactively. Explicit selections are marked `[x]`; transitively required technologies are marked `[+]`. Protocol and Memory are internal composition dependencies, so they remain visible but cannot be selected as misleading standalone installs.
 
 ### Complete Agent guarantee
 
@@ -239,7 +239,7 @@ Useful options:
 --force
 --no-start-services
 --portable
---ref <branch|tag|sha>
+--ref locked|main|<branch|tag|sha>
 --verbose
 --uninstall
 ```
@@ -309,7 +309,7 @@ The installer is idempotent and source-locked by default. It refuses to overwrit
 
 After installation, `<KITT_HOME>/installed-state.json` records requested modules, automatically resolved dependencies, exact repository SHAs, platform and launchers.
 
-Re-running the installer updates to the reviewed snapshot recorded in the lockfile unless `--ref` is explicitly used for development/testing.
+Re-running the installer updates to the reviewed snapshot recorded in the lockfile. `locked` is the default; `--ref main` or another explicit branch/tag/SHA is a development/testing opt-in. Cross-repository CI validates that internal package pins match the same frozen snapshot.
 
 ---
 
@@ -336,10 +336,11 @@ Validate installer and ecosystem invariants:
 ```bash
 python -m unittest discover -s tests -v
 python scripts/validate_ecosystem_lock.py
+GH_TOKEN=... python scripts/validate_component_pins.py
 python -m installer --modules agent-cli --dry-run --portable
 ```
 
-The broader integration workflow validates Rust workspaces, the PyO3 wheel, Python namespace composition, Agent CLI, Assistant, Protocol, Memory, AI Workers and Reverse Proxy at frozen revisions.
+The broader integration workflow validates Rust workspaces, the PyO3 wheel, Python namespace composition, Agent CLI, Assistant, Protocol, Memory, AI Workers and Reverse Proxy at frozen revisions. It also performs a clean non-portable Linux installation through the real installer, runs `pip check`, exercises installed launchers, verifies source cleanup and compares `installed-state.json` against `ecosystem.lock.json`.
 
 Each component repository also owns its technology-specific unit tests and lint/build checks.
 

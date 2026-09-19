@@ -16,10 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerUpdateRegressionTests(unittest.TestCase):
-    def test_default_install_tracks_main(self) -> None:
+    def test_default_install_tracks_locked_snapshot(self) -> None:
         with patch.dict(os.environ, {"KITT_REF": ""}):
             args = build_parser().parse_args([])
-        self.assertEqual(args.ref, "main")
+        self.assertEqual(args.ref, "locked")
 
     def test_environment_can_select_locked_install(self) -> None:
         with patch.dict(os.environ, {"KITT_REF": "locked"}):

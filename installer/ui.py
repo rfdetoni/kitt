@@ -79,6 +79,12 @@ class _SelectionState:
     def toggle_current(self) -> None:
         module_id = self.current_id
         module = self.catalog.modules[module_id]
+        if not module.selectable:
+            self.message = (
+                f"{module.name} is an internal dependency and is selected automatically "
+                "by the public modules that require it."
+            )
+            return
         resolution = self.resolution
         selected = set(resolution.ids)
 
@@ -105,8 +111,12 @@ class _SelectionState:
         self.message = f"Selected {module.name}. Required technologies will be added automatically."
 
     def select_all(self) -> None:
-        self.direct = set(self.ordered_ids)
-        self.message = "Selected every K.I.T.T. module explicitly."
+        self.direct = {
+            module_id
+            for module_id in self.ordered_ids
+            if self.catalog.modules[module_id].selectable
+        }
+        self.message = "Selected every public K.I.T.T. module explicitly."
 
     def select_none(self) -> None:
         self.direct.clear()
@@ -158,6 +168,9 @@ def _render(state: _SelectionState, *, fullscreen: bool) -> None:
             marker = _paint("[+]", "1;36", ansi=ansi)
             parents = resolution.auto_selected_by.get(module_id, ())
             status = "auto via " + ", ".join(parents) if parents else "automatic"
+        elif not module.selectable:
+            marker = "[-]"
+            status = "internal dependency"
         else:
             marker = "[ ]"
             status = ""
@@ -172,7 +185,7 @@ def _render(state: _SelectionState, *, fullscreen: bool) -> None:
     print(f" Top-level: {', '.join(direct_names) if direct_names else '(none)'}")
     print(f" Will install: {len(resolution.ids)} module(s)")
     print(f" {_paint('Info:', '1;33', ansi=ansi)} {state.message}")
-    print(" [x] selected directly   [+] included automatically by another selection")
+    print(" [x] selected directly   [+] included automatically   [-] internal-only dependency")
     sys.stdout.flush()
 
 
