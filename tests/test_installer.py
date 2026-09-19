@@ -71,11 +71,11 @@ class InstallerCliTests(unittest.TestCase):
         self.assertTrue(parser.parse_args(["-v"]).verbose)
 
     def test_locked_snapshot_is_default_ref(self) -> None:
-        parser = build_parser()
         with patch.dict(os.environ, {}, clear=False):
             os.environ.pop("KITT_REF", None)
+            parser = build_parser()
             self.assertEqual(parser.parse_args([]).ref, "locked")
-        self.assertEqual(parser.parse_args(["--ref", "main"]).ref, "main")
+            self.assertEqual(parser.parse_args(["--ref", "main"]).ref, "main")
 
     def test_environment_flags_accept_common_truthy_values(self) -> None:
         for value in ("1", "true", "TRUE", "yes", "on"):
