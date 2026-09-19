@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-18",
+  "generated_at": "2026-09-19",
   "components": {
-    "rfdetoni/kitt-protocol": "c2dbf4764a38a6036e66f9c97a3264bf4730cd3d",
-    "rfdetoni/kitt-memory": "0633e56eb88ddd55434d2a6d086744e43f960a26",
-    "rfdetoni/kitt-toolbox": "063a286ecb64ddfd30dd8d4a33ed9615b04b6b15",
-    "rfdetoni/kitt-ai-workers": "5cb04cf18c7c51a4ef9739e444a21743b11e50a2",
-    "rfdetoni/kitt-assistant": "4f804e9cdf96447c09171b7c97ebd89bcdb2dd8d",
-    "rfdetoni/kitt-agent-cli": "bff9b6658c6406b9e7049baeabe75a0e0eb8f389",
-    "rfdetoni/kitt-reverse-proxy": "7e784c76900d2a6cd43d4cb5b7c7d8607bc3843d"
+    "rfdetoni/kitt-protocol": "97e1cad8dfc6d3a74fe2332530dc01a25e476516",
+    "rfdetoni/kitt-memory": "48384a5e8bb592226cc55abc24c2011fcbdf9dfe",
+    "rfdetoni/kitt-toolbox": "3c218a23ff18b7b6f04355db4f66b05623afc945",
+    "rfdetoni/kitt-ai-workers": "91361b8e4c4eef87d3ccd4f1a006cff4d0f9fd41",
+    "rfdetoni/kitt-assistant": "c4a804106132308bc8607c7eb440d10cc27315d9",
+    "rfdetoni/kitt-agent-cli": "de299cb37e4e97a53e47c414d165857ee70a9870",
+    "rfdetoni/kitt-reverse-proxy": "fbe6bc6bca1d2bdaf8912cfe14fc743de0c7b6c1"
   }
 }

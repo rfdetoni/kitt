@@ -50,6 +50,18 @@ class CatalogTests(unittest.TestCase):
         with self.assertRaises(CatalogError):
             self.catalog.resolve(["not-a-kitt-module"])
 
+    def test_internal_dependency_cannot_be_selected_directly(self) -> None:
+        for module_id in ("protocol", "memory"):
+            with self.subTest(module_id=module_id), self.assertRaises(CatalogError):
+                self.catalog.resolve([module_id])
+
+    def test_full_preset_uses_public_agent_entrypoint(self) -> None:
+        self.assertEqual(self.catalog.preset("full"), ("agent-cli",))
+        self.assertEqual(
+            set(self.catalog.resolve(self.catalog.preset("full")).ids),
+            set(self.catalog.modules),
+        )
+
 
 class InstallerCliTests(unittest.TestCase):
     def test_verbose_is_opt_in(self) -> None:
@@ -57,6 +69,13 @@ class InstallerCliTests(unittest.TestCase):
         self.assertFalse(parser.parse_args([]).verbose)
         self.assertTrue(parser.parse_args(["--verbose"]).verbose)
         self.assertTrue(parser.parse_args(["-v"]).verbose)
+
+    def test_locked_snapshot_is_default_ref(self) -> None:
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("KITT_REF", None)
+            parser = build_parser()
+            self.assertEqual(parser.parse_args([]).ref, "locked")
+            self.assertEqual(parser.parse_args(["--ref", "main"]).ref, "main")
 
     def test_environment_flags_accept_common_truthy_values(self) -> None:
         for value in ("1", "true", "TRUE", "yes", "on"):
@@ -87,13 +106,20 @@ class InstallerUiTests(unittest.TestCase):
         self.assertEqual(set(state.resolution.ids), set(self.catalog.modules))
         self.assertEqual(state.current_id, "agent-cli")
 
-    def test_space_toggles_current_module(self) -> None:
-        state = _SelectionState.create(self.catalog, ("protocol",))
-        self.assertIn("protocol", state.direct)
+    def test_space_toggles_current_public_module(self) -> None:
+        state = _SelectionState.create(self.catalog, ("assistant",))
+        self.assertIn("assistant", state.direct)
+        self.assertIsNone(_handle_key(state, "space"))
+        self.assertNotIn("assistant", state.direct)
+        self.assertIsNone(_handle_key(state, "space"))
+        self.assertIn("assistant", state.direct)
+
+    def test_internal_dependency_cannot_be_promoted_in_ui(self) -> None:
+        state = _SelectionState.create(self.catalog, ("agent-cli",))
+        state.cursor = state.ordered_ids.index("protocol")
         self.assertIsNone(_handle_key(state, "space"))
         self.assertNotIn("protocol", state.direct)
-        self.assertIsNone(_handle_key(state, "space"))
-        self.assertIn("protocol", state.direct)
+        self.assertIn("internal dependency", state.message.lower())
 
     def test_arrow_keys_move_cursor_and_wrap(self) -> None:
         state = _SelectionState.create(self.catalog, ("agent-cli",))
@@ -103,32 +129,19 @@ class InstallerUiTests(unittest.TestCase):
         self.assertIsNone(_handle_key(state, "down"))
         self.assertEqual(state.cursor, first)
 
-    def test_automatic_dependency_can_be_promoted_to_explicit_selection(self) -> None:
+    def test_selectable_automatic_companion_can_be_promoted(self) -> None:
         state = _SelectionState.create(self.catalog, ("agent-cli",))
         automatic_id = next(
             module_id
             for module_id in state.resolution.ids
-            if module_id != "agent-cli" and module_id not in state.direct
+            if module_id != "agent-cli"
+            and module_id not in state.direct
+            and self.catalog.modules[module_id].selectable
         )
         state.cursor = state.ordered_ids.index(automatic_id)
         self.assertIsNone(_handle_key(state, "space"))
         self.assertIn(automatic_id, state.direct)
         self.assertIn("explicit", state.message.lower())
-
-    def test_promoted_dependency_survives_parent_removal(self) -> None:
-        state = _SelectionState.create(self.catalog, ("agent-cli",))
-        promoted = next(
-            module_id
-            for module_id in state.resolution.ids
-            if module_id != "agent-cli" and module_id not in state.direct
-        )
-        state.cursor = state.ordered_ids.index(promoted)
-        _handle_key(state, "space")
-        state.cursor = state.ordered_ids.index("agent-cli")
-        _handle_key(state, "space")
-        self.assertNotIn("agent-cli", state.direct)
-        self.assertIn(promoted, state.direct)
-        self.assertIn(promoted, state.resolution.ids)
 
     def test_none_prevents_enter_from_installing(self) -> None:
         state = _SelectionState.create(self.catalog)
@@ -138,18 +151,35 @@ class InstallerUiTests(unittest.TestCase):
         self.assertIn("select at least one", state.message.lower())
 
     def test_enter_confirms_non_empty_selection(self) -> None:
-        state = _SelectionState.create(self.catalog, ("protocol",))
+        state = _SelectionState.create(self.catalog, ("assistant",))
         self.assertEqual(_handle_key(state, "enter"), "install")
 
-    def test_shortcuts_select_all_and_restore_recommended(self) -> None:
-        state = _SelectionState.create(self.catalog, ("protocol",))
+    def test_shortcuts_select_all_public_modules_and_restore_recommended(self) -> None:
+        state = _SelectionState.create(self.catalog, ("assistant",))
         _handle_key(state, "a")
-        self.assertEqual(state.direct, set(state.ordered_ids))
+        self.assertEqual(
+            state.direct,
+            {
+                module_id
+                for module_id in state.ordered_ids
+                if self.catalog.modules[module_id].selectable
+            },
+        )
+        self.assertNotIn("protocol", state.direct)
+        self.assertNotIn("memory", state.direct)
         _handle_key(state, "r")
         self.assertEqual(state.ordered_direct(), ("agent-cli",))
 
 
 class PlatformTests(unittest.TestCase):
+    def test_unusable_command_wrapper_is_not_reported_as_found(self) -> None:
+        adapter = PlatformAdapter("linux", posix=True)
+        with (
+            patch("installer.platforms.shutil.which", return_value="/usr/bin/cargo"),
+            patch("installer.platforms._run_capture", return_value=(1, "rustup has no default toolchain")),
+        ):
+            self.assertIsNone(adapter.command_info("cargo"))
+
     def test_generic_posix_adapter_accepts_posix_modules(self) -> None:
         adapter = PlatformAdapter("haiku", posix=True)
         self.assertTrue(adapter.supports(("windows", "linux", "macos", "posix")))

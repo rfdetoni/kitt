@@ -16,6 +16,29 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class SourceFreeInstallerTests(unittest.TestCase):
+    def test_default_job_budget_respects_available_memory(self) -> None:
+        with (
+            patch.dict("installer.source_free.os.environ", {"KITT_INSTALL_JOBS": ""}),
+            patch("installer.source_free.os.cpu_count", return_value=16),
+            patch.object(
+                SourceFreeEcosystemInstaller,
+                "_available_memory_bytes",
+                return_value=4 * 1024 ** 3,
+            ),
+        ):
+            self.assertEqual(SourceFreeEcosystemInstaller._resolve_jobs(), 2)
+
+    def test_explicit_job_budget_remains_authoritative(self) -> None:
+        with (
+            patch.dict("installer.source_free.os.environ", {"KITT_INSTALL_JOBS": "7"}),
+            patch.object(
+                SourceFreeEcosystemInstaller,
+                "_available_memory_bytes",
+                return_value=2 * 1024 ** 3,
+            ),
+        ):
+            self.assertEqual(SourceFreeEcosystemInstaller._resolve_jobs(), 7)
+
     def _installer(self, root: Path) -> SourceFreeEcosystemInstaller:
         return SourceFreeEcosystemInstaller(
             EcosystemCatalog.load(ROOT),
@@ -83,6 +106,46 @@ class SourceFreeInstallerTests(unittest.TestCase):
                 installer._build_native_components(resolution)
 
             build.assert_called_once_with(installer.catalog.modules["assistant"])
+
+    def test_heavy_assistant_build_finishes_before_parallel_artifact_phase(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            resolution = installer.catalog.resolve(("agent-cli",))
+            events: list[str] = []
+
+            def native(_resolution):
+                events.append("native")
+
+            def after_native(label: str, result=None):
+                self.assertEqual(events[0], "native")
+                events.append(label)
+                return result
+
+            staged = root / ".staging" / "venv-test"
+            with (
+                patch.object(installer, "_build_native_components", side_effect=native),
+                patch.object(
+                    installer,
+                    "_build_assistant_ui",
+                    side_effect=lambda _resolution: after_native("hud"),
+                ),
+                patch.object(
+                    installer,
+                    "_build_reverse_proxy",
+                    side_effect=lambda _resolution: after_native("proxy"),
+                ),
+                patch.object(
+                    installer,
+                    "_install_python_stack",
+                    side_effect=lambda _resolution: after_native("python", staged),
+                ),
+            ):
+                result = installer._build_install_artifacts_parallel(resolution)
+
+            self.assertEqual(result, staged)
+            self.assertEqual(events[0], "native")
+            self.assertCountEqual(events[1:], ["hud", "proxy", "python"])
 
     def test_reverse_proxy_runtime_keeps_only_installed_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -191,6 +254,31 @@ class SourceFreeInstallerTests(unittest.TestCase):
             self.assertNotIn(agent_source, authoritative_installs[0])
             self.assertEqual(authoritative_installs[-1][-1], agent_source)
             self.assertFalse(any("-U" in command and "pip" in command for command in pip_commands))
+            self.assertTrue(any(command[-2:] == ("pip", "check") for command in commands))
+
+    def test_service_setup_failure_is_not_silently_ignored(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            binary = root / "runtime" / "assistant" / "bin" / "kittctl"
+            binary.parent.mkdir(parents=True)
+            binary.write_text("kittctl", encoding="utf-8")
+            resolution = Resolution(
+                requested=("assistant",),
+                modules=(installer.catalog.modules["assistant"],),
+                auto_selected_by={},
+            )
+            installer.options = InstallerOptions(
+                root=root,
+                bin_dir=root / "bin",
+                start_services=True,
+            )
+
+            with (
+                patch.object(installer, "_run", side_effect=RuntimeError("service failed")),
+                self.assertRaisesRegex(RuntimeError, "service failed"),
+            ):
+                installer._start_services(resolution)
 
     def test_staging_cleanup_removes_sources_but_keeps_build_cache(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
