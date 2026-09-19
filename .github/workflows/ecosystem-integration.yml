@@ -456,7 +456,18 @@ jobs:
           "$runtime/.venv-agent/bin/python" -m pip check
           "$bindir/kitt" --help >/dev/null
           "$bindir/kitt-reverse-proxy" --help >/dev/null
-          "$bindir/kittctl" --help >/dev/null
+
+          # kittctl intentionally treats missing/unknown commands as usage
+          # errors (exit 2) rather than exposing a GNU-style --help command.
+          # Validate that the installed launcher executes and emits its expected
+          # command surface without weakening the smoke test.
+          set +e
+          kittctl_usage="$("$bindir/kittctl" 2>&1)"
+          kittctl_rc=$?
+          set -e
+          test "$kittctl_rc" -eq 2
+          grep -q '^usage: kittctl ' <<<"$kittctl_usage"
+
           test ! -d "$runtime/.staging/sources"
           RUNTIME="$runtime" python - <<'PY'
           import json
