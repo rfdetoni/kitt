@@ -18,6 +18,7 @@ class ModuleSpec:
     description: str
     strategy: str
     order: int
+    selectable: bool
     requires: tuple[str, ...]
     companions: tuple[str, ...]
     platforms: tuple[str, ...]
@@ -69,6 +70,7 @@ class EcosystemCatalog:
                 description=str(raw.get("description") or ""),
                 strategy=str(raw.get("strategy") or ""),
                 order=int(raw.get("order", 100)),
+                selectable=bool(raw.get("selectable", True)),
                 requires=tuple(str(v) for v in raw.get("requires", [])),
                 companions=tuple(str(v) for v in raw.get("companions", [])),
                 platforms=tuple(str(v) for v in raw.get("platforms", [])),
@@ -143,6 +145,14 @@ class EcosystemCatalog:
         if unknown:
             raise CatalogError(
                 f"unknown modules {unknown}; choose from: {', '.join(sorted(self.modules))}"
+            )
+
+        internal = [module_id for module_id in requested_ids if not self.modules[module_id].selectable]
+        if internal:
+            raise CatalogError(
+                "internal dependency modules cannot be selected directly: "
+                + ", ".join(sorted(internal))
+                + "; select a public module or preset that composes them"
             )
 
         selected = set(requested_ids)
