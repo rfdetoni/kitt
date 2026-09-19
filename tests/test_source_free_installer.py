@@ -216,6 +216,30 @@ class SourceFreeInstallerTests(unittest.TestCase):
             self.assertFalse(any("-U" in command and "pip" in command for command in pip_commands))
             self.assertTrue(any(command[-2:] == ("pip", "check") for command in commands))
 
+    def test_service_setup_failure_is_not_silently_ignored(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            binary = root / "runtime" / "assistant" / "bin" / "kittctl"
+            binary.parent.mkdir(parents=True)
+            binary.write_text("kittctl", encoding="utf-8")
+            resolution = Resolution(
+                requested=("assistant",),
+                modules=(installer.catalog.modules["assistant"],),
+                auto_selected_by={},
+            )
+            installer.options = InstallerOptions(
+                root=root,
+                bin_dir=root / "bin",
+                start_services=True,
+            )
+
+            with (
+                patch.object(installer, "_run", side_effect=RuntimeError("service failed")),
+                self.assertRaisesRegex(RuntimeError, "service failed"),
+            ):
+                installer._start_services(resolution)
+
     def test_staging_cleanup_removes_sources_but_keeps_build_cache(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
