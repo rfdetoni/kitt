@@ -161,7 +161,7 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         (root / ".staging").mkdir(parents=True, exist_ok=True)
 
         selected = set(resolution.ids)
-        self._native_build_slots = 2 if {"assistant", "toolbox"} <= selected and not self.options.portable else 1
+        self._native_build_slots = 1
 
         try:
             self._sync_repositories_parallel(resolution)
@@ -231,9 +231,19 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
 
     def _build_install_artifacts_parallel(self, resolution: Resolution) -> Path | None:
         selected = set(resolution.ids)
-        tasks: list[tuple[str, Callable[[], object]]] = []
+
+        # Avoid running the Assistant Cargo workspace at the same time as the
+        # Toolbox Maturin/Cargo build inside the Python stack. Both are heavy
+        # native builds and concurrent execution creates avoidable RAM spikes.
+        # Complete the Assistant native artifact first, then keep the lighter
+        # HUD/Node/Python work parallel.
         if "assistant" in selected and not self.options.portable:
-            tasks.append(("KITT Assistant native", lambda: self._build_native_components(resolution)))
+            self._timed(
+                "KITT Assistant native",
+                lambda: self._build_native_components(resolution),
+            )
+
+        tasks: list[tuple[str, Callable[[], object]]] = []
         if "assistant" in selected:
             tasks.append(("KITT Assistant HUD", lambda: self._build_assistant_ui(resolution)))
         if "reverse-proxy" in selected:
