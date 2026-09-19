@@ -4,7 +4,7 @@
   "components": {
     "rfdetoni/kitt-protocol": "97e1cad8dfc6d3a74fe2332530dc01a25e476516",
     "rfdetoni/kitt-memory": "48384a5e8bb592226cc55abc24c2011fcbdf9dfe",
-    "rfdetoni/kitt-toolbox": "ccbc39c475d8ebbc53a39f4b4e48cc3673f16c07",
+    "rfdetoni/kitt-toolbox": "27c915d5178afbbee529f38c355bc09a05af0b64",
     "rfdetoni/kitt-ai-workers": "b7a96b6abd7bb841c633532bedd0e32efab02764",
     "rfdetoni/kitt-assistant": "be168ca6ca1bed38ed8a6cbdf341d16a888848ef",
     "rfdetoni/kitt-agent-cli": "f882013f6a41f30af071e0d04c6e40041219b17b",
