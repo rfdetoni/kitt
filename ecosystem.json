@@ -6,22 +6,30 @@
     "agent": {
       "name": "Complete Agent",
       "description": "KITT Agent CLI with every ecosystem technology it integrates with",
-      "modules": ["agent-cli"]
+      "modules": [
+        "agent-cli"
+      ]
     },
     "assistant": {
       "name": "Assistant",
       "description": "Resident assistant stack with shared protocol and memory services",
-      "modules": ["assistant"]
+      "modules": [
+        "assistant"
+      ]
     },
     "web": {
       "name": "Web Bridge",
       "description": "Authorized browser reverse proxy and shared protocol",
-      "modules": ["reverse-proxy"]
+      "modules": [
+        "reverse-proxy"
+      ]
     },
     "full": {
       "name": "Full Ecosystem",
       "description": "All KITT modules",
-      "modules": ["protocol", "memory", "toolbox", "assistant", "agent-cli", "ai-workers", "reverse-proxy"]
+      "modules": [
+        "agent-cli"
+      ]
     }
   },
   "modules": {
@@ -33,8 +41,16 @@
       "order": 10,
       "requires": [],
       "companions": [],
-      "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git"]
+      "platforms": [
+        "windows",
+        "linux",
+        "macos",
+        "posix"
+      ],
+      "prerequisites": [
+        "git"
+      ],
+      "selectable": false
     },
     "memory": {
       "name": "KITT Memory",
@@ -43,9 +59,20 @@
       "strategy": "rust",
       "order": 20,
       "requires": [],
-      "companions": ["protocol"],
-      "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git", "rust>=1.85"]
+      "companions": [
+        "protocol"
+      ],
+      "platforms": [
+        "windows",
+        "linux",
+        "macos",
+        "posix"
+      ],
+      "prerequisites": [
+        "git",
+        "rust>=1.85"
+      ],
+      "selectable": false
     },
     "toolbox": {
       "name": "KITT Toolbox",
@@ -54,9 +81,21 @@
       "strategy": "toolbox",
       "order": 30,
       "requires": [],
-      "companions": ["protocol"],
-      "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git", "python>=3.12", "rust>=1.85"]
+      "companions": [
+        "protocol"
+      ],
+      "platforms": [
+        "windows",
+        "linux",
+        "macos",
+        "posix"
+      ],
+      "prerequisites": [
+        "git",
+        "python>=3.12",
+        "rust>=1.85"
+      ],
+      "selectable": true
     },
     "assistant": {
       "name": "KITT Assistant",
@@ -65,9 +104,24 @@
       "strategy": "assistant",
       "order": 40,
       "requires": [],
-      "companions": ["protocol", "memory"],
-      "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git", "python>=3.12", "node>=20", "npm", "rust>=1.85"]
+      "companions": [
+        "protocol",
+        "memory"
+      ],
+      "platforms": [
+        "windows",
+        "linux",
+        "macos",
+        "posix"
+      ],
+      "prerequisites": [
+        "git",
+        "python>=3.12",
+        "node>=20",
+        "npm",
+        "rust>=1.85"
+      ],
+      "selectable": true
     },
     "agent-cli": {
       "name": "KITT Agent CLI",
@@ -75,10 +129,27 @@
       "description": "Autonomous coding-agent control plane",
       "strategy": "agent",
       "order": 50,
-      "requires": ["protocol"],
-      "companions": ["memory", "toolbox", "assistant", "ai-workers", "reverse-proxy"],
-      "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git", "python>=3.12"]
+      "requires": [
+        "protocol"
+      ],
+      "companions": [
+        "memory",
+        "toolbox",
+        "assistant",
+        "ai-workers",
+        "reverse-proxy"
+      ],
+      "platforms": [
+        "windows",
+        "linux",
+        "macos",
+        "posix"
+      ],
+      "prerequisites": [
+        "git",
+        "python>=3.12"
+      ],
+      "selectable": true
     },
     "ai-workers": {
       "name": "KITT AI Workers",
@@ -86,10 +157,21 @@
       "description": "Evolution, Evals and optional AI/STT worker processes",
       "strategy": "ai-workers",
       "order": 60,
-      "requires": ["protocol"],
+      "requires": [
+        "protocol"
+      ],
       "companions": [],
-      "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git", "python>=3.12"]
+      "platforms": [
+        "windows",
+        "linux",
+        "macos",
+        "posix"
+      ],
+      "prerequisites": [
+        "git",
+        "python>=3.12"
+      ],
+      "selectable": true
     },
     "reverse-proxy": {
       "name": "KITT Reverse Proxy",
@@ -98,9 +180,21 @@
       "strategy": "node-proxy",
       "order": 70,
       "requires": [],
-      "companions": ["protocol"],
-      "platforms": ["windows", "linux", "macos", "posix"],
-      "prerequisites": ["git", "node>=24", "npm"]
+      "companions": [
+        "protocol"
+      ],
+      "platforms": [
+        "windows",
+        "linux",
+        "macos",
+        "posix"
+      ],
+      "prerequisites": [
+        "git",
+        "node>=24",
+        "npm"
+      ],
+      "selectable": true
     }
   }
 }
