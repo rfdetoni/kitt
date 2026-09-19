@@ -16,6 +16,29 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class SourceFreeInstallerTests(unittest.TestCase):
+    def test_default_job_budget_respects_available_memory(self) -> None:
+        with (
+            patch.dict("installer.source_free.os.environ", {"KITT_INSTALL_JOBS": ""}),
+            patch("installer.source_free.os.cpu_count", return_value=16),
+            patch.object(
+                SourceFreeEcosystemInstaller,
+                "_available_memory_bytes",
+                return_value=4 * 1024 ** 3,
+            ),
+        ):
+            self.assertEqual(SourceFreeEcosystemInstaller._resolve_jobs(), 2)
+
+    def test_explicit_job_budget_remains_authoritative(self) -> None:
+        with (
+            patch.dict("installer.source_free.os.environ", {"KITT_INSTALL_JOBS": "7"}),
+            patch.object(
+                SourceFreeEcosystemInstaller,
+                "_available_memory_bytes",
+                return_value=2 * 1024 ** 3,
+            ),
+        ):
+            self.assertEqual(SourceFreeEcosystemInstaller._resolve_jobs(), 7)
+
     def _installer(self, root: Path) -> SourceFreeEcosystemInstaller:
         return SourceFreeEcosystemInstaller(
             EcosystemCatalog.load(ROOT),
@@ -191,6 +214,7 @@ class SourceFreeInstallerTests(unittest.TestCase):
             self.assertNotIn(agent_source, authoritative_installs[0])
             self.assertEqual(authoritative_installs[-1][-1], agent_source)
             self.assertFalse(any("-U" in command and "pip" in command for command in pip_commands))
+            self.assertTrue(any(command[-2:] == ("pip", "check") for command in commands))
 
     def test_staging_cleanup_removes_sources_but_keeps_build_cache(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
