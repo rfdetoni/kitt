@@ -27,7 +27,52 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         self._native_build_slots = 1
 
     @staticmethod
-    def _resolve_jobs() -> int:
+    def _available_memory_bytes() -> int | None:
+        """Best-effort available-memory probe without adding runtime dependencies."""
+        if os.name == "nt":
+            try:
+                import ctypes
+
+                class _MemoryStatusEx(ctypes.Structure):
+                    _fields_ = [
+                        ("dwLength", ctypes.c_ulong),
+                        ("dwMemoryLoad", ctypes.c_ulong),
+                        ("ullTotalPhys", ctypes.c_ulonglong),
+                        ("ullAvailPhys", ctypes.c_ulonglong),
+                        ("ullTotalPageFile", ctypes.c_ulonglong),
+                        ("ullAvailPageFile", ctypes.c_ulonglong),
+                        ("ullTotalVirtual", ctypes.c_ulonglong),
+                        ("ullAvailVirtual", ctypes.c_ulonglong),
+                        ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+                    ]
+
+                status = _MemoryStatusEx()
+                status.dwLength = ctypes.sizeof(status)
+                if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
+                    return int(status.ullAvailPhys)
+            except (AttributeError, OSError, ValueError):
+                return None
+
+        meminfo = Path("/proc/meminfo")
+        if meminfo.is_file():
+            try:
+                for line in meminfo.read_text(encoding="ascii", errors="ignore").splitlines():
+                    if line.startswith("MemAvailable:"):
+                        return int(line.split()[1]) * 1024
+            except (OSError, ValueError, IndexError):
+                pass
+
+        try:
+            pages = os.sysconf("SC_AVPHYS_PAGES")
+            page_size = os.sysconf("SC_PAGE_SIZE")
+            if isinstance(pages, int) and isinstance(page_size, int) and pages > 0 and page_size > 0:
+                return pages * page_size
+        except (AttributeError, OSError, ValueError):
+            return None
+        return None
+
+    @classmethod
+    def _resolve_jobs(cls) -> int:
         raw = os.environ.get("KITT_INSTALL_JOBS", "").strip()
         if raw:
             try:
@@ -37,7 +82,17 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             if value <= 0:
                 raise InstallerError("KITT_INSTALL_JOBS must be a positive integer")
             return min(value, 32)
-        return max(1, min(os.cpu_count() or 1, 16))
+
+        cpu_cap = max(1, min(os.cpu_count() or 1, 16))
+        available = cls._available_memory_bytes()
+        if available is None:
+            return cpu_cap
+
+        # Concurrent pip/npm/cargo builds can each consume substantial memory.
+        # Budget roughly 2 GiB per installer job and always leave at least one slot.
+        gib = 1024 ** 3
+        memory_cap = max(1, min(16, available // (2 * gib)))
+        return min(cpu_cap, int(memory_cap))
 
     def _io_workers(self, count: int) -> int:
         return min(count, max(2, min(8, self._jobs * 2)))
@@ -359,6 +414,7 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                 "--no-deps", str(wheels[0]),
             ])
 
+        self._run([str(python), "-m", "pip", "check"])
         return staging
 
     def _runtime_component_dir(self, name: str) -> Path:
@@ -493,8 +549,8 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         if not kittctl.exists():
             return
         print("\nInstall/start KITT Assistant service")
-        self._run([str(kittctl), "service", "install"], check=False)
-        self._run([str(kittctl), "service", "restart"], check=False)
+        self._run([str(kittctl), "service", "install"])
+        self._run([str(kittctl), "service", "restart"])
 
     def _rollback_runtime(self) -> None:
         super()._rollback_runtime()
