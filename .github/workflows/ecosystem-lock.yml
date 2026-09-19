@@ -16,6 +16,7 @@ on:
       - ecosystem.lock.json
       - installer/catalog.py
       - scripts/validate_ecosystem_lock.py
+      - scripts/validate_component_pins.py
       - .github/workflows/ecosystem-lock.yml
   workflow_dispatch:
 
