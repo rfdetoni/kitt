@@ -93,7 +93,7 @@
       "prerequisites": [
         "git",
         "python>=3.12",
-        "rust>=1.85"
+        "rust>=1.90"
       ],
       "selectable": true
     },
