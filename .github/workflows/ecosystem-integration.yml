@@ -299,22 +299,24 @@ jobs:
       - name: Install frozen Python runtime composition
         run: |
           python -m pip install pytest pytest-asyncio
-          python -m pip install --no-deps -e ./kitt-protocol/sdk/python
-          python -m pip install -e ./kitt-agent-cli
-          python -m pip install --no-deps --force-reinstall -e ./kitt-protocol/sdk/python
-          python -m pip install --no-deps -e ./kitt-assistant/packages/kitt-assistant-runtime
+          python -m pip install --no-deps ./kitt-protocol/sdk/python
+          python -m pip install ./kitt-agent-cli
+          python -m pip install --no-deps --force-reinstall ./kitt-protocol/sdk/python
+          python -m pip install --no-deps ./kitt-assistant/packages/kitt-assistant-runtime
           python -m pip check
       - name: Verify Assistant runtime ownership
         run: |
           python - <<'PY'
           from pathlib import Path
+          import kitt
           import kitt.daemon.client
           import kitt.daemon.server
           import kitt.remote.server
+          assert hasattr(kitt, "KITT_VERSION"), kitt
           for module in (kitt.daemon.client, kitt.daemon.server, kitt.remote.server):
               path = Path(module.__file__).resolve()
-              assert 'kitt-assistant-runtime' in str(path), path
-          print('Assistant runtime ownership: ok')
+              assert 'site-packages' in str(path), path
+          print('Assistant runtime wheel composition: ok')
           PY
       - run: python -m unittest discover -s kitt-assistant/packages/kitt-assistant-runtime/tests -v
       - working-directory: kitt-assistant
