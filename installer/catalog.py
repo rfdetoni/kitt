@@ -18,11 +18,11 @@ class ModuleSpec:
     description: str
     strategy: str
     order: int
-    selectable: bool
     requires: tuple[str, ...]
     companions: tuple[str, ...]
     platforms: tuple[str, ...]
     prerequisites: tuple[str, ...]
+    selectable: bool = True
 
 
 @dataclass(frozen=True)
