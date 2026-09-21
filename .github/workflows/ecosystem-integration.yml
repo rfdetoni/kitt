@@ -41,7 +41,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ecosystem-integration-${{ github.ref }}
+  group: ecosystem-integration-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -55,6 +55,7 @@ env:
 
 jobs:
   resolve_refs:
+    if: github.event_name != 'push'
     name: Freeze ecosystem snapshot
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -495,12 +496,25 @@ jobs:
     needs: [resolve_refs, installers, protocol, memory, toolbox, workers, assistant, agent_cli, reverse_proxy, locked_install]
     runs-on: ubuntu-latest
     steps:
-      - name: Require every frozen-snapshot gate
+      - name: Require event-appropriate ecosystem gates
         shell: bash
         run: |
           set -euo pipefail
-          test "${{ needs.resolve_refs.result }}" = success
+
+          # Every event validates the aggregate installers and the exact promoted
+          # ecosystem.lock.json snapshot end to end.
           test "${{ needs.installers.result }}" = success
+          test "${{ needs.locked_install.result }}" = success
+
+          # A push to main is already composed from component commits that passed
+          # their own repository gates. Avoid re-running every component suite
+          # after promotion; PR/manual/scheduled runs remain the deep audit path.
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "main push: locked install gate passed; deep component audit intentionally skipped"
+            exit 0
+          fi
+
+          test "${{ needs.resolve_refs.result }}" = success
           test "${{ needs.protocol.result }}" = success
           test "${{ needs.memory.result }}" = success
           test "${{ needs.toolbox.result }}" = success
@@ -508,4 +522,3 @@ jobs:
           test "${{ needs.assistant.result }}" = success
           test "${{ needs.agent_cli.result }}" = success
           test "${{ needs.reverse_proxy.result }}" = success
-          test "${{ needs.locked_install.result }}" = success
