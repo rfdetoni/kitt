@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-19",
+  "generated_at": "2026-09-21",
   "components": {
     "rfdetoni/kitt-protocol": "c4ae476521e812ec1497a442cce6b276a26d9f80",
     "rfdetoni/kitt-memory": "f3031588bc68e47db1f3ffa61f280c7ad8488c52",
     "rfdetoni/kitt-toolbox": "55f19ed944280bac8184c91886651438fa118481",
-    "rfdetoni/kitt-ai-workers": "0ced7d5b997a0740e88cfeb2afcaa528abffab66",
-    "rfdetoni/kitt-assistant": "a9527627318e45bd52086c7787f2056812189989",
-    "rfdetoni/kitt-agent-cli": "955dca403a283acfc2dd9e8f8ba6095c21c379f4",
-    "rfdetoni/kitt-reverse-proxy": "aa859bfcdb38f2fcc8217e123b9995540cb0df43"
+    "rfdetoni/kitt-ai-workers": "70e3e9095e90e7807fd5432b55f540883760299d",
+    "rfdetoni/kitt-assistant": "867519454ca97d0473bcefc515a39eb6fec657d0",
+    "rfdetoni/kitt-agent-cli": "badaa9542a8ba7a21789e151e25cf2693da74e4a",
+    "rfdetoni/kitt-reverse-proxy": "246524139b3d44bfeb8dc9b53e0ed5d26d78f22c"
   }
 }
