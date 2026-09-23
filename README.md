@@ -23,7 +23,7 @@ This repository is the **distribution and composition point** for the ecosystem.
 | Component | Responsibility | Primary technology |
 | --- | --- | --- |
 | [`kitt-agent-cli`](https://github.com/rfdetoni/kitt-agent-cli) | autonomous coding-agent control plane | Python + SQLite/FTS5 |
-| [`kitt-reverse-proxy`](https://github.com/rfdetoni/kitt-reverse-proxy) | authorized web-chat/API gateway | TypeScript/Node.js + Playwright |
+| [`kitt-reverse-proxy`](https://github.com/rfdetoni/kitt-reverse-proxy) | authorized web-chat/API gateway with versioned provider plugins | TypeScript/Node.js + Playwright |
 | [`kitt-assistant`](https://github.com/rfdetoni/kitt-assistant) | resident assistant, daemon and Control Center | Rust + web + Python runtime |
 | [`kitt-protocol`](https://github.com/rfdetoni/kitt-protocol) | cross-component contracts and SDKs | Rust + Python + TypeScript |
 | [`kitt-memory`](https://github.com/rfdetoni/kitt-memory) | shared persistent memory engine | Rust + SQLite WAL |
@@ -39,6 +39,7 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 - **Install the complete Agent stack:** use the installer below.
 - **Run the coding agent:** `kitt`
 - **Run the browser/API gateway:** `kitt-reverse-proxy start chatgpt`
+- **Develop WebChat providers:** use the versioned `kitt-reverse-proxy/plugin-sdk` contract.
 - **GHCR packages:** https://github.com/rfdetoni?tab=packages
 - **Inspect the resident service:** `kittctl service status`
 - **Evolution runs:** `kitt evolve runs`
@@ -54,7 +55,7 @@ Requirements are calculated from the selected module set rather than globally ha
 - Git;
 - Python **3.12+**;
 - Node.js **24+** and npm;
-- Rust **1.85+** and Cargo.
+- Rust **1.90+** and Cargo.
 
 Windows, Linux and macOS are first-class targets. Other POSIX systems use the generic POSIX adapter when the selected upstream toolchains support the OS.
 
@@ -160,8 +161,8 @@ Host services such as Ollama or LM Studio can be reached through `host.docker.in
 The Agent and reverse proxy evolve independently, so their release versions do not need to match. For example:
 
 ```env
-KITT_AGENT_VERSION=v0.4.0
-KITT_REVERSE_PROXY_VERSION=v3.1.0
+KITT_AGENT_VERSION=vMAJOR.MINOR.PATCH
+KITT_REVERSE_PROXY_VERSION=vMAJOR.MINOR.PATCH
 ```
 
 You can also override the image repository through `KITT_AGENT_IMAGE`, `KITT_REVERSE_PROXY_IMAGE` and `KITT_BROWSER_IMAGE`, for example when mirroring GHCR into a private registry.
@@ -294,7 +295,7 @@ Evolution candidates never replace live skills automatically; promotion happens 
                          │
                          ▼
                   Reverse Proxy
-                  provider gateway
+                  provider gateway + plugins
 ```
 
 The ownership rule is intentional: components communicate through versioned contracts and separately packaged capabilities instead of duplicating implementation code.
