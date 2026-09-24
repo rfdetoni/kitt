@@ -95,6 +95,10 @@ KITT Agent CLI
 
 The catalog resolver and CI enforce this relationship so the Agent is not silently installed as an incomplete subset simply because capabilities are owned by separate repositories.
 
+### Human approval continuity
+
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.69.3` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.14` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.1.2` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
 ---
