@@ -97,7 +97,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.72.1` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.14` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.2.0` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.72.2` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.15` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.2.0` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -105,14 +105,16 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.72 and Reverse Proxy 4.2 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy` to:
+The locked Agent stack now includes Agent CLI 0.72.2 and Reverse Proxy 4.2 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
 - start from a provider plugin or a custom WebChat URL;
 - stop/restart individual proxy instances;
 - bind independent instances to Context, Principal/Code and Validation roles;
-- operate the main configuration menus with keyboard or mouse.
+- operate the main configuration menus with keyboard or mouse;
+- scroll retained modal content without wheel events leaking to the transcript;
+- render modal text without raw ANSI/CSI escape artifacts.
 
 A supported dual-provider topology is:
 
