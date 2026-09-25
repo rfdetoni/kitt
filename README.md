@@ -38,7 +38,7 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 
 - **Install the complete Agent stack:** use the installer below.
 - **Run the coding agent:** `kitt`
-- **Run the browser/API gateway:** `kitt-reverse-proxy start chatgpt`
+- **Manage the browser/API gateway:** open `Ctrl+P -> KITT Reverse Proxy` in Agent CLI or use `kitt-reverse-proxy service list --json`
 - **Develop WebChat providers:** use the versioned `kitt-reverse-proxy/plugin-sdk` contract.
 - **GHCR packages:** https://github.com/rfdetoni?tab=packages
 - **Inspect the resident service:** `kittctl service status`
@@ -97,9 +97,32 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.69.3` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.14` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.1.2` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.72.0` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.14` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.2.0` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
+
+
+
+### Integrated Reverse Proxy control center
+
+The locked Agent stack now includes Agent CLI 0.72 and Reverse Proxy 4.2 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy` to:
+
+- run multiple reverse-proxy instances at once;
+- use named browser profiles and provider plugins;
+- start from a provider plugin or a custom WebChat URL;
+- stop/restart individual proxy instances;
+- bind independent instances to Context, Principal/Code and Validation roles;
+- operate the main configuration menus with keyboard or mouse.
+
+A supported dual-provider topology is:
+
+```text
+Context        -> Gemini Web  -> gemini-context -> local endpoint A
+Principal/Code -> ChatGPT Web -> chatgpt-code   -> local endpoint B
+```
+
+The TUI automatically consumes the reverse-proxy machine-readable control plane; it does not inspect OS process tables or hard-code the provider plugin list. Mouse interaction uses Agent-owned local-cell hit regions inspired by OpenTUI interaction principles while retaining the existing Python/prompt_toolkit renderer.
+
 
 ---
 
