@@ -366,12 +366,15 @@ jobs:
       - name: Install frozen composed namespace
         run: |
           python -m pip install pytest pytest-asyncio
-          python -m pip install --no-deps -e ./kitt-protocol/sdk/python
-          python -m pip install -e ./kitt-agent-cli
-          python -m pip install --no-deps --force-reinstall -e ./kitt-protocol/sdk/python
-          python -m pip install --no-deps -e ./kitt-assistant/packages/kitt-assistant-runtime
-          python -m pip install --no-deps -e ./kitt-ai-workers/packages/kitt-evolution
-          python -m pip install --no-deps -e ./kitt-ai-workers/packages/kitt-evals
+          # Use regular installs here: multiple PEP 660 editable distributions
+          # sharing the kitt.* namespace can register competing namespace finders.
+          # This gate intentionally validates the same import composition users get.
+          python -m pip install --no-deps ./kitt-protocol/sdk/python
+          python -m pip install ./kitt-agent-cli
+          python -m pip install --no-deps --force-reinstall ./kitt-protocol/sdk/python
+          python -m pip install --no-deps ./kitt-assistant/packages/kitt-assistant-runtime
+          python -m pip install --no-deps ./kitt-ai-workers/packages/kitt-evolution
+          python -m pip install --no-deps ./kitt-ai-workers/packages/kitt-evals
           python -m pip check
       - name: Compile Agent and companions
         run: >-
@@ -386,7 +389,7 @@ jobs:
         run: python -m unittest discover -s tests/prime_architecture -v
       - name: Verify composed namespace
         run: >-
-          python -c "import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; print('frozen composed namespace: ok')"
+          python -c "import kitt; import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; assert hasattr(kitt, 'DAEMON_PROTOCOL_VERSION'); print('frozen composed namespace: ok', kitt.__file__)"
 
   reverse_proxy:
     needs: resolve_refs
