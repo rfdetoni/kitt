@@ -55,10 +55,19 @@ class CatalogTests(unittest.TestCase):
             with self.subTest(module_id=module_id), self.assertRaises(CatalogError):
                 self.catalog.resolve([module_id])
 
-    def test_full_preset_uses_public_agent_entrypoint(self) -> None:
-        self.assertEqual(self.catalog.preset("full"), ("agent-cli",))
+    def test_full_preset_explicitly_selects_every_public_module(self) -> None:
+        requested = self.catalog.preset("full")
+        expected_public = tuple(
+            module.id
+            for module in sorted(
+                self.catalog.modules.values(),
+                key=lambda module: (module.order, module.id),
+            )
+            if module.selectable
+        )
+        self.assertEqual(set(requested), set(expected_public))
         self.assertEqual(
-            set(self.catalog.resolve(self.catalog.preset("full")).ids),
+            set(self.catalog.resolve(requested).ids),
             set(self.catalog.modules),
         )
 
