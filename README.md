@@ -97,7 +97,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.72.3` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.15` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.2.0` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.74.3` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.16` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.4.0` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -105,7 +105,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.72.3 and Reverse Proxy 4.2 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.74.3 and Reverse Proxy 4.4 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -397,6 +397,8 @@ Changes should keep repository ownership boundaries clear, preserve local-first 
 
 MIT. See [LICENSE](LICENSE).
 
-### Snapshot 0.9.13 — TUI interaction hardening
+### Snapshot 0.9.14 — Memory v0.2 hardening
 
-The locked ecosystem pairs Agent CLI 0.72.3 with AI Workers 0.1.19 and Reverse Proxy 4.2.0. This snapshot fixes Reverse Proxy modal visibility/start flow, stable pointer activation, retained-modal wheel scrolling, raw ANSI/CSI artifacts and action hover feedback. Evolution/Evals are pinned to the exact Agent 0.72.3 revision used by the distributor lock.
+The locked ecosystem pairs **KITT Memory 0.2.0**, **Protocol 0.2.0**, **Assistant 0.1.4 / runtime 0.2.16**, **Agent CLI 0.74.3**, **AI Workers 0.1.21** and **Reverse Proxy 4.4.0**.
+
+This snapshot adds real conversation isolation through `scope_key`, point-in-time recall through `as_of`, atomic multi-writer sensitivity guarantees, scope/kind-aware deduplication, SQL-side privacy filtering, lower FTS write amplification, batched knowledge-graph traversal, stricter corruption handling and transactional schema-v4 migration. Agent, Assistant, HUD, Protocol and Evolution/Evals are pinned to the same immutable contract set.
