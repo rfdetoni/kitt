@@ -28,7 +28,11 @@
       "name": "Full Ecosystem",
       "description": "All KITT modules",
       "modules": [
-        "agent-cli"
+        "agent-cli",
+        "toolbox",
+        "assistant",
+        "ai-workers",
+        "reverse-proxy"
       ]
     }
   },
