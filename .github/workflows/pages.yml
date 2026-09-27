@@ -23,6 +23,8 @@ jobs:
     name: Build static site
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      pages_enabled: ${{ steps.configure_pages.outcome == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -30,9 +32,9 @@ jobs:
           persist-credentials: false
 
       - name: Configure Pages
+        id: configure_pages
+        continue-on-error: true
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
-        with:
-          enablement: true
 
       - name: Assemble site
         shell: bash
@@ -61,6 +63,7 @@ jobs:
   deploy:
     name: Deploy GitHub Pages
     needs: build
+    if: needs.build.outputs.pages_enabled == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment:
