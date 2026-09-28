@@ -482,7 +482,7 @@ Official streaming providers distinguish explicit output-limit truncation from s
 
 ### Snapshot 0.9.23 — installer fallback and hybrid WebChat read path
 
-The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.1**, **Assistant 0.1.11 / runtime 0.2.21**, **AI Workers 0.1.28**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.0**.
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.2**, **Assistant 0.1.11 / runtime 0.2.21**, **AI Workers 0.1.28**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.0**.
 
 Assistant 0.1.11 fixes the Linux zero-prep fallback used when ALSA development headers are unavailable: `kittd` now compiles cleanly with `--no-default-features`, and Assistant CI permanently exercises that exact locked build path. The Python Assistant runtime remains 0.2.21 because its contract did not change.
 
