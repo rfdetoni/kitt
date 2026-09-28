@@ -7,7 +7,7 @@
     "rfdetoni/kitt-toolbox": "bf58cfa5b9ae9b8ab8a4231184cee2619e9546f2",
     "rfdetoni/kitt-ai-workers": "4e47933c1899298cf92e5d592bdb67c928bf2404",
     "rfdetoni/kitt-assistant": "58ebdbaf6bc2c9135d645cd782d639e226e24d03",
-    "rfdetoni/kitt-agent-cli": "4f7ff6d9a92d0675f1fc89bdae79f98e3e1942e6",
+    "rfdetoni/kitt-agent-cli": "62d5ff5313fca6991c25cb91f111a07f66e3f55f",
     "rfdetoni/kitt-reverse-proxy": "b13cd32a64e4833af5876c9eaa6543d708261259"
   }
 }
