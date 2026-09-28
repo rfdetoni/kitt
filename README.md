@@ -478,3 +478,12 @@ The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 
 Application-sized mutation requests now enter an evidence-first agentic loop: the complete user goal remains authoritative, but the first execution action is a bounded repository inspection before optional architecture planning or mutation. Subsequent work advances through small action/observation milestones and preserves the adaptive symbol/diff editing path for existing files.
 
 Official streaming providers distinguish explicit output-limit truncation from successful completion and the Agent recovers by regenerating a smaller complete action instead of concatenating partial JSON, diffs or source code. WebChat uses activity-aware response liveness with a bounded absolute ceiling, while managed reverse-proxy browser startup keeps the 330-second readiness budget. The retained TUI also includes bidirectional manual transcript scrolling and continuous visible K.I.T.T. scanner animation.
+
+
+### Snapshot 0.9.23 — installer fallback and hybrid WebChat read path
+
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.2**, **Assistant 0.1.11 / runtime 0.2.21**, **AI Workers 0.1.28**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.0**.
+
+Assistant 0.1.11 fixes the Linux zero-prep fallback used when ALSA development headers are unavailable: `kittd` now compiles cleanly with `--no-default-features`, and Assistant CI permanently exercises that exact locked build path. The Python Assistant runtime remains 0.2.21 because its contract did not change.
+
+Reverse Proxy 4.6.0 adds conservative hybrid UI response reading: the browser UI remains the sole send path and DOM remains the canonical final response, while a passive CDP tap may provide earlier streaming only after repeated DOM-equivalence verification. Tap health and circuit state are isolated from provider transport health, and `--read-mode dom` remains a hard kill switch.
