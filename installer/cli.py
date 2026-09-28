@@ -92,6 +92,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bin-dir", type=Path, help="command launcher directory")
     parser.add_argument("--with-ai-workers", action="store_true", help="also install heavy AI/STT worker dependencies")
     parser.add_argument(
+        "--no-auto-prerequisites",
+        action="store_true",
+        help="do not bootstrap supported missing prerequisites in non-interactive mode",
+    )
+    parser.add_argument(
         "--portable",
         action="store_true",
         help="explicitly skip Rust/native builds and use portable fallbacks where available",
@@ -207,6 +212,11 @@ def main(argv: list[str] | None = None) -> int:
             portable=bool(args.portable),
             dry_run=bool(args.dry_run),
             start_services=not bool(args.no_start_services),
+            auto_prerequisites=bool(
+                non_interactive
+                and not args.no_auto_prerequisites
+                and not _env_flag("KITT_NO_AUTO_PREREQUISITES")
+            ),
         )
         installer = SourceFreeEcosystemInstaller(catalog, platform, options)
         if args.uninstall:

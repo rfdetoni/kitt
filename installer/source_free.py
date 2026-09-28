@@ -140,9 +140,10 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         if not resolution.modules:
             raise InstallerError("no modules selected")
         self._validate_platforms(resolution.modules)
-        report = self._check_prerequisites(resolution.modules)
-        self._python = report.python
-        self._print_plan(resolution, report)
+        initial_report = self._check_prerequisites(resolution.modules)
+        self._python = initial_report.python
+        self._print_plan(resolution, initial_report)
+        report = self._prepare_prerequisites(resolution.modules)
         if report.missing:
             hint = self.platform.prerequisite_hint(report.missing)
             detail = f"\nSuggested setup:\n{hint}" if hint else ""

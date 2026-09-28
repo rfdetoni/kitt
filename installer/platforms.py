@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import platform as stdlib_platform
+import urllib.request
 import subprocess
 import sys
 import tempfile
@@ -203,6 +205,100 @@ class PlatformAdapter:
                 "Install the Haiku package that provides Python venv/pip support."
             )
         return f"Python {version_text} was found but venv/ensurepip is unavailable."
+
+    def _rustup_target(self) -> str:
+        machine = stdlib_platform.machine().strip().lower()
+        arch = {
+            "amd64": "x86_64",
+            "x86_64": "x86_64",
+            "arm64": "aarch64",
+            "aarch64": "aarch64",
+        }.get(machine)
+        if arch is None:
+            raise RuntimeError(f"automatic Rust bootstrap does not support architecture {machine!r}")
+        suffix = {
+            "windows": "pc-windows-msvc",
+            "linux": "unknown-linux-gnu",
+            "macos": "apple-darwin",
+        }.get(self.name)
+        if suffix is None:
+            raise RuntimeError(
+                f"automatic Rust bootstrap is not available on platform {self.name!r}"
+            )
+        return f"{arch}-{suffix}"
+
+    def _prepend_process_path(self, path: Path) -> None:
+        current = [part for part in os.environ.get("PATH", "").split(os.pathsep) if part]
+        current = [part for part in current if not self._same_path(part, path)]
+        os.environ["PATH"] = os.pathsep.join([str(path), *current])
+
+    def install_rust(self, minimum: tuple[int, ...]) -> CommandInfo:
+        """Install a user-local stable Rust toolchain through official rustup-init."""
+        target = self._rustup_target()
+        suffix = ".exe" if self.name == "windows" else ""
+        url = f"https://static.rust-lang.org/rustup/dist/{target}/rustup-init{suffix}"
+        cargo_home = Path(os.environ.get("CARGO_HOME") or (Path.home() / ".cargo")).expanduser()
+        cargo_bin = cargo_home / "bin"
+        cargo_bin.mkdir(parents=True, exist_ok=True)
+
+        with tempfile.TemporaryDirectory(prefix="kitt-rustup-") as temp:
+            installer = Path(temp) / f"rustup-init{suffix}"
+            request = urllib.request.Request(
+                url,
+                headers={"User-Agent": "kitt-installer-rust-bootstrap"},
+            )
+            try:
+                with urllib.request.urlopen(request, timeout=60) as response:
+                    data = response.read(64 * 1024 * 1024 + 1)
+            except Exception as exc:
+                raise RuntimeError(f"could not download rustup-init from {url}: {exc}") from exc
+            if not data or len(data) > 64 * 1024 * 1024:
+                raise RuntimeError("downloaded rustup-init is empty or exceeds the safety limit")
+            installer.write_bytes(data)
+            if self.posix:
+                installer.chmod(0o700)
+
+            env = os.environ.copy()
+            env["CARGO_HOME"] = str(cargo_home)
+            command = [
+                str(installer),
+                "-y",
+                "--profile",
+                "minimal",
+                "--default-toolchain",
+                "stable",
+            ]
+            try:
+                proc = subprocess.run(
+                    command,
+                    env=env,
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    timeout=300,
+                    check=False,
+                )
+            except (OSError, subprocess.SubprocessError) as exc:
+                raise RuntimeError(f"rustup-init could not be executed: {exc}") from exc
+            if proc.returncode != 0:
+                output = (proc.stdout or "").strip()
+                raise RuntimeError(
+                    f"rustup-init failed with exit code {proc.returncode}"
+                    + (f": {output}" if output else "")
+                )
+
+        self._prepend_process_path(cargo_bin)
+        cargo = self.command_info("cargo")
+        rustc = self.command_info("rustc")
+        if cargo is None or rustc is None:
+            raise RuntimeError("rustup completed but cargo/rustc are still unavailable")
+        if minimum:
+            if (cargo.version and cargo.version < minimum) or (rustc.version and rustc.version < minimum):
+                wanted = ".".join(map(str, minimum))
+                raise RuntimeError(
+                    f"rustup installed an incompatible toolchain; Rust >={wanted} is required"
+                )
+        return rustc
 
     def prerequisite_hint(self, missing: Iterable[str]) -> str:
         missing_set = set(missing)

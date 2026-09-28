@@ -40,6 +40,7 @@ class InstallerOptions:
     portable: bool = False
     dry_run: bool = False
     start_services: bool = True
+    auto_prerequisites: bool = False
 
 
 @dataclass(frozen=True)
@@ -71,9 +72,10 @@ class EcosystemInstaller:
         if not resolution.modules:
             raise InstallerError("no modules selected")
         self._validate_platforms(resolution.modules)
-        report = self._check_prerequisites(resolution.modules)
-        self._python = report.python
-        self._print_plan(resolution, report)
+        initial_report = self._check_prerequisites(resolution.modules)
+        self._python = initial_report.python
+        self._print_plan(resolution, initial_report)
+        report = self._prepare_prerequisites(resolution.modules)
         if report.missing:
             hint = self.platform.prerequisite_hint(report.missing)
             detail = f"\nSuggested setup:\n{hint}" if hint else ""
@@ -203,6 +205,43 @@ class EcosystemInstaller:
             missing=tuple(dict.fromkeys(missing)),
             found=found,
         )
+
+    @staticmethod
+    def _missing_rust_minimum(missing: Iterable[str]) -> tuple[int, ...] | None:
+        minimum: tuple[int, ...] | None = None
+        for item in missing:
+            if item == "rust":
+                candidate = (1, 85)
+            elif item.startswith("rust>="):
+                try:
+                    candidate = tuple(int(part) for part in item.split(">=", 1)[1].split("."))
+                except ValueError:
+                    continue
+            else:
+                continue
+            if minimum is None or candidate > minimum:
+                minimum = candidate
+        return minimum
+
+    def _prepare_prerequisites(self, modules: Iterable[ModuleSpec]) -> PrerequisiteReport:
+        modules = tuple(modules)
+        report = self._check_prerequisites(modules)
+        self._python = report.python
+        if not report.missing or not self.options.auto_prerequisites or self.options.dry_run:
+            return report
+
+        rust_minimum = self._missing_rust_minimum(report.missing)
+        if rust_minimum is not None:
+            wanted = ".".join(map(str, rust_minimum))
+            print(f"\nBootstrap Rust >={wanted} with user-local rustup")
+            try:
+                info = self.platform.install_rust(rust_minimum)
+            except RuntimeError as exc:
+                raise InstallerError(f"automatic Rust bootstrap failed: {exc}") from exc
+            print(f"    Rust ready: {info.version_text}")
+            report = self._check_prerequisites(modules)
+            self._python = report.python
+        return report
 
     def _print_plan(self, resolution: Resolution, report: PrerequisiteReport) -> None:
         print(f"\nK.I.T.T. installation plan ({self.platform.name})")

@@ -189,6 +189,21 @@ class PlatformTests(unittest.TestCase):
         ):
             self.assertIsNone(adapter.command_info("cargo"))
 
+    def test_rustup_target_matches_supported_platform_architecture(self) -> None:
+        with patch("installer.platforms.stdlib_platform.machine", return_value="x86_64"):
+            self.assertEqual(
+                PlatformAdapter("linux", posix=True)._rustup_target(),
+                "x86_64-unknown-linux-gnu",
+            )
+            self.assertEqual(
+                PlatformAdapter("macos", posix=True)._rustup_target(),
+                "x86_64-apple-darwin",
+            )
+            self.assertEqual(
+                PlatformAdapter("windows", posix=False)._rustup_target(),
+                "x86_64-pc-windows-msvc",
+            )
+
     def test_generic_posix_adapter_accepts_posix_modules(self) -> None:
         adapter = PlatformAdapter("haiku", posix=True)
         self.assertTrue(adapter.supports(("windows", "linux", "macos", "posix")))
@@ -241,6 +256,53 @@ class PlatformTests(unittest.TestCase):
 
 
 class RequirementTests(unittest.TestCase):
+    def test_missing_rust_minimum_uses_highest_required_version(self) -> None:
+        self.assertEqual(
+            EcosystemInstaller._missing_rust_minimum(("git", "rust>=1.88", "rust>=1.90")),
+            (1, 90),
+        )
+        self.assertEqual(EcosystemInstaller._missing_rust_minimum(("rust",)), (1, 85))
+        self.assertIsNone(EcosystemInstaller._missing_rust_minimum(("git", "node")))
+
+    def test_noninteractive_auto_prerequisite_retry_clears_rust_failure(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            adapter = PlatformAdapter("linux", posix=True)
+            installer = EcosystemInstaller(
+                catalog,
+                adapter,
+                InstallerOptions(
+                    root=root,
+                    bin_dir=root / "bin",
+                    auto_prerequisites=True,
+                ),
+            )
+            reports = [
+                type("Report", (), {
+                    "python": None,
+                    "missing": ("rust>=1.90",),
+                    "found": {},
+                })(),
+                type("Report", (), {
+                    "python": None,
+                    "missing": (),
+                    "found": {"cargo": "cargo 1.90", "rustc": "rustc 1.90"},
+                })(),
+            ]
+            with (
+                patch.object(installer, "_check_prerequisites", side_effect=reports),
+                patch.object(adapter, "install_rust") as install_rust,
+            ):
+                install_rust.return_value = type(
+                    "Info", (), {"version_text": "rustc 1.90.0"}
+                )()
+                report = installer._prepare_prerequisites(
+                    (catalog.modules["toolbox"],)
+                )
+            install_rust.assert_called_once_with((1, 90))
+            self.assertEqual(report.missing, ())
+
     def test_requirement_parser(self) -> None:
         self.assertEqual(EcosystemInstaller._parse_requirement("python>=3.12"), ("python", (3, 12)))
         self.assertEqual(EcosystemInstaller._parse_requirement("git"), ("git", ()))

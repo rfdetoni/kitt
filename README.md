@@ -414,3 +414,12 @@ The design is a clean-room KITT implementation: specialized stores keep their ow
 
 
 Snapshot 0.9.18 uses the final validation SHAs for Agent/Workers: Agent `c24487c9727e10706f1d51fe933578207a2c6db1` and AI Workers `ee6b749f91874815a179e8e7ff583d7fcbb3e879`. Runtime versions remain Agent 0.75.1 and AI Workers 0.1.25.
+
+
+### Automatic prerequisite bootstrap
+
+Non-interactive installs now bootstrap a missing/incompatible Rust toolchain automatically when native K.I.T.T. modules require it. The installer downloads the official platform-specific `rustup-init` binary over HTTPS, installs the stable minimal toolchain in the current user's Cargo home, prepends that Cargo bin directory for the active install process, revalidates the required Rust version, and then continues.
+
+This behavior is enabled by `KITT_NON_INTERACTIVE=1` / `--yes`. To require prerequisites to be preinstalled instead, pass `--no-auto-prerequisites` or set `KITT_NO_AUTO_PREREQUISITES=1`.
+
+The installer still fails closed if the platform/architecture cannot be mapped to an official rustup target or the installed stable toolchain does not satisfy the highest Rust requirement in the selected module graph.
