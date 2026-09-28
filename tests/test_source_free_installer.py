@@ -140,12 +140,19 @@ class SourceFreeInstallerTests(unittest.TestCase):
                     "_install_python_stack",
                     side_effect=lambda _resolution: after_native("python", staged),
                 ),
+                patch.object(
+                    installer,
+                    "_cargo_build_cached",
+                    side_effect=lambda module: after_native("memory")
+                    if module.id == "memory"
+                    else None,
+                ),
             ):
                 result = installer._build_install_artifacts_parallel(resolution)
 
             self.assertEqual(result, staged)
             self.assertEqual(events[0], "native")
-            self.assertCountEqual(events[1:], ["hud", "proxy", "python"])
+            self.assertCountEqual(events[1:], ["memory", "hud", "proxy", "python"])
 
     def test_reverse_proxy_runtime_keeps_only_installed_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
