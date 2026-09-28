@@ -423,3 +423,10 @@ Non-interactive installs now bootstrap a missing/incompatible Rust toolchain aut
 This behavior is enabled by `KITT_NON_INTERACTIVE=1` / `--yes`. To require prerequisites to be preinstalled instead, pass `--no-auto-prerequisites` or set `KITT_NO_AUTO_PREREQUISITES=1`.
 
 The installer still fails closed if the platform/architecture cannot be mapped to an official rustup target or the installed stable toolchain does not satisfy the highest Rust requirement in the selected module graph.
+
+
+### Linux native audio fallback
+
+The installer no longer requires `pkg-config`/ALSA development headers just to install the complete agent stack. On Linux it probes `pkg-config --exists alsa` before the Assistant Cargo build. When the native audio toolchain is absent, it builds KITT Assistant with `--no-default-features`: resident microphone/wake-word capture is omitted, while the daemon, Control Center, HUD, memory, model routing, explicit transcription APIs and the rest of the ecosystem remain installed.
+
+If ALSA development support is present, the normal default-feature build is used and resident voice capture remains enabled.

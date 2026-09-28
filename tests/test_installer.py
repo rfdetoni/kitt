@@ -204,6 +204,25 @@ class PlatformTests(unittest.TestCase):
                 "x86_64-pc-windows-msvc",
             )
 
+    def test_linux_voice_build_requires_pkg_config_and_alsa(self) -> None:
+        adapter = PlatformAdapter("linux", posix=True)
+        with patch("installer.platforms.shutil.which", return_value=None):
+            self.assertFalse(adapter.assistant_voice_build_available())
+        with (
+            patch("installer.platforms.shutil.which", return_value="/usr/bin/pkg-config"),
+            patch("installer.platforms._run_capture", return_value=(1, "")),
+        ):
+            self.assertFalse(adapter.assistant_voice_build_available())
+        with (
+            patch("installer.platforms.shutil.which", return_value="/usr/bin/pkg-config"),
+            patch("installer.platforms._run_capture", return_value=(0, "")),
+        ):
+            self.assertTrue(adapter.assistant_voice_build_available())
+
+    def test_non_linux_voice_build_has_no_alsa_probe(self) -> None:
+        self.assertTrue(PlatformAdapter("windows", posix=False).assistant_voice_build_available())
+        self.assertTrue(PlatformAdapter("macos", posix=True).assistant_voice_build_available())
+
     def test_generic_posix_adapter_accepts_posix_modules(self) -> None:
         adapter = PlatformAdapter("haiku", posix=True)
         self.assertTrue(adapter.supports(("windows", "linux", "macos", "posix")))
@@ -306,6 +325,56 @@ class RequirementTests(unittest.TestCase):
     def test_requirement_parser(self) -> None:
         self.assertEqual(EcosystemInstaller._parse_requirement("python>=3.12"), ("python", (3, 12)))
         self.assertEqual(EcosystemInstaller._parse_requirement("git"), ("git", ()))
+
+
+class NativeBuildTests(unittest.TestCase):
+    def test_assistant_falls_back_to_no_default_features_without_alsa(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        module = catalog.modules["assistant"]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / ".staging" / "sources" / "kitt-assistant"
+            source.mkdir(parents=True)
+            (source / "Cargo.toml").write_text("[workspace]\n", encoding="utf-8")
+            installer = __import__(
+                "installer.source_free",
+                fromlist=["SourceFreeEcosystemInstaller"],
+            ).SourceFreeEcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(root=root, bin_dir=root / "bin"),
+            )
+            with (
+                patch.object(installer.platform, "assistant_voice_build_available", return_value=False),
+                patch.object(installer, "_run") as run,
+            ):
+                installer._cargo_build_cached(module)
+            argv = run.call_args.args[0]
+            self.assertIn("--no-default-features", argv)
+
+    def test_assistant_keeps_voice_features_when_native_audio_is_available(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        module = catalog.modules["assistant"]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / ".staging" / "sources" / "kitt-assistant"
+            source.mkdir(parents=True)
+            (source / "Cargo.toml").write_text("[workspace]\n", encoding="utf-8")
+            installer = __import__(
+                "installer.source_free",
+                fromlist=["SourceFreeEcosystemInstaller"],
+            ).SourceFreeEcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(root=root, bin_dir=root / "bin"),
+            )
+            with (
+                patch.object(installer.platform, "assistant_voice_build_available", return_value=True),
+                patch.object(installer, "_run") as run,
+            ):
+                installer._cargo_build_cached(module)
+            argv = run.call_args.args[0]
+            self.assertNotIn("--no-default-features", argv)
 
 
 class RepositoryStateTests(unittest.TestCase):

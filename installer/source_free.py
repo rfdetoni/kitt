@@ -277,6 +277,12 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         lock = path / "Cargo.lock"
         generated_lock = not lock.exists()
         command = ["cargo", "build", "--release", "--jobs", str(self._cargo_jobs())]
+        if module.id == "assistant" and not self.platform.assistant_voice_build_available():
+            print(
+                "    native voice capture disabled: Linux ALSA development "
+                "toolchain is unavailable (core Assistant remains enabled)"
+            )
+            command.append("--no-default-features")
         if not generated_lock:
             command.append("--locked")
         try:

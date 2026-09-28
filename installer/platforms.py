@@ -300,6 +300,16 @@ class PlatformAdapter:
                 )
         return rustc
 
+    def assistant_voice_build_available(self) -> bool:
+        """Return whether the host can compile the resident microphone stack."""
+        if self.name != "linux":
+            return True
+        executable = shutil.which("pkg-config")
+        if not executable:
+            return False
+        code, _ = _run_capture((executable, "--exists", "alsa"))
+        return code == 0
+
     def prerequisite_hint(self, missing: Iterable[str]) -> str:
         missing_set = set(missing)
         hints: list[str] = []
