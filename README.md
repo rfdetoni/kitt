@@ -97,7 +97,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.77.3` persists `PENDING` approvals without a wall-clock timeout and treats explicit `allow-all` as authoritative for ordinary commands instead of silently reopening ASK when a strong OS sandbox is unavailable. Critical authority boundaries such as denied argv, network elevation and control-plane mutation remain fail-closed. `kitt-assistant-runtime 0.2.22` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.77.3` persists `PENDING` approvals without a wall-clock timeout and treats explicit `allow-all` as authoritative for ordinary commands instead of silently reopening ASK when a strong OS sandbox is unavailable. Critical authority boundaries such as denied argv, network elevation and control-plane mutation remain fail-closed. `kitt-assistant-runtime 0.2.21` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -473,7 +473,7 @@ Agent CLI now delegates durable semantic memory, provenance, lifecycle state and
 
 ### Snapshot 0.9.23 — autonomy, modal and action-summary reliability
 
-The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.3**, **Assistant 0.1.11 / runtime 0.2.22**, **AI Workers 0.1.29**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.1**.
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.3**, **Assistant 0.1.11 / runtime 0.2.21**, **AI Workers 0.1.29**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.1**.
 
 This snapshot fixes three execution-path inconsistencies. First, explicit `allow-all` remains an ALLOW decision for ordinary model-initiated commands even when the host cannot provide the strongest OS sandbox; explicitly denied commands and privileged network/control-plane boundaries continue to fail closed. Second, the permission surface is a real pointer modal: blank/body clicks are consumed by the modal and only visible approval controls are actionable. Third, the bounded agent-contract `reasoning_summary` now survives Reverse Proxy native tool-call conversion and is projected by the Agent TUI as a concise description of what the model is doing and why, while the concrete tool/operation remains visible as technical detail.
 
