@@ -473,7 +473,7 @@ Agent CLI now delegates durable semantic memory, provenance, lifecycle state and
 
 ### Snapshot 0.9.22 — evidence-first agentic reliability
 
-The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.0**, **Assistant 0.1.9 / runtime 0.2.20**, **AI Workers 0.1.26**, **Toolbox 0.2.9** and **Reverse Proxy 4.5.0**.
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.0**, **Assistant 0.1.9 / runtime 0.2.20**, **AI Workers 0.1.27**, **Toolbox 0.2.9** and **Reverse Proxy 4.5.0**.
 
 Application-sized mutation requests now enter an evidence-first agentic loop: the complete user goal remains authoritative, but the first execution action is a bounded repository inspection before optional architecture planning or mutation. Subsequent work advances through small action/observation milestones and preserves the adaptive symbol/diff editing path for existing files.
 
