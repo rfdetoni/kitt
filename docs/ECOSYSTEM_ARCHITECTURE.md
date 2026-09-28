@@ -60,6 +60,7 @@ Arrows are collaboration/dependency relationships, not permission to import sibl
 5. **Aggregates require consistency boundaries.** Use aggregate-like modeling only when a set of state changes must preserve one invariant/transactional lifecycle.
 6. **Composition is immutable.** The root lock promotes only revisions that passed component and cross-repository validation.
 7. **Fallback preserves behavior.** Optional native or resident components may accelerate/enrich behavior but may not silently change security semantics.
+8. **CI fixtures are not composition pins.** A component workflow may pin a known-compatible historical sibling revision for reproducible standalone tests. Only runtime/build dependency metadata is required to match `ecosystem.lock.json`; the root ecosystem integration validates the exact promoted snapshot. This avoids cyclic SHA dependencies between independently versioned bounded contexts.
 
 ## Compatibility invariants
 

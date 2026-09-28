@@ -57,46 +57,29 @@ def _reject_mutable_vcs_ref(text: str, label: str) -> None:
             raise PinValidationError(f"{label} contains mutable internal dependency {needle}")
 
 
-def validate(root: Path = ROOT) -> None:
-    payload = json.loads((root / "ecosystem.lock.json").read_text(encoding="utf-8"))
-    components = payload["components"]
+def dependency_checks(
+    components: dict[str, str],
+) -> list[tuple[str, str, str, tuple[str, ...]]]:
+    """Return immutable runtime/build dependency metadata checks.
 
+    Component-owned CI workflows may intentionally pin an older known-compatible
+    fixture for reproducibility. Those fixture SHAs are not composition
+    dependencies and must not be forced to equal ecosystem.lock.json, otherwise
+    the lock creates a provenance cycle between components. The root
+    ecosystem-integration workflow validates the exact promoted snapshot.
+    """
     protocol = components["rfdetoni/kitt-protocol"]
     memory = components["rfdetoni/kitt-memory"]
     assistant = components["rfdetoni/kitt-assistant"]
     agent = components["rfdetoni/kitt-agent-cli"]
     workers = components["rfdetoni/kitt-ai-workers"]
 
-    checks: list[tuple[str, str, str, tuple[str, ...]]] = [
+    return [
         (
             "rfdetoni/kitt-agent-cli",
             "pyproject.toml",
             agent,
             (protocol,),
-        ),
-        (
-            "rfdetoni/kitt-agent-cli",
-            ".github/workflows/ci.yml",
-            agent,
-            (assistant,),
-        ),
-        (
-            "rfdetoni/kitt-agent-cli",
-            ".github/workflows/pr-checks.yml",
-            agent,
-            (assistant,),
-        ),
-        (
-            "rfdetoni/kitt-agent-cli",
-            ".github/workflows/prime-architecture.yml",
-            agent,
-            (assistant,),
-        ),
-        (
-            "rfdetoni/kitt-agent-cli",
-            ".github/workflows/release.yml",
-            agent,
-            (assistant,),
         ),
         (
             "rfdetoni/kitt-assistant",
@@ -148,7 +131,12 @@ def validate(root: Path = ROOT) -> None:
         ),
     ]
 
-    for repository, path, ref, expected_revisions in checks:
+
+def validate(root: Path = ROOT) -> None:
+    payload = json.loads((root / "ecosystem.lock.json").read_text(encoding="utf-8"))
+    components = payload["components"]
+
+    for repository, path, ref, expected_revisions in dependency_checks(components):
         label = f"{repository}@{ref}:{path}"
         text = _fetch_text(repository, path, ref)
         _reject_mutable_vcs_ref(text, label)
