@@ -275,6 +275,25 @@ class PlatformTests(unittest.TestCase):
 
 
 class RequirementTests(unittest.TestCase):
+    def test_prerequisite_report_keeps_highest_rust_requirement(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = EcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(root=root, bin_dir=root / "bin"),
+            )
+            with (
+                patch.object(installer.platform, "find_python", return_value=None),
+                patch.object(installer.platform, "command_info", return_value=None),
+            ):
+                report = installer._check_prerequisites(
+                    (catalog.modules["memory"], catalog.modules["toolbox"])
+                )
+            self.assertIn("rust>=1.90", report.missing)
+            self.assertNotIn("rust>=1.85", report.missing)
+
     def test_missing_rust_minimum_uses_highest_required_version(self) -> None:
         self.assertEqual(
             EcosystemInstaller._missing_rust_minimum(("git", "rust>=1.88", "rust>=1.90")),

@@ -172,6 +172,7 @@ class EcosystemInstaller:
                 else:
                     requested.setdefault(name, current)
 
+        rust_minimum = requested.get("rust", ())
         if "rust" in requested:
             minimum = requested.pop("rust")
             requested["cargo"] = minimum
@@ -196,10 +197,17 @@ class EcosystemInstaller:
                 continue
             found[name] = info.version_text or "found"
 
-        if any("rust" in value for value in missing):
-            missing = [value for value in missing if not value.startswith("cargo") and not value.startswith("rustc")]
-            if not any(value.startswith("rust") for value in missing):
-                missing.append("rust>=1.85")
+        if any(value == "rust" or value.startswith("rust>=") for value in missing):
+            missing = [
+                value
+                for value in missing
+                if not value.startswith("cargo") and not value.startswith("rustc")
+            ]
+            missing = [value for value in missing if not value.startswith("rust")]
+            label = "rust"
+            if rust_minimum:
+                label += ">=" + ".".join(map(str, rust_minimum))
+            missing.append(label)
         return PrerequisiteReport(
             python=python,
             missing=tuple(dict.fromkeys(missing)),
