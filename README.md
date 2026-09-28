@@ -45,6 +45,7 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 - **Evolution runs:** `kitt evolve runs`
 - **Security:** [SECURITY.md](SECURITY.md)
 - **Pinned ecosystem revisions:** [`ecosystem.lock.json`](ecosystem.lock.json)
+- **Architecture and bounded contexts:** [docs/ECOSYSTEM_ARCHITECTURE.md](docs/ECOSYSTEM_ARCHITECTURE.md)
 
 ---
 
