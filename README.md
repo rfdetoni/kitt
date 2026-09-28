@@ -430,3 +430,10 @@ The installer still fails closed if the platform/architecture cannot be mapped t
 The installer no longer requires `pkg-config`/ALSA development headers just to install the complete agent stack. On Linux it probes `pkg-config --exists alsa` before the Assistant Cargo build. When the native audio toolchain is absent, it builds KITT Assistant with `--no-default-features`: resident microphone/wake-word capture is omitted, while the daemon, Control Center, HUD, memory, model routing, explicit transcription APIs and the rest of the ecosystem remain installed.
 
 If ALSA development support is present, the normal default-feature build is used and resident voice capture remains enabled.
+
+
+### Snapshot 0.9.20 — zero-prep native install fallback
+
+The locked ecosystem now promotes Assistant **0.1.8** at `dc36ff35f66e3934f7e7bf2182e1bb0d62330b26`, Agent CLI 0.75.1 validation snapshot `aee552caf0ef4fd7bd44b12a85e15e7df1febed4`, and AI Workers 0.1.25 snapshot `21978ab2e4968861e2be1387323d9c6e9bce07f4`.
+
+Non-interactive installation bootstraps missing Rust through official rustup. On Linux, resident Assistant microphone/wake-word capture is compiled only when the ALSA development toolchain is already available; otherwise the installer automatically selects the non-audio Assistant build. This keeps the complete coding-agent, daemon, Control Center, memory, HUD, reverse proxy and explicit transcription interfaces installable without requiring a system package-manager preparation step.
