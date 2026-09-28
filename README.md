@@ -97,7 +97,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.77.0` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.21` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.5.0` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.77.3` persists `PENDING` approvals without a wall-clock timeout and treats explicit `allow-all` as authoritative for ordinary commands instead of silently reopening ASK when a strong OS sandbox is unavailable. Critical authority boundaries such as denied argv, network elevation and control-plane mutation remain fail-closed. `kitt-assistant-runtime 0.2.22` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -105,7 +105,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.77.0 and Reverse Proxy 4.5.0 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.77.3 and Reverse Proxy 4.6.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -470,6 +470,14 @@ The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 
 
 Agent CLI now delegates durable semantic memory, provenance, lifecycle state and Dreaming commits to standalone `kitt-memoryd`. Local Agent memory/vector/concept/correction tables were removed by schema migration v7. The minimal `agent-proxy-minimal --minimal` installation includes Protocol + Memory + Agent CLI + Reverse Proxy only; Assistant, Toolbox and AI Workers remain optional.
 
+
+### Snapshot 0.9.23 — autonomy, modal and action-summary reliability
+
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.3**, **Assistant 0.1.11 / runtime 0.2.22**, **AI Workers 0.1.29**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.1**.
+
+This snapshot fixes three execution-path inconsistencies. First, explicit `allow-all` remains an ALLOW decision for ordinary model-initiated commands even when the host cannot provide the strongest OS sandbox; explicitly denied commands and privileged network/control-plane boundaries continue to fail closed. Second, the permission surface is a real pointer modal: blank/body clicks are consumed by the modal and only visible approval controls are actionable. Third, the bounded agent-contract `reasoning_summary` now survives Reverse Proxy native tool-call conversion and is projected by the Agent TUI as a concise description of what the model is doing and why, while the concrete tool/operation remains visible as technical detail.
+
+The snapshot also pins AI Workers 0.1.29 Evolution/Evals to the exact Agent 0.77.3 revision so offline evaluation and staged evolution use the same execution semantics as the interactive Agent.
 
 ### Snapshot 0.9.22 — evidence-first agentic reliability
 
