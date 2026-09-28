@@ -8,7 +8,7 @@
 <p align="center">
   <a href="https://github.com/rfdetoni/kitt/blob/main/LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Platforms" src="https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey">
-  <img alt="Python" src="https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.14%2B-3776AB?logo=python&logoColor=white">
   <img alt="Rust" src="https://img.shields.io/badge/Rust-native-000000?logo=rust&logoColor=white">
 </p>
 
@@ -53,7 +53,7 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 Requirements are calculated from the selected module set rather than globally hard-coded. A normal complete Agent installation currently uses:
 
 - Git;
-- Python **3.12+**;
+- Python **3.14+**;
 - Node.js **24+** and npm;
 - Rust **1.90+** and Cargo.
 
@@ -97,7 +97,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.74.3` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.16` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.4.0` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.74.5` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.18` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.4.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -105,7 +105,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.74.3 and Reverse Proxy 4.4 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.74.5 and Reverse Proxy 4.4.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -397,8 +397,8 @@ Changes should keep repository ownership boundaries clear, preserve local-first 
 
 MIT. See [LICENSE](LICENSE).
 
-### Snapshot 0.9.14 — Memory v0.2 hardening
+### Snapshot 0.9.16 — consistency and lifecycle hardening
 
-The locked ecosystem pairs **KITT Memory 0.2.0**, **Protocol 0.2.0**, **Assistant 0.1.4 / runtime 0.2.16**, **Agent CLI 0.74.3**, **AI Workers 0.1.21** and **Reverse Proxy 4.4.0**.
+The promoted ecosystem pairs **KITT Memory 0.2.1**, **Protocol 0.2.1**, **Assistant 0.1.6 / runtime 0.2.18**, **Agent CLI 0.74.5**, **AI Workers 0.1.23**, **Toolbox 0.2.9** and **Reverse Proxy 4.4.1**.
 
-This snapshot adds real conversation isolation through `scope_key`, point-in-time recall through `as_of`, atomic multi-writer sensitivity guarantees, scope/kind-aware deduplication, SQL-side privacy filtering, lower FTS write amplification, batched knowledge-graph traversal, stricter corruption handling and transactional schema-v4 migration. Agent, Assistant, HUD, Protocol and Evolution/Evals are pinned to the same immutable contract set.
+This snapshot hardens reverse-proxy process ownership against PID reuse, serializes its multi-process control plane, verifies service readiness before publication and bounds session shutdown. Agent memory now has deterministic local structured authority with shared-memory mirroring/merged recall, project clearing covers structured/shared records, Markdown fallback is locked/atomic, and default files no longer fabricate user preferences. Approval denial is durable-first, daemon protocol versioning is unified, HUD fan-out no longer performs socket I/O under its subscriber mutex, and standalone Assistant CI is immutable. Python packages now require the single supported/validated interpreter, Python 3.14+, while the Assistant's Node prerequisite matches its validated Node 22+ floor.
