@@ -97,7 +97,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.74.5` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.18` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.4.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.74.6` persists `PENDING` approvals without a wall-clock timeout, `kitt-assistant-runtime 0.2.18` preserves that state across the daemon boundary without age/capacity eviction, and `kitt-reverse-proxy 4.4.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -105,7 +105,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.74.5 and Reverse Proxy 4.4.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.74.6 and Reverse Proxy 4.4.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -397,8 +397,8 @@ Changes should keep repository ownership boundaries clear, preserve local-first 
 
 MIT. See [LICENSE](LICENSE).
 
-### Snapshot 0.9.16 — consistency and lifecycle hardening
+### Snapshot 0.9.17 — consistency and lifecycle hardening
 
-The promoted ecosystem pairs **KITT Memory 0.2.1**, **Protocol 0.2.1**, **Assistant 0.1.6 / runtime 0.2.18**, **Agent CLI 0.74.5**, **AI Workers 0.1.23**, **Toolbox 0.2.9** and **Reverse Proxy 4.4.1**.
+The promoted ecosystem pairs **KITT Memory 0.2.1**, **Protocol 0.2.1**, **Assistant 0.1.6 / runtime 0.2.18**, **Agent CLI 0.74.6**, **AI Workers 0.1.24**, **Toolbox 0.2.9** and **Reverse Proxy 4.4.1**.
 
-This snapshot hardens reverse-proxy process ownership against PID reuse, serializes its multi-process control plane, verifies service readiness before publication and bounds session shutdown. Agent memory now has deterministic local structured authority with shared-memory mirroring/merged recall, project clearing covers structured/shared records, Markdown fallback is locked/atomic, and default files no longer fabricate user preferences. Approval denial is durable-first, daemon protocol versioning is unified, HUD fan-out no longer performs socket I/O under its subscriber mutex, and standalone Assistant CI is immutable. Python packages now require the single supported/validated interpreter, Python 3.14+, while the Assistant's Node prerequisite matches its validated Node 22+ floor.
+This snapshot hardens reverse-proxy process ownership against PID reuse, serializes its multi-process control plane, verifies service readiness before publication and bounds session shutdown. The Agent release image is also aligned to Python 3.14 and uses the refreshed Docker build actions. Agent memory now has deterministic local structured authority with shared-memory mirroring/merged recall, project clearing covers structured/shared records, Markdown fallback is locked/atomic, and default files no longer fabricate user preferences. Approval denial is durable-first, daemon protocol versioning is unified, HUD fan-out no longer performs socket I/O under its subscriber mutex, and standalone Assistant CI is immutable. Python packages now require the single supported/validated interpreter, Python 3.14+, while the Assistant's Node prerequisite matches its validated Node 22+ floor.
