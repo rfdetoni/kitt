@@ -5,9 +5,9 @@
     "rfdetoni/kitt-protocol": "5a8de5984c48eb4012f904815db3feb71100e6af",
     "rfdetoni/kitt-memory": "37e677696a9f1ea0e5bbcffd911991971e83a9aa",
     "rfdetoni/kitt-toolbox": "bf58cfa5b9ae9b8ab8a4231184cee2619e9546f2",
-    "rfdetoni/kitt-ai-workers": "c9b4fcc32e0623ee6fbd36772eeb2463215d2539",
+    "rfdetoni/kitt-ai-workers": "ee6b749f91874815a179e8e7ff583d7fcbb3e879",
     "rfdetoni/kitt-assistant": "de2ade83f95a31c19c447fcdd863240f6bcd86d5",
-    "rfdetoni/kitt-agent-cli": "18753fa9b9a80fde7291be576913993b6ee325a8",
+    "rfdetoni/kitt-agent-cli": "c24487c9727e10706f1d51fe933578207a2c6db1",
     "rfdetoni/kitt-reverse-proxy": "6f48051f43a2065656f5a8b2f44e3c6094c82180"
   }
 }

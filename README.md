@@ -411,3 +411,6 @@ The promoted ecosystem pairs **KITT Memory 0.3.0**, **Protocol 0.3.0**, **Assist
 This snapshot adds a hierarchical shared-memory context layer with progressive summaries, provenance, durable ChangeSets, recall traces and extensible memory schemas without changing the local-authority contract. The Agent adds structured long-session WorkingState, rehydratable externalized tool outputs, a declarative Surface runtime projected through TUI/Web renderers, and a host-owned Backend IR with validation, impact planning and deterministic Python/TypeScript/Rust contract generation. AI Workers adds evidence-backed experience generalization and long-horizon memory evaluation; the Assistant exposes capability-aware Surface rendering and a narrow semantic-action path rather than a generic browser-to-runtime execution endpoint.
 
 The design is a clean-room KITT implementation: specialized stores keep their own authority, semantic contracts remain declarative, repository mutation stays behind SafeRuntime policy/approval boundaries, and the new memory/experience features do not make vector search or a centralized context service mandatory.
+
+
+Snapshot 0.9.18 uses the final validation SHAs for Agent/Workers: Agent `c24487c9727e10706f1d51fe933578207a2c6db1` and AI Workers `ee6b749f91874815a179e8e7ff583d7fcbb3e879`. Runtime versions remain Agent 0.75.1 and AI Workers 0.1.25.
