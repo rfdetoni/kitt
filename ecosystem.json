@@ -96,7 +96,7 @@
       ],
       "prerequisites": [
         "git",
-        "python>=3.12",
+        "python>=3.14",
         "rust>=1.90"
       ],
       "selectable": true
@@ -120,8 +120,8 @@
       ],
       "prerequisites": [
         "git",
-        "python>=3.12",
-        "node>=20",
+        "python>=3.14",
+        "node>=22",
         "npm",
         "rust>=1.88"
       ],
@@ -151,7 +151,7 @@
       ],
       "prerequisites": [
         "git",
-        "python>=3.12"
+        "python>=3.14"
       ],
       "selectable": true
     },
@@ -173,7 +173,7 @@
       ],
       "prerequisites": [
         "git",
-        "python>=3.12"
+        "python>=3.14"
       ],
       "selectable": true
     },
