@@ -9,6 +9,9 @@ on:
       - installer/catalog.py
       - scripts/validate_ecosystem_lock.py
       - scripts/validate_component_pins.py
+      - scripts/validate_architecture.py
+      - docs/ECOSYSTEM_ARCHITECTURE.md
+      - tests/test_ecosystem_architecture.py
       - .github/workflows/ecosystem-lock.yml
   pull_request:
     paths:
@@ -17,6 +20,9 @@ on:
       - installer/catalog.py
       - scripts/validate_ecosystem_lock.py
       - scripts/validate_component_pins.py
+      - scripts/validate_architecture.py
+      - docs/ECOSYSTEM_ARCHITECTURE.md
+      - tests/test_ecosystem_architecture.py
       - .github/workflows/ecosystem-lock.yml
   workflow_dispatch:
 
@@ -36,6 +42,8 @@ jobs:
           python-version: '3.14'
       - name: Validate catalog, immutable lock and Agent closure
         run: python scripts/validate_ecosystem_lock.py
+      - name: Validate bounded-context architecture
+        run: python scripts/validate_architecture.py
       - name: Verify every pinned commit exists
         env:
           GH_TOKEN: ${{ github.token }}
