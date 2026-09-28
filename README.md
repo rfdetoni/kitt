@@ -45,6 +45,7 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 - **Evolution runs:** `kitt evolve runs`
 - **Security:** [SECURITY.md](SECURITY.md)
 - **Pinned ecosystem revisions:** [`ecosystem.lock.json`](ecosystem.lock.json)
+- **Architecture and bounded contexts:** [docs/ECOSYSTEM_ARCHITECTURE.md](docs/ECOSYSTEM_ARCHITECTURE.md)
 
 ---
 
@@ -97,7 +98,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.77.3` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.21` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.0` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.22` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -105,7 +106,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.77.3 and Reverse Proxy 4.6.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.78.0 and Reverse Proxy 4.6.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -366,6 +367,7 @@ Validate installer and ecosystem invariants:
 ```bash
 python -m unittest discover -s tests -v
 python scripts/validate_ecosystem_lock.py
+python scripts/validate_architecture.py
 GH_TOKEN=... python scripts/validate_component_pins.py
 python -m installer --modules agent-cli --dry-run --portable
 ```
@@ -481,7 +483,7 @@ Official streaming providers distinguish explicit output-limit truncation from s
 
 ### Snapshot 0.9.23 — autonomous interaction and action transparency
 
-The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.77.3**, **Assistant 0.1.11 / runtime 0.2.21**, **AI Workers 0.1.29**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.1**.
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.78.0**, **Assistant 0.1.12 / runtime 0.2.22**, **AI Workers 0.1.30**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.1**.
 
 Autonomy semantics are now explicit end to end: `allow-all` remains authoritative for ordinary model-initiated commands even when a strong OS sandbox is unavailable, while dangerous argv, network elevation and control-plane mutation retain their dedicated fail-closed/approval boundaries. Permission overlays consume pointer input across the whole modal and expose clicks only on visible approval actions, eliminating modal-body fallthrough.
 
