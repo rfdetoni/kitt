@@ -98,7 +98,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.0` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.22` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.1` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.22` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -106,7 +106,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.78.0 and Reverse Proxy 4.6.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.78.1 and Reverse Proxy 4.6.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -491,3 +491,12 @@ The agent-contract `reasoning_summary` is no longer discarded when a model respo
 
 The immutable lock uses Agent `4e3eb53437cccfcd7254a338b8051e54e41ae1be`, Reverse Proxy `f5dd7787554d2c599df8277830124db6e7ffeb41`, Assistant `58ebdbaf6bc2c9135d645cd782d639e226e24d03` and AI Workers `9d073716163491a0716e44c341a6d6674bbba931`.
 
+
+
+### Snapshot 0.9.25 — governed Figma integration
+
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 0.78.1**, **Assistant 0.1.12 / runtime 0.2.22**, **AI Workers 0.1.31**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.1**.
+
+Agent CLI 0.78.1 adds the opt-in `kitt-figma` integration through the official Figma MCP boundary. The plugin registers only plugin-owned runtime MCP adapters, preserves user-owned MCP configuration, and keeps Figma operations inside the normal KITT ToolRegistry/policy/approval path. AI Workers 0.1.31 updates Evolution/Evals immutable Agent provenance to the same promoted Agent revision.
+
+The immutable lock pins Agent `fbc64cdd90d476773f1af081f864572a4cc72b7b` and AI Workers `c01d1ff13f202f39b6a109d95bac914ede4b8688`; all other component revisions remain unchanged from the preceding validated snapshot.
