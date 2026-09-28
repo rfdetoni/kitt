@@ -28,6 +28,26 @@ class CatalogTests(unittest.TestCase):
         for module_id in set(self.catalog.modules) - {"agent-cli"}:
             self.assertIn(module_id, resolution.ids)
 
+    def test_minimal_agent_and_proxy_resolve_only_strict_dependencies(self) -> None:
+        resolution = self.catalog.resolve(
+            ("agent-cli", "reverse-proxy"),
+            include_companions=False,
+        )
+        self.assertEqual(
+            set(resolution.ids),
+            {"protocol", "agent-cli", "reverse-proxy"},
+        )
+        self.assertNotIn("assistant", resolution.ids)
+        self.assertNotIn("memory", resolution.ids)
+        self.assertNotIn("toolbox", resolution.ids)
+        self.assertNotIn("ai-workers", resolution.ids)
+
+    def test_agent_proxy_minimal_preset_is_explicit(self) -> None:
+        requested = self.catalog.preset("agent-proxy-minimal")
+        self.assertEqual(requested, ("agent-cli", "reverse-proxy"))
+        resolution = self.catalog.resolve(requested, include_companions=False)
+        self.assertEqual(set(resolution.ids), {"protocol", "agent-cli", "reverse-proxy"})
+
     def test_agent_preset_has_same_complete_closure(self) -> None:
         requested = self.catalog.preset("agent")
         self.assertEqual(requested, ("agent-cli",))
@@ -78,6 +98,11 @@ class InstallerCliTests(unittest.TestCase):
         self.assertFalse(parser.parse_args([]).verbose)
         self.assertTrue(parser.parse_args(["--verbose"]).verbose)
         self.assertTrue(parser.parse_args(["-v"]).verbose)
+
+    def test_minimal_flag_is_opt_in(self) -> None:
+        parser = build_parser()
+        self.assertFalse(parser.parse_args([]).minimal)
+        self.assertTrue(parser.parse_args(["--minimal"]).minimal)
 
     def test_locked_snapshot_is_default_ref(self) -> None:
         with patch.dict(os.environ, {}, clear=False):

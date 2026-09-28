@@ -139,7 +139,12 @@ class EcosystemCatalog:
                 f"unknown preset {preset_id!r}; choose one of: {', '.join(sorted(self.presets))}"
             ) from exc
 
-    def resolve(self, requested: Iterable[str]) -> Resolution:
+    def resolve(
+        self,
+        requested: Iterable[str],
+        *,
+        include_companions: bool = True,
+    ) -> Resolution:
         requested_ids = tuple(dict.fromkeys(str(v).strip() for v in requested if str(v).strip()))
         unknown = sorted(set(requested_ids) - set(self.modules))
         if unknown:
@@ -161,7 +166,10 @@ class EcosystemCatalog:
         while queue:
             parent_id = queue.pop(0)
             parent = self.modules[parent_id]
-            for dependency in (*parent.requires, *parent.companions):
+            dependencies = parent.requires
+            if include_companions:
+                dependencies = (*dependencies, *parent.companions)
+            for dependency in dependencies:
                 if dependency not in requested_ids:
                     auto_by.setdefault(dependency, set()).add(parent_id)
                 if dependency not in selected:

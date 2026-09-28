@@ -79,7 +79,15 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="MODULES",
         help="comma-separated top-level modules (for example: agent-cli)",
     )
-    parser.add_argument("--preset", help="catalog preset (agent, assistant, web, full)")
+    parser.add_argument(
+        "--preset",
+        help="catalog preset (agent, agent-proxy-minimal, assistant, web, full)",
+    )
+    parser.add_argument(
+        "--minimal",
+        action="store_true",
+        help="resolve only strict 'requires' dependencies; do not auto-install optional companions",
+    )
     parser.add_argument(
         "--ref",
         default=os.environ.get("KITT_REF") or "locked",
@@ -241,7 +249,8 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 requested = list(choose_modules(catalog))
 
-        resolution = catalog.resolve(requested)
+        minimal = bool(args.minimal or _env_flag("KITT_MINIMAL"))
+        resolution = catalog.resolve(requested, include_companions=not minimal)
         concise = not verbose and not args.dry_run
         if concise:
             active_progress = InstallProgress()

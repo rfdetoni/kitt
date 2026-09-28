@@ -437,3 +437,22 @@ If ALSA development support is present, the normal default-feature build is used
 The locked ecosystem now promotes Assistant **0.1.8** at `dc36ff35f66e3934f7e7bf2182e1bb0d62330b26`, Agent CLI 0.75.1 validation snapshot `aee552caf0ef4fd7bd44b12a85e15e7df1febed4`, and AI Workers 0.1.25 snapshot `21978ab2e4968861e2be1387323d9c6e9bce07f4`.
 
 Non-interactive installation bootstraps missing Rust through official rustup. On Linux, resident Assistant microphone/wake-word capture is compiled only when the ALSA development toolchain is already available; otherwise the installer automatically selects the non-audio Assistant build. This keeps the complete coding-agent, daemon, Control Center, memory, HUD, reverse proxy and explicit transcription interfaces installable without requiring a system package-manager preparation step.
+
+
+### Minimal Agent + Reverse Proxy install
+
+For a coding-agent installation without Assistant, Memory daemon, AI Workers or native Toolbox, use the explicit minimal preset:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh -s -- --preset agent-proxy-minimal --minimal --yes
+```
+
+`--minimal` changes dependency resolution from `requires + companions` to strict `requires` only. With this preset the resolved KITT modules are exactly:
+
+```text
+kitt-protocol
+kitt-agent-cli
+kitt-reverse-proxy
+```
+
+The Agent CLI keeps its safe Python fallback when the optional native Toolbox is not installed. The Reverse Proxy remains an independent Node service. Assistant, shared-memory daemon, AI Workers and resident voice components are not installed.

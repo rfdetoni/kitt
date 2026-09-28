@@ -34,6 +34,14 @@
         "ai-workers",
         "reverse-proxy"
       ]
+    },
+    "agent-proxy-minimal": {
+      "name": "Agent + Reverse Proxy (minimal)",
+      "description": "Only Agent CLI, Reverse Proxy and strict runtime dependencies",
+      "modules": [
+        "agent-cli",
+        "reverse-proxy"
+      ]
     }
   },
   "modules": {
