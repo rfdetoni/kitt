@@ -451,8 +451,14 @@ curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh 
 
 ```text
 kitt-protocol
+kitt-memory
 kitt-agent-cli
 kitt-reverse-proxy
 ```
 
-The Agent CLI keeps its safe Python fallback when the optional native Toolbox is not installed. The Reverse Proxy remains an independent Node service. Assistant, shared-memory daemon, AI Workers and resident voice components are not installed.
+The Agent CLI requires kitt-memory and uses its standalone kitt-memoryd as the sole durable memory authority. kitt-memoryd is installed with the preset and auto-started by the Agent when first needed. The Agent CLI keeps its safe Python fallback when the optional native Toolbox is not installed. The Reverse Proxy remains an independent Node service. Assistant, shared-memory daemon, AI Workers and resident voice components are not installed.
+
+
+### Memory authority update
+
+The minimal Agent/Proxy installation now includes `kitt-memory` by design. Agent CLI 0.76+ no longer owns a second memory database: `kitt-memoryd` stores semantic memories, provenance, lifecycle state and dream commits. Assistant remains optional and is not required to host memory.

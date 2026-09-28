@@ -35,10 +35,10 @@ class CatalogTests(unittest.TestCase):
         )
         self.assertEqual(
             set(resolution.ids),
-            {"protocol", "agent-cli", "reverse-proxy"},
+            {"protocol", "memory", "agent-cli", "reverse-proxy"},
         )
         self.assertNotIn("assistant", resolution.ids)
-        self.assertNotIn("memory", resolution.ids)
+        self.assertIn("memory", resolution.ids)
         self.assertNotIn("toolbox", resolution.ids)
         self.assertNotIn("ai-workers", resolution.ids)
 
@@ -46,7 +46,10 @@ class CatalogTests(unittest.TestCase):
         requested = self.catalog.preset("agent-proxy-minimal")
         self.assertEqual(requested, ("agent-cli", "reverse-proxy"))
         resolution = self.catalog.resolve(requested, include_companions=False)
-        self.assertEqual(set(resolution.ids), {"protocol", "agent-cli", "reverse-proxy"})
+        self.assertEqual(
+            set(resolution.ids),
+            {"protocol", "memory", "agent-cli", "reverse-proxy"},
+        )
 
     def test_agent_preset_has_same_complete_closure(self) -> None:
         requested = self.catalog.preset("agent")

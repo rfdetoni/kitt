@@ -37,7 +37,7 @@
     },
     "agent-proxy-minimal": {
       "name": "Agent + Reverse Proxy (minimal)",
-      "description": "Only Agent CLI, Reverse Proxy and strict runtime dependencies",
+      "description": "Agent CLI + kitt-memoryd + Reverse Proxy, excluding optional companions",
       "modules": [
         "agent-cli",
         "reverse-proxy"
@@ -70,10 +70,10 @@
       "description": "Shared local memory service",
       "strategy": "rust",
       "order": 20,
-      "requires": [],
-      "companions": [
+      "requires": [
         "protocol"
       ],
+      "companions": [],
       "platforms": [
         "windows",
         "linux",
@@ -142,10 +142,10 @@
       "strategy": "agent",
       "order": 50,
       "requires": [
-        "protocol"
+        "protocol",
+        "memory"
       ],
       "companions": [
-        "memory",
         "toolbox",
         "assistant",
         "ai-workers",

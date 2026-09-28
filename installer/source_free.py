@@ -245,6 +245,11 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             )
 
         tasks: list[tuple[str, Callable[[], object]]] = []
+        if "memory" in selected and not self.options.portable:
+            tasks.append((
+                "KITT Memory",
+                lambda: self._cargo_build_cached(self.catalog.modules["memory"]),
+            ))
         if "assistant" in selected:
             tasks.append(("KITT Assistant HUD", lambda: self._build_assistant_ui(resolution)))
         if "reverse-proxy" in selected:
@@ -485,6 +490,23 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
 
         return self._swap_runtime_component("reverse-proxy", staged)
 
+    def _prepare_memory_runtime(self) -> Path:
+        source = self._repo_dir(self.catalog.modules["memory"])
+        release = self._cargo_target_dir("memory") / "release"
+        staged = self._staged_runtime_component_dir("memory")
+        if staged.exists():
+            shutil.rmtree(staged)
+        binary_dir = staged / "bin"
+        binary_dir.mkdir(parents=True, exist_ok=True)
+        suffix = ".exe" if self.platform.name == "windows" else ""
+        source_binary = release / f"kitt-memoryd{suffix}"
+        if not source_binary.is_file():
+            raise InstallerError(
+                f"memory runtime artifact missing after build: {source_binary}"
+            )
+        shutil.copy2(source_binary, binary_dir / source_binary.name)
+        return self._swap_runtime_component("memory", staged)
+
     def _prepare_assistant_runtime(self) -> Path:
         source = self._repo_dir(self.catalog.modules["assistant"])
         release = self._cargo_target_dir("assistant") / "release"
@@ -525,6 +547,13 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             launchers.append(
                 self._write_runtime_launcher("kitt", [str(python), "-m", "kitt.cli.main"])
             )
+
+        if "memory" in selected and not self.options.portable:
+            memory = self._prepare_memory_runtime()
+            suffix = ".exe" if self.platform.name == "windows" else ""
+            binary = memory / "bin" / f"kitt-memoryd{suffix}"
+            self._run([str(binary), "--version"], quiet=True)
+            launchers.append(self._write_runtime_launcher("kitt-memoryd", [str(binary)]))
 
         if "reverse-proxy" in selected:
             proxy = self._prepare_reverse_proxy_runtime()
