@@ -543,6 +543,6 @@ This prevents the earlier superprompt amplification where the same task, workspa
 
 ### Snapshot 0.9.28 — structural reverse-proxy tool transport
 
-The promoted stack aligns **Agent CLI 0.78.7**, **Reverse Proxy 4.6.5**, **AI Workers 0.1.36** and Assistant runtime 0.2.24.
+The promoted stack aligns **Agent CLI 0.78.7**, **Reverse Proxy 4.6.5**, **AI Workers 0.1.37** and Assistant runtime 0.2.24.
 
 Agent tool schemas now travel as structured execution data instead of being rediscovered from the textual Tool Contract. Prompt compaction may therefore remove duplicated tool instructions without causing `TOOLS_AVAILABLE: []`. Internal provider retries also preserve the same structural schema, preventing a retry from silently downgrading an execution turn to an empty tool surface. The exact per-turn `kitt_runtime.operation` allowlist remains enforced by the Agent host and its policy/approval boundary.
