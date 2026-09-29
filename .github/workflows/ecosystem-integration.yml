@@ -55,7 +55,7 @@ env:
 
 jobs:
   resolve_refs:
-    name: Freeze ecosystem snapshot
+    name: Resolve ecosystem refs
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Resolve requested refs to immutable commit SHAs
+      - name: Resolve requested refs for this CI run
         id: refs
         shell: bash
         env:
@@ -93,12 +93,6 @@ jobs:
               "agent_sha": ("rfdetoni/kitt-agent-cli", os.environ["AGENT_REF"]),
               "reverse_proxy_sha": ("rfdetoni/kitt-reverse-proxy", os.environ["REVERSE_PROXY_REF"]),
           }
-          if os.environ.get("GITHUB_EVENT_NAME") == "push":
-              locked = json.load(open("ecosystem.lock.json", encoding="utf-8"))["components"]
-              components = {
-                  key: (repo, locked[repo])
-                  for key, (repo, _) in components.items()
-              }
           token = os.environ["GITHUB_TOKEN"]
           headers = {
               "Accept": "application/vnd.github+json",
@@ -133,7 +127,7 @@ jobs:
               return value.replace("\n", " ").replace("\r", " ").replace("|", "\\|")
 
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
-              summary.write("## Frozen KITT ecosystem snapshot\n\n")
+              summary.write("## KITT ecosystem refs resolved for this CI run\n\n")
               summary.write("| Component | Requested ref | Resolved SHA |\n| --- | --- | --- |\n")
               for _, (repo, requested_ref, sha) in resolved.items():
                   summary.write(f"| `{safe(repo)}` | `{safe(requested_ref)}` | `{sha}` |\n")
@@ -237,7 +231,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with: { python-version: '3.14' }
-      - name: Install frozen split packages
+      - name: Install composed split packages
         run: |
           python -m pip install pytest pytest-asyncio
           python -m pip install --no-deps -e ./kitt-protocol/sdk/python
@@ -305,7 +299,7 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - working-directory: kitt-assistant
         run: cargo test --workspace
-      - name: Install frozen Python runtime composition
+      - name: Install composed Python runtime
         run: |
           python -m pip install pytest pytest-asyncio
           python -m pip install --no-deps ./kitt-protocol/sdk/python
@@ -391,7 +385,7 @@ jobs:
           echo "KITT_MEMORY_TOKEN_PATH=$RUNNER_TEMP/kitt-memory-config/auth.token" >> "$GITHUB_ENV"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with: { python-version: '3.14' }
-      - name: Install frozen composed namespace
+      - name: Install composed namespace
         run: |
           python -m pip install pytest pytest-asyncio
           # Use regular installs here: multiple PEP 660 editable distributions
@@ -417,7 +411,7 @@ jobs:
         run: python -m unittest discover -s tests/prime_architecture -v
       - name: Verify composed namespace
         run: >-
-          python -c "import kitt; import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; assert hasattr(kitt, 'DAEMON_PROTOCOL_VERSION'); print('frozen composed namespace: ok', kitt.__file__)"
+          python -c "import kitt; import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; assert hasattr(kitt, 'DAEMON_PROTOCOL_VERSION'); print('composed namespace: ok', kitt.__file__)"
 
   reverse_proxy:
     needs: resolve_refs
@@ -434,8 +428,8 @@ jobs:
       - run: npm ci
       - run: npm run verify
 
-  locked_install:
-    name: Install locked ecosystem end to end
+  main_install:
+    name: Install main ecosystem end to end
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -458,13 +452,11 @@ jobs:
         run: rustup default 1.90.0
       - name: Install Linux native prerequisites
         run: sudo apt-get update && sudo apt-get install -y libasound2-dev pkg-config
-      - name: Validate locked snapshot before installation
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Validate main-first catalog before installation
         run: |
-          python scripts/validate_ecosystem_lock.py
-          python scripts/validate_component_pins.py
-      - name: Perform clean locked installation
+          python scripts/validate_ecosystem_main.py
+          python scripts/validate_architecture.py
+      - name: Perform clean main installation
         shell: bash
         run: |
           set -euo pipefail
@@ -508,23 +500,21 @@ jobs:
 
           root = Path(os.environ["RUNTIME"])
           installed = json.loads((root / "installed-state.json").read_text(encoding="utf-8"))
-          locked = json.loads(Path("ecosystem.lock.json").read_text(encoding="utf-8"))
-          assert installed["source_ref"] == "locked", installed
-          assert installed["repositories"] == locked["components"], (
-              installed["repositories"],
-              locked["components"],
-          )
+          assert installed["source_ref"] == "main", installed
+          repositories = installed["repositories"]
+          assert repositories, installed
+          assert all(len(sha) == 40 for sha in repositories.values()), repositories
           expected = {
               "protocol", "memory", "toolbox", "assistant",
               "agent-cli", "ai-workers", "reverse-proxy",
           }
           assert set(installed["resolved_modules"]) == expected, installed["resolved_modules"]
-          print("locked end-to-end installation: ok")
+          print("main end-to-end installation: ok")
           PY
 
   ecosystem:
     if: always()
-    needs: [resolve_refs, installers, protocol, memory, toolbox, workers, assistant, agent_cli, reverse_proxy, locked_install]
+    needs: [resolve_refs, installers, protocol, memory, toolbox, workers, assistant, agent_cli, reverse_proxy, main_install]
     runs-on: ubuntu-latest
     steps:
       - name: Require event-appropriate ecosystem gates
@@ -532,16 +522,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Every event validates the aggregate installers and the exact promoted
-          # ecosystem.lock.json snapshot end to end.
+          # Every event validates the aggregate installers and a clean install
+          # resolved from the current main branches end to end.
           test "${{ needs.installers.result }}" = success
-          test "${{ needs.locked_install.result }}" = success
+          test "${{ needs.main_install.result }}" = success
 
           # A push to main is already composed from component commits that passed
           # their own repository gates. Avoid re-running every component suite
           # after promotion; PR/manual/scheduled runs remain the deep audit path.
           if [[ "${{ github.event_name }}" == "push" ]]; then
-            echo "main push: locked install gate passed; deep component audit intentionally skipped"
+            echo "main push: main install gate passed; deep component audit intentionally skipped"
             exit 0
           fi
 
