@@ -161,7 +161,6 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         self.options.bin_dir.mkdir(parents=True, exist_ok=True)
         (root / ".staging").mkdir(parents=True, exist_ok=True)
 
-        selected = set(resolution.ids)
         self._native_build_slots = 1
 
         try:
@@ -491,7 +490,6 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         return self._swap_runtime_component("reverse-proxy", staged)
 
     def _prepare_memory_runtime(self) -> Path:
-        source = self._repo_dir(self.catalog.modules["memory"])
         release = self._cargo_target_dir("memory") / "release"
         staged = self._staged_runtime_component_dir("memory")
         if staged.exists():
