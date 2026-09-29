@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -63,11 +62,13 @@ class CatalogTests(unittest.TestCase):
         ids = set(self.catalog.resolve(["assistant"]).ids)
         self.assertTrue({"assistant", "protocol", "memory"} <= ids)
 
-    def test_every_catalog_repository_is_immutably_locked(self) -> None:
-        sha_re = re.compile(r"^[0-9a-f]{40}$")
-        repositories = {module.repository for module in self.catalog.modules.values()}
-        self.assertEqual(repositories, set(self.catalog.locks))
-        self.assertTrue(all(sha_re.fullmatch(sha) for sha in self.catalog.locks.values()))
+    def test_every_catalog_repository_defaults_to_main(self) -> None:
+        self.assertTrue(
+            all(
+                self.catalog.resolve_ref(module) == "main"
+                for module in self.catalog.modules.values()
+            )
+        )
 
     def test_unknown_module_fails_closed(self) -> None:
         with self.assertRaises(CatalogError):
@@ -107,12 +108,12 @@ class InstallerCliTests(unittest.TestCase):
         self.assertFalse(parser.parse_args([]).minimal)
         self.assertTrue(parser.parse_args(["--minimal"]).minimal)
 
-    def test_locked_snapshot_is_default_ref(self) -> None:
+    def test_main_is_default_ref(self) -> None:
         with patch.dict(os.environ, {}, clear=False):
             os.environ.pop("KITT_REF", None)
             parser = build_parser()
-            self.assertEqual(parser.parse_args([]).ref, "locked")
-            self.assertEqual(parser.parse_args(["--ref", "main"]).ref, "main")
+            self.assertEqual(parser.parse_args([]).ref, "main")
+            self.assertEqual(parser.parse_args(["--ref", "feature/test"]).ref, "feature/test")
 
     def test_environment_flags_accept_common_truthy_values(self) -> None:
         for value in ("1", "true", "TRUE", "yes", "on"):
