@@ -16,25 +16,23 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerUpdateRegressionTests(unittest.TestCase):
-    def test_default_install_tracks_locked_snapshot(self) -> None:
+    def test_default_install_tracks_main(self) -> None:
         with patch.dict(os.environ, {"KITT_REF": ""}):
             args = build_parser().parse_args([])
-        self.assertEqual(args.ref, "locked")
+        self.assertEqual(args.ref, "main")
 
-    def test_environment_can_select_locked_install(self) -> None:
-        with patch.dict(os.environ, {"KITT_REF": "locked"}):
+    def test_environment_can_override_component_ref(self) -> None:
+        with patch.dict(os.environ, {"KITT_REF": "feature/test"}):
             args = build_parser().parse_args([])
-        self.assertEqual(args.ref, "locked")
+        self.assertEqual(args.ref, "feature/test")
 
-    def test_locked_ref_aliases_use_ecosystem_lock(self) -> None:
+    def test_component_ref_defaults_to_main_and_accepts_explicit_override(self) -> None:
         catalog = EcosystemCatalog.load(ROOT)
         module = catalog.modules["agent-cli"]
-        expected = catalog.locks[module.repository]
-        self.assertEqual(catalog.locked_ref(module, "locked"), expected)
-        self.assertEqual(catalog.locked_ref(module, "lock"), expected)
-        self.assertEqual(catalog.locked_ref(module, None), expected)
-        self.assertEqual(catalog.locked_ref(module, "main"), "main")
-        self.assertEqual(catalog.locked_ref(module, "v1.2.3"), "v1.2.3")
+        self.assertEqual(catalog.resolve_ref(module, None), "main")
+        self.assertEqual(catalog.resolve_ref(module, ""), "main")
+        self.assertEqual(catalog.resolve_ref(module, "main"), "main")
+        self.assertEqual(catalog.resolve_ref(module, "v1.2.3"), "v1.2.3")
 
     def test_source_ref_is_persisted_for_main_install(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -50,7 +48,7 @@ class InstallerUpdateRegressionTests(unittest.TestCase):
             payload = json.loads(state.read_text(encoding="utf-8"))
             self.assertEqual(payload["source_ref"], "main")
 
-    def test_lock_alias_is_normalized_when_source_ref_is_persisted(self) -> None:
+    def test_default_source_ref_is_persisted_as_main(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             state = root / "installed-state.json"
@@ -59,10 +57,10 @@ class InstallerUpdateRegressionTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            _record_source_ref(root, "lock")
+            _record_source_ref(root, None)
 
             payload = json.loads(state.read_text(encoding="utf-8"))
-            self.assertEqual(payload["source_ref"], "locked")
+            self.assertEqual(payload["source_ref"], "main")
 
     @unittest.skipIf(os.name == "nt", "POSIX process discovery requires POSIX user semantics")
     def test_posix_service_stop_targets_only_kitt_runtime_entrypoints(self) -> None:
