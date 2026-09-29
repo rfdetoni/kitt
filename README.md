@@ -531,7 +531,7 @@ The immutable lock pins Agent `7d56faec43fa6f5c0e4b1f63c0c18e269a0eb9d8`, Revers
 
 ### Snapshot 0.9.27 — compact staged WebChat execution
 
-The promoted WebChat execution path aligns **Agent CLI 0.78.6**, **Reverse Proxy 4.6.4** and **AI Workers 0.1.35**.
+The promoted WebChat execution path aligns **Agent CLI 0.78.5**, **Reverse Proxy 4.6.4** and **AI Workers 0.1.35**.
 
 The Agent no longer forwards its generated execution persona or textual Tool Contract across the reverse-proxy boundary after tools have been represented structurally. Reverse Proxy bounds retained trusted orchestration to 4 KiB and drives mutation turns through the deterministic phases `discovery -> mutation -> validation`, requesting one host action per round trip.
 
@@ -542,4 +542,4 @@ This prevents the earlier superprompt amplification where the same task, workspa
 
 The promoted stack aligns **Agent CLI 0.78.6**, **Reverse Proxy 4.6.4**, **AI Workers 0.1.36** and Assistant runtime 0.2.24.
 
-Agent tool schemas now travel as structured execution data instead of being rediscovered from the textual Tool Contract. Prompt compaction may therefore remove duplicated tool instructions without causing `TOOLS_AVAILABLE: []`. The exact per-turn `kitt_runtime.operation` allowlist remains enforced by the Agent host and its policy/approval boundary.
+Agent tool schemas now travel as structured execution data instead of being rediscovered from the textual Tool Contract. Prompt compaction may therefore remove duplicated tool instructions without causing `TOOLS_AVAILABLE: []`. Internal provider retries also preserve the same structural schema, preventing a retry from silently downgrading an execution turn to an empty tool surface. The exact per-turn `kitt_runtime.operation` allowlist remains enforced by the Agent host and its policy/approval boundary.
