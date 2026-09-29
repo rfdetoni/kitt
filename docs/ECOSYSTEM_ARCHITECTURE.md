@@ -14,7 +14,7 @@ This repository is the composition boundary for the K.I.T.T. ecosystem. The arch
 | `ai-workers` | `rfdetoni/kitt-ai-workers` | Evaluation/AI Workers | evals, evolution and optional heavy workers |
 | `reverse-proxy` | `rfdetoni/kitt-reverse-proxy` | Provider Gateway | authorized API/web-provider transport, sessions and provider plugins |
 
-The root `rfdetoni/kitt` repository owns installation, dependency resolution and the immutable compatibility snapshot in `ecosystem.lock.json`. It must not become a shared source-code dumping ground.
+The root `rfdetoni/kitt` repository owns installation, dependency resolution and cross-repository compatibility validation. It composes the current `main` branches by default and must not become a shared source-code dumping ground.
 
 ## Context map
 
@@ -46,7 +46,7 @@ The root `rfdetoni/kitt` repository owns installation, dependency resolution and
                | native data     |
                +-----------------+
 
-rfdetoni/kitt composes compatible revisions of every context.
+rfdetoni/kitt composes the current `main` revision of every selected context.
 ```
 
 Arrows are collaboration/dependency relationships, not permission to import sibling internals.
@@ -58,9 +58,9 @@ Arrows are collaboration/dependency relationships, not permission to import sibl
 3. **Dependencies are directional.** A context can depend on a contract or companion without taking ownership of its implementation.
 4. **Infrastructure stays infrastructure.** HTTP clients, SQLite adapters, TUI renderers, browser automation and native bridges are not domain entities merely because DDD is used elsewhere.
 5. **Aggregates require consistency boundaries.** Use aggregate-like modeling only when a set of state changes must preserve one invariant/transactional lifecycle.
-6. **Composition is immutable.** The root lock promotes only revisions that passed component and cross-repository validation.
+6. **Composition follows main.** The root installer resolves every selected K.I.T.T. repository from `main` by default; explicit tags/SHAs are opt-in diagnostic overrides.
 7. **Fallback preserves behavior.** Optional native or resident components may accelerate/enrich behavior but may not silently change security semantics.
-8. **CI fixtures are not composition pins.** A component workflow may pin a known-compatible historical sibling revision for reproducible standalone tests. Only runtime/build dependency metadata is required to match `ecosystem.lock.json`; the root ecosystem integration validates the exact promoted snapshot. On `main` pushes the resolver reads the immutable lock itself, so release validation cannot silently follow moving sibling branches. This avoids cyclic SHA dependencies between independently versioned bounded contexts.
+8. **CI snapshots are ephemeral.** Cross-repository CI resolves moving refs to concrete SHAs once at the start of a run so that run is internally consistent. Those SHAs are evidence for that run, not a persistent ecosystem lock.
 
 ## Compatibility invariants
 
@@ -85,6 +85,6 @@ Do **not** introduce a generic `domain/application/infrastructure` folder hierar
 
 ## Governance
 
-`scripts/validate_architecture.py` validates the catalog dependency graph and checks that every catalog repository is represented in this document. CI runs it together with the ecosystem lock validation.
+`scripts/validate_architecture.py` validates the catalog dependency graph and checks that every catalog repository is represented in this document. CI runs it together with the main-first ecosystem validation.
 
 This guard intentionally checks high-value ownership/dependency invariants rather than cosmetic package names.
