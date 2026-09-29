@@ -101,7 +101,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.7` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.24` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.5` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.9` persists `PENDING` approvals without a wall-clock timeout and includes Ctrl+C turn isolation. `kitt-assistant-runtime 0.2.24` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.6` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -109,7 +109,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.78.7 and Reverse Proxy 4.6.5 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.78.9 and Reverse Proxy 4.6.6 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -464,6 +464,16 @@ kitt-reverse-proxy
 The Agent CLI requires kitt-memory and uses its standalone kitt-memoryd as the sole durable memory authority. kitt-memoryd is installed with the preset and auto-started by the Agent when first needed. The Agent CLI keeps its safe Python fallback when the optional native Toolbox is not installed. The Reverse Proxy remains an independent Node service. Assistant, shared-memory daemon, AI Workers and resident voice components are not installed.
 
 
+### Locked vs. live component updates
+
+The command above installs the reviewed **locked** ecosystem snapshot by default. Re-running it upgrades the machine whenever `ecosystem.lock.json` is promoted. If you intentionally want the current `main` of every selected component instead of the reviewed snapshot, use:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh -s -- --preset agent-proxy-minimal --minimal --ref main -y
+```
+
+For normal installations, prefer the locked command; it keeps Agent, Memory, Protocol and Reverse Proxy on a cross-repository validated composition.
+
 ### Memory authority update
 
 The minimal Agent/Proxy installation now includes `kitt-memory` by design. Agent CLI 0.76+ no longer owns a second memory database: `kitt-memoryd` stores semantic memories, provenance, lifecycle state and dream commits. Assistant remains optional and is not required to host memory.
@@ -546,3 +556,10 @@ This prevents the earlier superprompt amplification where the same task, workspa
 The promoted stack aligns **Agent CLI 0.78.7**, **Reverse Proxy 4.6.5**, **AI Workers 0.1.37** and Assistant runtime 0.2.24.
 
 Agent tool schemas now travel as structured execution data instead of being rediscovered from the textual Tool Contract. Prompt compaction may therefore remove duplicated tool instructions without causing `TOOLS_AVAILABLE: []`. Internal provider retries also preserve the same structural schema, preventing a retry from silently downgrading an execution turn to an empty tool surface. The exact per-turn `kitt_runtime.operation` allowlist remains enforced by the Agent host and its policy/approval boundary.
+
+
+### Snapshot 0.9.29 — recoverable cancellation and model-response flow
+
+The promoted minimal Agent/Proxy stack aligns **Protocol 0.4.0**, **Memory 0.5.0**, **Agent CLI 0.78.9**, **AI Workers 0.1.38** and **Reverse Proxy 4.6.6**.
+
+Agent CLI 0.78.9 fixes the Ctrl+C cancellation race where an already-running local worker could keep the single-worker executor occupied and leave the next prompt queued indefinitely. Cancelled consumers are generation-scoped so stale cleanup cannot clear the replacement turn. Reverse Proxy 4.6.6 preserves browser sessions for recoverable invalid model responses and exposes Continue/Retry metadata. The root lock now promotes those revisions, so the documented `agent-proxy-minimal --minimal -y` command upgrades existing locked installations to the new Agent and Reverse Proxy versions.
