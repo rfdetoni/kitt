@@ -266,7 +266,7 @@ python -m installer --modules agent-cli --dry-run
 Useful options:
 
 ```text
---preset agent|assistant|web|full
+--preset agent|agent-proxy-minimal|assistant|web|full
 --modules <id[,id...]>
 --with-ai-workers
 --force
