@@ -64,6 +64,44 @@ class InstallerUpdateRegressionTests(unittest.TestCase):
             payload = json.loads(state.read_text(encoding="utf-8"))
             self.assertEqual(payload["source_ref"], "locked")
 
+    def test_posix_service_stop_targets_only_kitt_runtime_entrypoints(self) -> None:
+        adapter = PlatformAdapter("linux", posix=True)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            bin_dir = root / "bin"
+            bin_dir.mkdir()
+            kitt = bin_dir / "kitt"
+            kittctl = bin_dir / "kittctl"
+            kitt.write_text("#!/bin/sh\n", encoding="utf-8")
+            kittctl.write_text("#!/bin/sh\n", encoding="utf-8")
+
+            def which(name: str):
+                if name == "systemctl":
+                    return "/usr/bin/systemctl"
+                if name == "pgrep":
+                    return "/usr/bin/pgrep"
+                return None
+
+            with (
+                patch("installer.platforms.shutil.which", side_effect=which),
+                patch("installer.platforms._run_capture", side_effect=[
+                    (0, ""),
+                    (0, ""),
+                    (0, ""),
+                    (1, ""),
+                ]) as run,
+            ):
+                adapter.stop_kitt_services(root, bin_dir)
+
+            commands = [tuple(call.args[0]) for call in run.call_args_list]
+            self.assertIn((str(kittctl), "service", "stop"), commands)
+            self.assertIn((str(kitt), "daemon", "stop"), commands)
+            self.assertTrue(any(command[:3] == ("/usr/bin/systemctl", "--user", "stop") for command in commands))
+            pgrep = commands[-1]
+            self.assertEqual(pgrep[0], "/usr/bin/pgrep")
+            self.assertIn("kitt-reverse-proxy", pgrep[-1])
+            self.assertNotIn(" kitt ", pgrep[-1])
+
     def test_reinstall_replaces_existing_launcher(self) -> None:
         adapter = PlatformAdapter("linux", posix=True)
         with tempfile.TemporaryDirectory() as temp:
