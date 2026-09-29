@@ -210,7 +210,7 @@ class EcosystemInstaller:
             else:
                 parents = ", ".join(resolution.auto_selected_by.get(module.id, ()))
                 reason = f"automatic via {parents}" if parents else "automatic"
-            ref = self.catalog.locked_ref(module, self.options.ref)
+            ref = self.catalog.resolve_ref(module, self.options.ref)
             print(f"  - {module.name:<22} {reason:<28} {ref[:12]}")
         if self.options.with_ai_workers and "ai-workers" in resolution.ids:
             print("  - AI/STT worker extras      enabled")
