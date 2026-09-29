@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from installer.catalog import EcosystemCatalog, Resolution
-from installer.core import InstallerOptions
+from installer.core import InstallerOptions, PrerequisiteReport
 from installer.platforms import CommandInfo, PlatformAdapter
 from installer.source_free import SourceFreeEcosystemInstaller
 
@@ -66,6 +66,38 @@ class SourceFreeInstallerTests(unittest.TestCase):
             encoding="utf-8",
         )
         return source
+
+    def test_install_stops_resident_services_before_syncing_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            resolution = installer.catalog.resolve(("reverse-proxy",))
+            report = PrerequisiteReport(python=None, missing=(), found={})
+            events: list[str] = []
+
+            def fail_after_stop(_resolution):
+                events.append("sync")
+                raise RuntimeError("stop after ordering assertion")
+
+            with (
+                patch.object(installer, "_check_prerequisites", return_value=report),
+                patch.object(installer, "_prepare_prerequisites", return_value=report),
+                patch.object(installer, "_print_plan"),
+                patch.object(
+                    installer.platform,
+                    "stop_kitt_services",
+                    side_effect=lambda *_args: events.append("stop"),
+                ),
+                patch.object(
+                    installer,
+                    "_sync_repositories_parallel",
+                    side_effect=fail_after_stop,
+                ),
+                self.assertRaisesRegex(RuntimeError, "ordering assertion"),
+            ):
+                installer.install(resolution)
+
+            self.assertEqual(events[:2], ["stop", "sync"])
 
     def test_repository_checkouts_live_only_under_staging(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
