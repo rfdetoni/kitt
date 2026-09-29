@@ -80,6 +80,9 @@ irm https://raw.githubusercontent.com/rfdetoni/kitt/main/install.ps1 | iex
 
 The installer presents K.I.T.T. modules interactively. Explicit selections are marked `[x]`; transitively required technologies are marked `[+]`. Protocol and Memory are internal composition dependencies, so they remain visible but cannot be selected as misleading standalone installs.
 
+
+Before an install or update replaces any runtime artifact, the ecosystem installer now quiesces registered K.I.T.T. services and narrowly matched resident processes (daemon, Assistant, Reverse Proxy and Agent Gateway). This prevents an old Python/Node process from retaining pre-update modules in memory while the on-disk installation already points at a newer locked snapshot. Interactive Agent clients are not targeted by the fallback process matcher.
+
 ### Complete Agent guarantee
 
 Selecting **KITT Agent CLI** resolves the full technology stack that the Agent integrates with:
@@ -98,7 +101,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.6` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.24` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.4` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.7` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.24` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.4` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -106,7 +109,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.78.6 and Reverse Proxy 4.6.4 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.78.7 and Reverse Proxy 4.6.4 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -520,7 +523,7 @@ The immutable lock pins Agent `89a63da16368a59eac5eee185373bfbf89f516b1`, Memory
 
 ### Snapshot 0.9.27 — staged prompt execution
 
-The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.5.0**, **Agent CLI 0.78.6**, **Assistant 0.1.14 / runtime 0.2.24**, **AI Workers 0.1.34**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.4**.
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.5.0**, **Agent CLI 0.78.7**, **Assistant 0.1.14 / runtime 0.2.24**, **AI Workers 0.1.34**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.4**.
 
 This snapshot fixes the browser-backed superprompt regression. Agent CLI carries its deterministic discovery phase as structured turn data and deduplicates equivalent semantic/raw task text. Reverse Proxy sends the complete tool/workspace bootstrap once per stable context fingerprint, then sends compact delta turns while the named WebChat session retains previously supplied context.
 
@@ -540,6 +543,6 @@ This prevents the earlier superprompt amplification where the same task, workspa
 
 ### Snapshot 0.9.28 — structural reverse-proxy tool transport
 
-The promoted stack aligns **Agent CLI 0.78.6**, **Reverse Proxy 4.6.4**, **AI Workers 0.1.36** and Assistant runtime 0.2.24.
+The promoted stack aligns **Agent CLI 0.78.7**, **Reverse Proxy 4.6.4**, **AI Workers 0.1.36** and Assistant runtime 0.2.24.
 
 Agent tool schemas now travel as structured execution data instead of being rediscovered from the textual Tool Contract. Prompt compaction may therefore remove duplicated tool instructions without causing `TOOLS_AVAILABLE: []`. Internal provider retries also preserve the same structural schema, preventing a retry from silently downgrading an execution turn to an empty tool surface. The exact per-turn `kitt_runtime.operation` allowlist remains enforced by the Agent host and its policy/approval boundary.
