@@ -98,7 +98,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.3` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.23` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.2` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.4` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.24` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.3` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -106,7 +106,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.78.3 and Reverse Proxy 4.6.2 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.78.4 and Reverse Proxy 4.6.3 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -516,3 +516,14 @@ This snapshot removes redundant Agent-local memory authority, unused Python/Type
 CI is stricter across the composition: Agent and Workers reject critical unused Python symbols, Reverse Proxy TypeScript rejects unused locals/parameters, Rust components keep clippy warnings as errors, and Protocol continues cross-SDK parity checks. The root promotion workflow now resolves `push` builds from the immutable `ecosystem.lock.json` instead of skipping the resolver, so a main-branch promotion validates the exact revisions it can release.
 
 The immutable lock pins Agent `89a63da16368a59eac5eee185373bfbf89f516b1`, Memory `defa05c7712c726a4accc3626757b270d190387b`, AI Workers `f0d9a28601b202a4f516622245406f4e042b18d5`, Assistant `b4237627c57980c8c9cd0c4656ccd021b09a9765` and Reverse Proxy `7fd858bbf5c4fda8dd1cdbb290a3ce29fc857d72`.
+
+
+### Snapshot 0.9.27 — staged prompt execution
+
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.5.0**, **Agent CLI 0.78.4**, **Assistant 0.1.14 / runtime 0.2.24**, **AI Workers 0.1.34**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.3**.
+
+This snapshot fixes the browser-backed superprompt regression. Agent CLI carries its deterministic discovery phase as structured turn data and deduplicates equivalent semantic/raw task text. Reverse Proxy sends the complete tool/workspace bootstrap once per stable context fingerprint, then sends compact delta turns while the named WebChat session retains previously supplied context.
+
+Contract repairs no longer replay the original task/workspace payload. Valid tool actions may omit nullable fields, common tool-call aliases are normalized locally, and each turn chooses one host action then waits for its observation before choosing the next action. Broad implementation work therefore follows staged discovery -> mutation -> validation instead of attempting a project-sized tool bundle in one model response.
+
+The immutable lock pins Agent `7d56faec43fa6f5c0e4b1f63c0c18e269a0eb9d8`, Reverse Proxy `581083b839d285428f28d40f7c9c85b771bfb23b`, Assistant `2101bac97a876611b6c696c2efba7c7f68711f35` and AI Workers `12cd5489fbc0c73097eed4b0c120b6f8791f1939`.
