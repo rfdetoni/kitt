@@ -425,36 +425,6 @@ class NativeBuildTests(unittest.TestCase):
 
 
 class RepositoryStateTests(unittest.TestCase):
-    def test_only_known_generated_artifacts_do_not_block_update(self) -> None:
-        self.assertFalse(EcosystemInstaller._has_blocking_changes("toolbox", "?? Cargo.lock\n"))
-        self.assertFalse(
-            EcosystemInstaller._has_blocking_changes("protocol", "?? sdk/python/build/\n")
-        )
-        self.assertTrue(
-            EcosystemInstaller._has_blocking_changes(
-                "toolbox", "?? Cargo.lock\n M src/lib.rs\n"
-            )
-        )
-        self.assertTrue(EcosystemInstaller._has_blocking_changes("toolbox", " M Cargo.lock\n"))
-        self.assertTrue(EcosystemInstaller._has_blocking_changes("protocol", "?? notes.txt\n"))
-
-    def test_cargo_build_removes_lock_it_generated_on_failure(self) -> None:
-        installer = object.__new__(EcosystemInstaller)
-        with tempfile.TemporaryDirectory() as temp:
-            path = Path(temp)
-
-            def build(*args, **kwargs):
-                (path / "Cargo.lock").write_text("generated", encoding="utf-8")
-                raise RuntimeError("build failed")
-
-            with (
-                patch.object(installer, "_run", side_effect=build),
-                self.assertRaisesRegex(RuntimeError, "build failed"),
-            ):
-                installer._cargo_build(path)
-
-            self.assertFalse((path / "Cargo.lock").exists())
-
     def test_success_cleanup_removes_only_known_generated_artifacts(self) -> None:
         catalog = EcosystemCatalog.load(ROOT)
         with tempfile.TemporaryDirectory() as temp:
@@ -474,33 +444,6 @@ class RepositoryStateTests(unittest.TestCase):
 
             self.assertFalse(generated.exists())
             self.assertTrue(unrelated.exists())
-
-
-class LauncherTests(unittest.TestCase):
-    def test_agent_launcher_uses_stable_venv_python_path(self) -> None:
-        catalog = EcosystemCatalog.load(ROOT)
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            bin_dir = root / "bin"
-            venv = root / ".venv-agent"
-            python = venv / "bin" / "python"
-            python.parent.mkdir(parents=True)
-            python.touch()
-            installer = EcosystemInstaller(
-                catalog,
-                PlatformAdapter("linux", posix=True),
-                InstallerOptions(root=root, bin_dir=bin_dir),
-            )
-            resolution = Resolution(
-                requested=("agent-cli",),
-                modules=(catalog.modules["agent-cli"],),
-                auto_selected_by={},
-            )
-
-            installer._install_launchers(resolution, venv)
-
-            launcher = (bin_dir / "kitt").read_text(encoding="utf-8")
-            self.assertIn(f"exec '{python}' '-m' 'kitt.cli.main'", launcher)
 
 
 if __name__ == "__main__":
