@@ -100,7 +100,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.9` persists `PENDING` approvals without a wall-clock timeout and includes Ctrl+C turn isolation. `kitt-assistant-runtime 0.2.24` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.6` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
+The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.10` persists `PENDING` approvals without a wall-clock timeout, includes Ctrl+C turn isolation and follows sibling `main` dependencies. `kitt-assistant-runtime 0.2.25` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.6` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -108,7 +108,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.78.9 and Reverse Proxy 4.6.6 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.78.10 and Reverse Proxy 4.6.6 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -564,5 +564,7 @@ Agent CLI 0.78.9 fixes the Ctrl+C cancellation race where an already-running loc
 
 
 ### Snapshot 0.9.30 — main-first ecosystem installation
+
+The main-first stack aligns **Agent CLI 0.78.10**, **Assistant 0.1.15 / runtime 0.2.25**, **AI Workers 0.1.39** and **Reverse Proxy 4.6.6**, with Protocol, Memory and Toolbox also resolved from their current `main` branches.
 
 The root installer no longer persists a cross-repository `ecosystem.lock.json`. Every selected K.I.T.T. module resolves from `main` by default, while the exact fetched SHAs are recorded only as installation provenance. `--ref <branch|tag|sha>` remains available as an explicit override. CI resolves moving refs once per run for consistency without turning them into a long-lived ecosystem lock.
