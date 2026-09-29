@@ -500,3 +500,8 @@ The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.4.0**, **Agent CLI 
 Agent CLI 0.78.1 adds the opt-in `kitt-figma` integration through the official Figma MCP boundary. The plugin registers only plugin-owned runtime MCP adapters, preserves user-owned MCP configuration, and keeps Figma operations inside the normal KITT ToolRegistry/policy/approval path. AI Workers 0.1.31 updates Evolution/Evals immutable Agent provenance to the same promoted Agent revision.
 
 The immutable lock pins Agent `fbc64cdd90d476773f1af081f864572a4cc72b7b` and AI Workers `c01d1ff13f202f39b6a109d95bac914ede4b8688`; all other component revisions remain unchanged from the preceding validated snapshot.
+
+
+### Installer cleanup
+
+The distribution CLI has one installation pipeline: `SourceFreeEcosystemInstaller`. `EcosystemInstaller` now contains only shared prerequisites, rollback, state, smoke-test and launcher utilities; the obsolete source-retaining build/install implementation was removed.
