@@ -157,6 +157,8 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             return
 
         root = self.options.root
+        print("\nStop active K.I.T.T. services before install/update")
+        self.platform.stop_kitt_services(root, self.options.bin_dir)
         root.mkdir(parents=True, exist_ok=True)
         self.options.bin_dir.mkdir(parents=True, exist_ok=True)
         (root / ".staging").mkdir(parents=True, exist_ok=True)
