@@ -55,7 +55,6 @@ env:
 
 jobs:
   resolve_refs:
-    if: github.event_name != 'push'
     name: Freeze ecosystem snapshot
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -68,6 +67,9 @@ jobs:
       agent_sha: ${{ steps.refs.outputs.agent_sha }}
       reverse_proxy_sha: ${{ steps.refs.outputs.reverse_proxy_sha }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Resolve requested refs to immutable commit SHAs
         id: refs
         shell: bash
@@ -91,6 +93,12 @@ jobs:
               "agent_sha": ("rfdetoni/kitt-agent-cli", os.environ["AGENT_REF"]),
               "reverse_proxy_sha": ("rfdetoni/kitt-reverse-proxy", os.environ["REVERSE_PROXY_REF"]),
           }
+          if os.environ.get("GITHUB_EVENT_NAME") == "push":
+              locked = json.load(open("ecosystem.lock.json", encoding="utf-8"))["components"]
+              components = {
+                  key: (repo, locked[repo])
+                  for key, (repo, _) in components.items()
+              }
           token = os.environ["GITHUB_TOKEN"]
           headers = {
               "Accept": "application/vnd.github+json",
