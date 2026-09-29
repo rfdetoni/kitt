@@ -128,6 +128,85 @@ class SourceFreeInstallerTests(unittest.TestCase):
             )
             self.assertFalse(any("clone" in command for command in commands))
 
+    def test_source_sync_defaults_to_main(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            module = installer.catalog.modules["agent-cli"]
+
+            with (
+                patch.object(installer, "_run") as run,
+                patch.object(installer, "_capture", return_value="a" * 40),
+            ):
+                installer._sync_repository(module)
+
+            fetches = [
+                tuple(call.args[0])
+                for call in run.call_args_list
+                if "fetch" in call.args[0]
+            ]
+            self.assertEqual(len(fetches), 1)
+            self.assertEqual(fetches[0][-1], "main")
+
+    def test_assistant_refreshes_kitt_main_dependencies_before_locked_build(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            module = installer.catalog.modules["assistant"]
+            source = installer._repo_dir(module)
+            source.mkdir(parents=True)
+            (source / "Cargo.toml").write_text("[workspace]\n", encoding="utf-8")
+            (source / "Cargo.lock").write_text("version = 4\n", encoding="utf-8")
+
+            with (
+                patch.object(installer.platform, "assistant_voice_build_available", return_value=True),
+                patch.object(installer, "_run") as run,
+            ):
+                installer._cargo_build_cached(module)
+
+            commands = [tuple(call.args[0]) for call in run.call_args_list]
+            updates = [command for command in commands if command[:2] == ("cargo", "update")]
+            self.assertEqual(
+                updates,
+                [
+                    ("cargo", "update", "-p", "kitt-protocol"),
+                    ("cargo", "update", "-p", "kitt-memory-core"),
+                    ("cargo", "update", "-p", "kitt-memory-sqlite"),
+                ],
+            )
+            build = next(command for command in commands if command[:2] == ("cargo", "build"))
+            self.assertIn("--locked", build)
+
+    def test_assistant_hud_refreshes_protocol_main_before_build(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            installer = self._installer(root)
+            assistant = installer._repo_dir(installer.catalog.modules["assistant"])
+            hud = assistant / "apps" / "kitt-hud"
+            hud.mkdir(parents=True)
+            node = CommandInfo(argv=("node",), version=(24, 0, 0), version_text="24.0.0")
+
+            with (
+                patch.object(installer.platform, "command_info", return_value=node),
+                patch.object(installer, "_run") as run,
+            ):
+                installer._build_assistant_ui(
+                    Resolution(
+                        requested=("assistant",),
+                        modules=(installer.catalog.modules["assistant"],),
+                        auto_selected_by={},
+                    )
+                )
+
+            commands = [tuple(call.args[0]) for call in run.call_args_list]
+            self.assertIn(
+                ("npm", "update", "@kitt/protocol", "--no-audit", "--no-fund", "--prefer-offline"),
+                commands,
+            )
+            self.assertLess(
+                commands.index(("npm", "ci", "--no-audit", "--no-fund", "--prefer-offline")),
+                commands.index(("npm", "update", "@kitt/protocol", "--no-audit", "--no-fund", "--prefer-offline")),
+            )
     def test_source_free_native_build_only_compiles_runtime_assistant(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

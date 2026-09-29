@@ -5,24 +5,19 @@ on:
     branches: [main]
     paths:
       - ecosystem.json
-      - ecosystem.lock.json
       - install.sh
       - install.ps1
       - installer/**
+      - scripts/validate_ecosystem_main.py
       - tests/**
-      - scripts/validate_ecosystem_lock.py
-      - scripts/validate_component_pins.py
       - .github/workflows/installer-portability.yml
   pull_request:
     paths:
       - ecosystem.json
-      - ecosystem.lock.json
       - install.sh
       - install.ps1
       - installer/**
       - tests/**
-      - scripts/validate_ecosystem_lock.py
-      - scripts/validate_component_pins.py
       - .github/workflows/installer-portability.yml
   workflow_dispatch:
 
@@ -52,8 +47,8 @@ jobs:
         run: |
           python -m pip install ruff
           ruff check installer scripts --select F401,F841,F821,E9 --exclude "**/__init__.py"
-      - name: Validate catalog and immutable lock
-        run: python scripts/validate_ecosystem_lock.py
+      - name: Validate main-first ecosystem policy
+        run: python scripts/validate_ecosystem_main.py
       - name: Run installer unit tests
         run: python -m unittest discover -s tests -v
       - name: Validate complete Agent dependency closure
