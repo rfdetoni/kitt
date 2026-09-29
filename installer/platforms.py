@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+import signal
 import shutil
 import platform as stdlib_platform
 import urllib.request
@@ -299,6 +300,129 @@ class PlatformAdapter:
                     f"rustup installed an incompatible toolchain; Rust >={wanted} is required"
                 )
         return rustc
+
+    @staticmethod
+    def _first_existing_command(*candidates: str | Path | None) -> str | None:
+        for candidate in candidates:
+            if not candidate:
+                continue
+            path = Path(candidate)
+            if path.is_file():
+                return str(path)
+        return None
+
+    def stop_kitt_services(self, root: Path, bin_dir: Path) -> None:
+        """Stop resident K.I.T.T. processes before replacing runtime artifacts.
+
+        Best-effort service-manager shutdown is followed by a narrowly-scoped
+        process cleanup. Interactive Agent clients are intentionally excluded.
+        """
+        suffix = ".exe" if self.name == "windows" else ""
+        launcher_suffix = ".cmd" if self.name == "windows" else ""
+
+        kittctl = self._first_existing_command(
+            root / "runtime" / "assistant" / "bin" / f"kittctl{suffix}",
+            bin_dir / f"kittctl{launcher_suffix}",
+            shutil.which("kittctl"),
+        )
+        if kittctl:
+            _run_capture((kittctl, "service", "stop"))
+
+        kitt = self._first_existing_command(
+            bin_dir / f"kitt{launcher_suffix}",
+            shutil.which("kitt"),
+        )
+        if kitt:
+            _run_capture((kitt, "daemon", "stop"))
+
+        if self.name == "windows":
+            powershell = shutil.which("powershell") or shutil.which("pwsh")
+            if not powershell:
+                return
+            script = (
+                "$ErrorActionPreference='SilentlyContinue';"
+                "$tasks=@('KITT Daemon','KITT Assistant','KITT Reverse Proxy','KITT Agent Gateway');"
+                "foreach($name in $tasks){"
+                "$task=Get-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue;"
+                "if($task){Stop-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue}};"
+                "Get-Service -ErrorAction SilentlyContinue | "
+                "Where-Object {$_.Name -match '(?i)^kitt' -or $_.DisplayName -match '(?i)^K\\.I\\.T\\.T\\.|^KITT'} | "
+                "ForEach-Object {Stop-Service -Name $_.Name -Force -ErrorAction SilentlyContinue};"
+                "$pattern='(?i)(kittd(?:\\.exe)?|kitt\\.cli\\.main.+daemon\\s+run|"
+                "kitt-reverse-proxy(?:\\.cmd|\\.exe)?|kitt-agent-gateway(?:\\.cmd|\\.exe)?|"
+                "kitt-reverse-proxy[\\\\/].*dist[\\\\/](?:gateway[\\\\/])?cli\\.js)';"
+                f"$self={os.getpid()};"
+                "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
+                "Where-Object {$_.ProcessId -ne $self -and $_.CommandLine -and $_.CommandLine -match $pattern} | "
+                "ForEach-Object {Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue}"
+            )
+            _run_capture((powershell, "-NoProfile", "-NonInteractive", "-Command", script))
+            return
+
+        systemctl = shutil.which("systemctl")
+        if systemctl:
+            _run_capture((
+                systemctl,
+                "--user",
+                "stop",
+                "kitt-daemon.service",
+                "kitt-assistant.service",
+                "kitt-reverse-proxy.service",
+                "kitt-agent-gateway.service",
+            ))
+
+        launchctl = shutil.which("launchctl")
+        if launchctl:
+            for label in (
+                "com.kitt.daemon",
+                "com.kitt.assistant",
+                "com.kitt.reverse-proxy",
+                "com.kitt.agent-gateway",
+            ):
+                _run_capture((launchctl, "stop", label))
+
+        pgrep = shutil.which("pgrep")
+        if not pgrep or not hasattr(os, "getuid"):
+            return
+        pattern = (
+            r"(kittd([[:space:]]|$)|kitt[.]cli[.]main.*daemon[[:space:]]+run|"
+            r"kitt-reverse-proxy([[:space:]]|$)|kitt-agent-gateway([[:space:]]|$)|"
+            r"kitt-reverse-proxy/.*/dist/(gateway/)?cli[.]js)"
+        )
+        code, output = _run_capture((pgrep, "-u", str(os.getuid()), "-f", pattern))
+        if code not in {0, 1}:
+            return
+
+        protected = {os.getpid(), os.getppid()}
+        pids = [
+            int(value)
+            for value in output.split()
+            if value.isdigit() and int(value) not in protected
+        ]
+        for pid in pids:
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except (ProcessLookupError, PermissionError):
+                pass
+
+        deadline = time.monotonic() + 3.0
+        alive = set(pids)
+        while alive and time.monotonic() < deadline:
+            for pid in tuple(alive):
+                try:
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    alive.discard(pid)
+                except PermissionError:
+                    alive.discard(pid)
+            if alive:
+                time.sleep(0.1)
+
+        for pid in alive:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
 
     def assistant_voice_build_available(self) -> bool:
         """Return whether the host can compile the resident microphone stack."""
