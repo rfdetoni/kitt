@@ -276,12 +276,21 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                     staged_venv = result if isinstance(result, Path) else None
         return staged_venv
 
+    def _refresh_kitt_main_dependencies(self, module: ModuleSpec, path: Path) -> None:
+        """Refresh moving K.I.T.T. sibling dependencies inside staging only."""
+        if module.id != "assistant":
+            return
+        env = self._cargo_env(module.id)
+        for package in ("kitt-protocol", "kitt-memory-core", "kitt-memory-sqlite"):
+            self._run(["cargo", "update", "-p", package], cwd=path, env=env)
+
     def _cargo_build_cached(self, module: ModuleSpec) -> None:
         path = self._repo_dir(module)
         if not (path / "Cargo.toml").is_file():
             raise InstallerError(f"{module.repository} has no Cargo.toml for strategy {module.strategy}")
         lock = path / "Cargo.lock"
         generated_lock = not lock.exists()
+        self._refresh_kitt_main_dependencies(module, path)
         command = ["cargo", "build", "--release", "--jobs", str(self._cargo_jobs())]
         if module.id == "assistant" and not self.platform.assistant_voice_build_available():
             print(
@@ -317,6 +326,11 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         print("\nBuild KITT Assistant HUD")
         env = self._npm_env()
         self._run(["npm", "ci", "--no-audit", "--no-fund", "--prefer-offline"], cwd=hud, env=env)
+        self._run(
+            ["npm", "update", "@kitt/protocol", "--no-audit", "--no-fund", "--prefer-offline"],
+            cwd=hud,
+            env=env,
+        )
         self._run(["npm", "run", "build"], cwd=hud, env=env)
 
     def _build_reverse_proxy(self, resolution: Resolution) -> None:
@@ -395,7 +409,7 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                 ])
 
             # Re-apply selected KITT packages without dependency resolution
-            # so the requested main/locked checkouts are authoritative even when
+            # so the requested component checkouts are authoritative even when
             # one package declares another KITT repository through a direct URL.
             #
             # Install the Agent on its own and last. Multiple KITT distributions
