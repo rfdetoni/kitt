@@ -1,0 +1,50 @@
+name: ecosystem-main
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ecosystem.json
+      - installer/catalog.py
+      - installer/cli.py
+      - scripts/validate_ecosystem_main.py
+      - scripts/validate_architecture.py
+      - docs/ECOSYSTEM_ARCHITECTURE.md
+      - tests/test_ecosystem_architecture.py
+      - tests/test_installer.py
+      - tests/test_installer_update.py
+      - .github/workflows/ecosystem-main.yml
+  pull_request:
+    paths:
+      - ecosystem.json
+      - installer/catalog.py
+      - installer/cli.py
+      - scripts/validate_ecosystem_main.py
+      - scripts/validate_architecture.py
+      - docs/ECOSYSTEM_ARCHITECTURE.md
+      - tests/test_ecosystem_architecture.py
+      - tests/test_installer.py
+      - tests/test_installer_update.py
+      - .github/workflows/ecosystem-main.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  main-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - name: Validate main-first ecosystem policy
+        run: python scripts/validate_ecosystem_main.py
+      - name: Validate bounded-context architecture
+        run: python scripts/validate_architecture.py
+      - name: Run installer/catalog regressions
+        run: python -m unittest tests.test_installer tests.test_installer_update tests.test_ecosystem_architecture -v
