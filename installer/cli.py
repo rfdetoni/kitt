@@ -90,10 +90,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--ref",
-        default=os.environ.get("KITT_REF") or "locked",
+        default=os.environ.get("KITT_REF") or "main",
         help=(
             "component branch/tag/SHA installed from every selected repository "
-            "(default: locked ecosystem.lock.json snapshot); use 'main' only for development/testing"
+            "(default: main for every K.I.T.T. module)"
         ),
     )
     parser.add_argument("--root", type=Path, help="installation root")
@@ -176,9 +176,7 @@ def _record_source_ref(root: Path, ref: str | None) -> None:
     if not isinstance(payload, dict):
         raise InstallerError(f"installed state at {state_path} is not an object")
 
-    source_ref = (ref or "locked").strip() or "locked"
-    if source_ref.lower() == "lock":
-        source_ref = "locked"
+    source_ref = (ref or "main").strip() or "main"
     payload["source_ref"] = source_ref
 
     temporary = state_path.with_suffix(".ref.tmp")
