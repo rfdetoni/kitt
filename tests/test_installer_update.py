@@ -64,6 +64,7 @@ class InstallerUpdateRegressionTests(unittest.TestCase):
             payload = json.loads(state.read_text(encoding="utf-8"))
             self.assertEqual(payload["source_ref"], "locked")
 
+    @unittest.skipIf(os.name == "nt", "POSIX process discovery requires POSIX user semantics")
     def test_posix_service_stop_targets_only_kitt_runtime_entrypoints(self) -> None:
         adapter = PlatformAdapter("linux", posix=True)
         with tempfile.TemporaryDirectory() as temp:
