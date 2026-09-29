@@ -255,7 +255,6 @@ class EcosystemInstaller:
         proc = self._run(argv, cwd=cwd, quiet=True)
         return (proc.stdout or "").strip()
 
-    @staticmethod
     def _rollback_repositories(self) -> None:
         if not self._created_repos and not self._previous_revisions:
             return
