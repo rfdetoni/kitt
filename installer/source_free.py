@@ -197,7 +197,7 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
     def _sync_repository(self, module: ModuleSpec) -> None:
         name = module.repository.split("/", 1)[1]
         path = self._repo_dir(module)
-        ref = self.catalog.locked_ref(module, self.options.ref)
+        ref = self.catalog.resolve_ref(module, self.options.ref)
         url = f"https://github.com/{module.repository}.git"
         with self._state_lock:
             self._managed_legacy_sources.add(name)
