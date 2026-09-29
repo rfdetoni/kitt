@@ -14,7 +14,7 @@
 
 K.I.T.T. is a modular, local-first AI ecosystem centered on a high-performance autonomous coding agent. Flexible orchestration stays in Python and TypeScript; deterministic CPU/data-plane work can run in Rust; heavy AI/ML workloads are isolated into on-demand workers; browser-backed provider access remains inside a dedicated gateway.
 
-This repository is the **distribution and composition point** for the ecosystem. It resolves compatible component revisions, installs the selected stack and validates that separately owned packages compose as one K.I.T.T. installation.
+This repository is the **distribution and composition point** for the ecosystem. It tracks the current `main` branch of each selected component, installs the selected stack and validates that separately owned packages compose as one K.I.T.T. installation.
 
 ---
 
@@ -44,7 +44,6 @@ The Python distributions compose through the shared `kitt.*` namespace instead o
 - **Inspect the resident service:** `kittctl service status`
 - **Evolution runs:** `kitt evolve runs`
 - **Security:** [SECURITY.md](SECURITY.md)
-- **Pinned ecosystem revisions:** [`ecosystem.lock.json`](ecosystem.lock.json)
 - **Architecture and bounded contexts:** [docs/ECOSYSTEM_ARCHITECTURE.md](docs/ECOSYSTEM_ARCHITECTURE.md)
 
 ---
@@ -81,7 +80,7 @@ irm https://raw.githubusercontent.com/rfdetoni/kitt/main/install.ps1 | iex
 The installer presents K.I.T.T. modules interactively. Explicit selections are marked `[x]`; transitively required technologies are marked `[+]`. Protocol and Memory are internal composition dependencies, so they remain visible but cannot be selected as misleading standalone installs.
 
 
-Before an install or update replaces any runtime artifact, the ecosystem installer now quiesces registered K.I.T.T. services and narrowly matched resident processes (daemon, Assistant, Reverse Proxy and Agent Gateway). This prevents an old Python/Node process from retaining pre-update modules in memory while the on-disk installation already points at a newer locked snapshot. Interactive Agent clients are not targeted by the fallback process matcher.
+Before an install or update replaces any runtime artifact, the ecosystem installer now quiesces registered K.I.T.T. services and narrowly matched resident processes (daemon, Assistant, Reverse Proxy and Agent Gateway). This prevents an old Python/Node process from retaining pre-update modules in memory while the on-disk installation already points at a newer component revision. Interactive Agent clients are not targeted by the fallback process matcher.
 
 ### Complete Agent guarantee
 
@@ -101,7 +100,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.9` persists `PENDING` approvals without a wall-clock timeout and includes Ctrl+C turn isolation. `kitt-assistant-runtime 0.2.24` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.6` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
+The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.9` persists `PENDING` approvals without a wall-clock timeout and includes Ctrl+C turn isolation. `kitt-assistant-runtime 0.2.24` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.6` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -109,7 +108,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.78.9 and Reverse Proxy 4.6.6 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.78.9 and Reverse Proxy 4.6.6 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -273,7 +272,7 @@ Useful options:
 --force
 --no-start-services
 --portable
---ref locked|main|<branch|tag|sha>
+--ref main|<branch|tag|sha>
 --verbose
 --uninstall
 ```
@@ -337,13 +336,13 @@ The ownership rule is intentional: components communicate through versioned cont
 
 ## Installer & release integrity
 
-`ecosystem.json` is the module catalog. `ecosystem.lock.json` pins every repository to an immutable commit SHA.
+`ecosystem.json` is the module catalog. There is no persistent cross-repository lockfile: every selected K.I.T.T. module resolves from `main` by default.
 
-The installer is idempotent and source-locked by default. It refuses to overwrite local component changes unless `--force` is supplied. Python packages are composed from the locally checked-out locked revisions with `--no-deps` where appropriate so VCS dependency declarations cannot silently replace one component with another revision.
+The installer remains idempotent and records the exact commit SHA actually fetched for each repository in `<KITT_HOME>/installed-state.json`. This gives each installation provenance without freezing future updates. Re-running the same installer command fetches the current `main` of every selected module.
 
-After installation, `<KITT_HOME>/installed-state.json` records requested modules, automatically resolved dependencies, exact repository SHAs, platform and launchers.
+`--ref <branch|tag|sha>` is retained as an explicit one-off override for debugging, bisecting or reproducible testing. CI resolves the requested moving refs to SHAs at the start of each run so one CI execution is internally consistent, but those SHAs are not persisted as an ecosystem lock.
 
-Re-running the installer updates to the reviewed snapshot recorded in the lockfile. `locked` is the default; `--ref main` or another explicit branch/tag/SHA is a development/testing opt-in. Cross-repository CI validates that internal package pins match the same frozen snapshot.
+Package-manager locks such as `uv.lock`, `package-lock.json` and `Cargo.lock` remain component-owned dependency artifacts; they are not used by the root installer to choose which K.I.T.T. repository revision to install.
 
 ---
 
@@ -369,13 +368,12 @@ Validate installer and ecosystem invariants:
 
 ```bash
 python -m unittest discover -s tests -v
-python scripts/validate_ecosystem_lock.py
+python scripts/validate_ecosystem_main.py
 python scripts/validate_architecture.py
-GH_TOKEN=... python scripts/validate_component_pins.py
 python -m installer --modules agent-cli --dry-run --portable
 ```
 
-The broader integration workflow validates Rust workspaces, the PyO3 wheel, Python namespace composition, Agent CLI, Assistant, Protocol, Memory, AI Workers and Reverse Proxy at frozen revisions. It also performs a clean non-portable Linux installation through the real installer, runs `pip check`, exercises installed launchers, verifies source cleanup and compares `installed-state.json` against `ecosystem.lock.json`.
+The broader integration workflow resolves the current component `main` branches once per CI run, validates Rust workspaces, the PyO3 wheel, Python namespace composition, Agent CLI, Assistant, Protocol, Memory, AI Workers and Reverse Proxy, and performs a clean non-portable Linux installation through the real installer. It runs `pip check`, exercises installed launchers and verifies source cleanup and recorded provenance.
 
 Each component repository also owns its technology-specific unit tests and lint/build checks.
 
@@ -383,7 +381,7 @@ Each component repository also owns its technology-specific unit tests and lint/
 
 ## Contributing
 
-Changes should keep repository ownership boundaries clear, preserve local-first security defaults and avoid adding dependencies to the hot path without a measurable benefit. Cross-repository changes should update contracts and the ecosystem lock together when required.
+Changes should keep repository ownership boundaries clear, preserve local-first security defaults and avoid adding dependencies to the hot path without a measurable benefit. Cross-repository changes should keep shared contracts and sibling `main` branches compatible because the installer composes them directly.
 
 ---
 
@@ -464,15 +462,15 @@ kitt-reverse-proxy
 The Agent CLI requires kitt-memory and uses its standalone kitt-memoryd as the sole durable memory authority. kitt-memoryd is installed with the preset and auto-started by the Agent when first needed. The Agent CLI keeps its safe Python fallback when the optional native Toolbox is not installed. The Reverse Proxy remains an independent Node service. Assistant, shared-memory daemon, AI Workers and resident voice components are not installed.
 
 
-### Locked vs. live component updates
+### Main-first component updates
 
-The command above installs the reviewed **locked** ecosystem snapshot by default. Re-running it upgrades the machine whenever `ecosystem.lock.json` is promoted. If you intentionally want the current `main` of every selected component instead of the reviewed snapshot, use:
+The minimal command above follows `main` for Protocol, Memory, Agent CLI and Reverse Proxy on every run. No extra flag is needed:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh -s -- --preset agent-proxy-minimal --minimal --ref main -y
+curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh -s -- --preset agent-proxy-minimal --minimal -y
 ```
 
-For normal installations, prefer the locked command; it keeps Agent, Memory, Protocol and Reverse Proxy on a cross-repository validated composition.
+Use `--ref <branch|tag|sha>` only when you intentionally want every selected K.I.T.T. module to use that alternate ref for a specific test.
 
 ### Memory authority update
 
@@ -562,4 +560,9 @@ Agent tool schemas now travel as structured execution data instead of being redi
 
 The promoted minimal Agent/Proxy stack aligns **Protocol 0.4.0**, **Memory 0.5.0**, **Agent CLI 0.78.9**, **AI Workers 0.1.38** and **Reverse Proxy 4.6.6**.
 
-Agent CLI 0.78.9 fixes the Ctrl+C cancellation race where an already-running local worker could keep the single-worker executor occupied and leave the next prompt queued indefinitely. Cancelled consumers are generation-scoped so stale cleanup cannot clear the replacement turn. Reverse Proxy 4.6.6 preserves browser sessions for recoverable invalid model responses and exposes Continue/Retry metadata. The root lock now promotes those revisions, so the documented `agent-proxy-minimal --minimal -y` command upgrades existing locked installations to the new Agent and Reverse Proxy versions.
+Agent CLI 0.78.9 fixes the Ctrl+C cancellation race where an already-running local worker could keep the single-worker executor occupied and leave the next prompt queued indefinitely. Cancelled consumers are generation-scoped so stale cleanup cannot clear the replacement turn. Reverse Proxy 4.6.6 preserves browser sessions for recoverable invalid model responses and exposes Continue/Retry metadata. The root installer now follows `main`, so the documented `agent-proxy-minimal --minimal -y` command upgrades existing installations to the current Agent and Reverse Proxy revisions.
+
+
+### Snapshot 0.9.30 — main-first ecosystem installation
+
+The root installer no longer persists a cross-repository `ecosystem.lock.json`. Every selected K.I.T.T. module resolves from `main` by default, while the exact fetched SHAs are recorded only as installation provenance. `--ref <branch|tag|sha>` remains available as an explicit override. CI resolves moving refs once per run for consistency without turning them into a long-lived ecosystem lock.
