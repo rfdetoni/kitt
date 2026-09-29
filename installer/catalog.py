@@ -37,19 +37,12 @@ class Resolution:
 
 
 class EcosystemCatalog:
-    def __init__(self, payload: dict, lock_payload: dict):
+    def __init__(self, payload: dict):
         if payload.get("schema_version") != 1:
             raise CatalogError("ecosystem schema_version must be 1")
-        if lock_payload.get("schema_version") != 1:
-            raise CatalogError("ecosystem lock schema_version must be 1")
-
         raw_modules = payload.get("modules")
         if not isinstance(raw_modules, dict) or not raw_modules:
             raise CatalogError("ecosystem modules must be a non-empty object")
-        raw_locks = lock_payload.get("components")
-        if not isinstance(raw_locks, dict):
-            raise CatalogError("ecosystem lock components must be an object")
-
         modules: dict[str, ModuleSpec] = {}
         repos: set[str] = set()
         for module_id, raw in raw_modules.items():
@@ -86,12 +79,6 @@ class EcosystemCatalog:
             if not module.strategy:
                 raise CatalogError(f"module {module.id!r} has no install strategy")
 
-        if set(raw_locks) != repos:
-            missing = sorted(repos - set(raw_locks))
-            extra = sorted(set(raw_locks) - repos)
-            raise CatalogError(
-                f"catalog/lock repository mismatch; missing={missing}, extra={extra}"
-            )
 
         raw_presets = payload.get("presets") or {}
         if not isinstance(raw_presets, dict):
@@ -116,7 +103,6 @@ class EcosystemCatalog:
 
         self.name = str(payload.get("name") or "K.I.T.T. Ecosystem")
         self.modules = modules
-        self.locks = {str(k): str(v) for k, v in raw_locks.items()}
         self.presets = presets
         self.preset_names = preset_names
         self.preset_descriptions = preset_descriptions
@@ -126,10 +112,7 @@ class EcosystemCatalog:
     def load(cls, root: str | Path) -> "EcosystemCatalog":
         root_path = Path(root)
         payload = json.loads((root_path / "ecosystem.json").read_text(encoding="utf-8"))
-        lock_payload = json.loads(
-            (root_path / "ecosystem.lock.json").read_text(encoding="utf-8")
-        )
-        return cls(payload, lock_payload)
+        return cls(payload)
 
     def preset(self, preset_id: str) -> tuple[str, ...]:
         try:
@@ -185,10 +168,12 @@ class EcosystemCatalog:
         reasons = {key: tuple(sorted(value)) for key, value in auto_by.items()}
         return Resolution(requested=requested_ids, modules=ordered, auto_selected_by=reasons)
 
-    def locked_ref(self, module: ModuleSpec, override_ref: str | None = None) -> str:
-        """Resolve the component ref, keeping the lockfile available as an explicit mode."""
-        if override_ref:
-            requested = override_ref.strip()
-            if requested.lower() not in {"lock", "locked"}:
-                return requested
-        return self.locks[module.repository]
+    def resolve_ref(self, module: ModuleSpec, override_ref: str | None = None) -> str:
+        """Resolve the live component ref.
+
+        K.I.T.T. evolves as one ecosystem, so component installs track main by
+        default. A caller may still provide an explicit branch, tag or SHA for a
+        one-off reproducible/test installation.
+        """
+        requested = (override_ref or "main").strip()
+        return requested or "main"
