@@ -98,7 +98,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.1` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.22` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.1` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
+The locked Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.3` persists `PENDING` approvals without a wall-clock timeout. `kitt-assistant-runtime 0.2.23` preserves that state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.2` pins provider sessions while a client tool result is outstanding. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -106,7 +106,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The locked Agent stack now includes Agent CLI 0.78.1 and Reverse Proxy 4.6.1 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The locked Agent stack now includes Agent CLI 0.78.3 and Reverse Proxy 4.6.2 as one compatible snapshot. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
@@ -505,3 +505,14 @@ The immutable lock pins Agent `fbc64cdd90d476773f1af081f864572a4cc72b7b` and AI 
 ### Installer cleanup
 
 The distribution CLI has one installation pipeline: `SourceFreeEcosystemInstaller`. `EcosystemInstaller` now contains only shared prerequisites, rollback, state, smoke-test and launcher utilities; the obsolete source-retaining build/install implementation was removed.
+
+
+### Snapshot 0.9.26 — authority and dead-code hardening
+
+The promoted ecosystem aligns **Protocol 0.4.0**, **Memory 0.5.0**, **Agent CLI 0.78.3**, **Assistant 0.1.13 / runtime 0.2.23**, **AI Workers 0.1.33**, **Toolbox 0.2.9** and **Reverse Proxy 4.6.2**.
+
+This snapshot removes redundant Agent-local memory authority, unused Python/TypeScript/Rust symbols and obsolete installer paths while preserving explicit compatibility exports that are part of the public surface. Agent state now creates only the current history schema and rejects obsolete local revisions instead of retaining migration code for removed authorities. KITT Memory remains the sole durable semantic-memory authority; Assistant consumes Memory 0.5.0 without recreating Agent memory ownership.
+
+CI is stricter across the composition: Agent and Workers reject critical unused Python symbols, Reverse Proxy TypeScript rejects unused locals/parameters, Rust components keep clippy warnings as errors, and Protocol continues cross-SDK parity checks. The root promotion workflow now resolves `push` builds from the immutable `ecosystem.lock.json` instead of skipping the resolver, so a main-branch promotion validates the exact revisions it can release.
+
+The immutable lock pins Agent `89a63da16368a59eac5eee185373bfbf89f516b1`, Memory `defa05c7712c726a4accc3626757b270d190387b`, AI Workers `f0d9a28601b202a4f516622245406f4e042b18d5`, Assistant `b4237627c57980c8c9cd0c4656ccd021b09a9765` and Reverse Proxy `7fd858bbf5c4fda8dd1cdbb290a3ce29fc857d72`.
