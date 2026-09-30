@@ -18,6 +18,16 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.10.0 — durable Agent Engineering stack
+
+The 0.10.0 distribution composes Agent CLI **0.80.0**, Protocol **0.5.0**, Memory **0.6.0**, Assistant Runtime **0.2.26**, AI Workers **0.1.40** and Reverse Proxy **4.7.0** from their current `main` branches.
+
+The Agent control plane now owns replayable EventLedger/RunCoordinator state, a single turn execution budget with delegated child leases, content-derived ContextEpochs, exact ArtifactStore recovery references, authority snapshots, identity-scoped saved permissions, verified workspace snapshot rollback and Task Episode learning telemetry. Memory remains a separate durable authority and adds recall-consumption receipts plus leased idempotent background jobs. Companion components transport or evaluate these contracts rather than duplicating their ownership.
+
+See the Agent repository's `docs/AGENT_ENGINEERING.md` for the detailed invariants and ownership boundaries.
+
+---
+
 ## What’s included
 
 | Component | Responsibility | Primary technology |
@@ -100,7 +110,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.78.10` persists `PENDING` approvals without a wall-clock timeout, includes Ctrl+C turn isolation and follows sibling `main` dependencies. `kitt-assistant-runtime 0.2.25` preserves approval state when the optional Assistant is installed, and `kitt-reverse-proxy 4.6.6` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
+The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.80.0` persists `PENDING` approvals without a wall-clock timeout, revalidates authority snapshots before resume and scopes remembered permissions by workspace/executable identity. `kitt-assistant-runtime 0.2.26` transports the same saved-permission identity in daemon mode, while `kitt-reverse-proxy 4.7.0` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -108,7 +118,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.78.10 and Reverse Proxy 4.6.6 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.80.0 and Reverse Proxy 4.7.0 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
