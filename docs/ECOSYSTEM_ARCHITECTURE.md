@@ -51,6 +51,25 @@ rfdetoni/kitt composes the current `main` revision of every selected context.
 
 Arrows are collaboration/dependency relationships, not permission to import sibling internals.
 
+## Agent Engineering ownership in 0.10
+
+The Agent Engineering contracts introduced by Protocol 0.5 are intentionally
+cross-language value contracts, not new shared runtime authorities:
+
+| Contract / concern | Runtime owner | Notes |
+| --- | --- | --- |
+| `AgentEvent`, replayable run state | Agent CLI | persisted by the Agent EventLedger; Assistant transports events only |
+| `ExecutionBudget`, `BudgetLease`, `AgentLineage` | Agent CLI | one parent wallet; child workers consume leased slices |
+| `ExecutionAuthoritySnapshot`, `SavedPermission` | Agent CLI | policy/approval authority; Assistant forwards daemon identity only |
+| `ContextEpoch`, `CompactionCheckpoint`, recovery refs | Agent CLI | exact bytes remain in Agent ArtifactStore; Protocol defines shape |
+| `WorkspaceSnapshot` | Agent CLI | captured/restored under Agent workspace mutation fencing |
+| `RecallTrace`, `MemoryConsumptionReceipt`, `MemoryJob` | Memory | kitt-memoryd remains the only durable semantic-memory authority |
+| Task Episode efficiency and learning candidates | Agent CLI + AI Workers | Agent records evidence; Workers/Evals evaluate candidates; no silent live auto-apply |
+| `PluginCapabilities` | Plugin host (Agent) | declarations narrow exports; host permissions remain authority |
+
+A companion may cache or transport one of these values, but it must not create a
+second durable source of truth for the same lifecycle.
+
 ## Strategic rules
 
 1. **One authority per concept.** Conversation execution belongs to Agent; durable semantic memory belongs to Memory; provider transport belongs to Reverse Proxy.
