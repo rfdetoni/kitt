@@ -51,7 +51,7 @@ rfdetoni/kitt composes the current `main` revision of every selected context.
 
 Arrows are collaboration/dependency relationships, not permission to import sibling internals.
 
-## Agent Engineering ownership in 0.10.1
+## Agent Engineering ownership in 0.10.2
 
 The Agent Engineering contracts introduced by Protocol 0.5 are intentionally
 cross-language value contracts, not new shared runtime authorities:
