@@ -51,7 +51,7 @@ rfdetoni/kitt composes the current `main` revision of every selected context.
 
 Arrows are collaboration/dependency relationships, not permission to import sibling internals.
 
-## Agent Engineering ownership in 0.10
+## Agent Engineering ownership in 0.10.1
 
 The Agent Engineering contracts introduced by Protocol 0.5 are intentionally
 cross-language value contracts, not new shared runtime authorities:
@@ -59,12 +59,16 @@ cross-language value contracts, not new shared runtime authorities:
 | Contract / concern | Runtime owner | Notes |
 | --- | --- | --- |
 | `AgentEvent`, replayable run state | Agent CLI | persisted by the Agent EventLedger; Assistant transports events only |
+| `AgentRole` enforcement | Agent CLI | structural capabilities/tools/mutation/context/model/budget policy; prompt persona is not authority |
+| managed process identity/lifecycle | Agent CLI runtime/tool registry | `process.start/read/stdin/signal/stop/resume`; control revalidates captured authority and output/exit enter the EventLedger |
 | `ExecutionBudget`, `BudgetLease`, `AgentLineage` | Agent CLI | one parent wallet; child workers consume leased slices |
 | `ExecutionAuthoritySnapshot`, `SavedPermission` | Agent CLI | policy/approval authority; Assistant forwards daemon identity only |
 | `ContextEpoch`, `CompactionCheckpoint`, recovery refs | Agent CLI | exact bytes remain in Agent ArtifactStore; Protocol defines shape |
 | `WorkspaceSnapshot` | Agent CLI | captured/restored under Agent workspace mutation fencing |
 | `RecallTrace`, `MemoryConsumptionReceipt`, `MemoryJob` | Memory | kitt-memoryd remains the only durable semantic-memory authority |
+| public memory lifecycle evidence | Memory | digest-only `session.started` / `turn.started` / `tool.completed` / `turn.completed` / `session.ended` ingress feeds the same MemoryJob pipeline; no parallel Agent store |
 | Task Episode efficiency and learning candidates | Agent CLI + AI Workers | Agent records evidence; Workers/Evals evaluate candidates; no silent live auto-apply |
+| `kitt learn` portfolio/experiment frontend | Agent CLI | exposes sanitized local evidence and control/candidate measurements; never auto-promotes a candidate |
 | `PluginCapabilities` | Plugin host (Agent) | declarations narrow exports; host permissions remain authority |
 
 A companion may cache or transport one of these values, but it must not create a
