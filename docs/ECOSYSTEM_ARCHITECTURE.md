@@ -74,6 +74,12 @@ cross-language value contracts, not new shared runtime authorities:
 A companion may cache or transport one of these values, but it must not create a
 second durable source of truth for the same lifecycle.
 
+Provider transport follows the same one-authority rule: Agent CLI emits typed
+`kitt_context`, native tool schemas and `kitt_meta`; Reverse Proxy lowers those
+contracts for WebChat without reparsing generated prompt headings. The legacy
+`[KITT TURN CONTEXT]` / textual `Tool Contract:` path is intentionally removed
+from the current ecosystem rather than maintained as a second semantic channel.
+
 ## Strategic rules
 
 1. **One authority per concept.** Conversation execution belongs to Agent; durable semantic memory belongs to Memory; provider transport belongs to Reverse Proxy.
