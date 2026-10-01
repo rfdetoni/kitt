@@ -18,6 +18,16 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.10.5 — agentic runtime completion and progressive memory
+
+The 0.10.5 distribution composes Agent CLI **0.81.0**, Protocol **0.6.0**, Memory **0.7.0**, Assistant Runtime **0.2.27**, AI Workers **0.1.40** and Reverse Proxy **4.7.4** from their current `main` branches.
+
+Agent CLI 0.81.0 completes the current Agent Engineering architecture with structural-only provider transport, progressive Memory search/get hydration, replay-safe durable events and mutating-tool idempotency, typed fair resource coordination, one stage-aware execution wallet shared with child agents, selective workspace rollback, bounded artifact exact/query recovery, per-conversation Docker/Podman runtime lifecycle and stronger secret redaction across observability boundaries. Protocol 0.6.0 owns the typed contracts; Memory 0.7.0 remains the sole durable semantic-memory authority; Assistant Runtime 0.2.27 is validated against the immutable Agent 0.81.0 release SHA.
+
+The distribution CI resolves every component `main` to an exact SHA at run start, validates the composed namespace, and performs a clean non-interactive installation before promotion. See the Agent repository's `docs/AGENTIC_RUNTIME_ACCEPTANCE.md` and `docs/AGENT_ENGINEERING.md` for the acceptance matrix and ownership invariants.
+
+---
+
 ## Ecosystem 0.10.4 — structural request identity and immutable releases
 
 The 0.10.4 distribution composes Agent CLI **0.80.5**, Protocol **0.5.2**, Memory **0.6.1**, Assistant Runtime **0.2.26**, AI Workers **0.1.40** and Reverse Proxy **4.7.4** from their current `main` branches.
@@ -110,7 +120,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.80.5` persists `PENDING` approvals without a wall-clock timeout, revalidates authority snapshots before resume and scopes remembered permissions by workspace/executable identity. `kitt-assistant-runtime 0.2.26` transports the same saved-permission identity in daemon mode, while `kitt-reverse-proxy 4.7.4` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
+The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.81.0` persists `PENDING` approvals without a wall-clock timeout, revalidates authority snapshots before resume and scopes remembered permissions by workspace/executable identity. `kitt-assistant-runtime 0.2.27` transports the same saved-permission identity in daemon mode, while `kitt-reverse-proxy 4.7.4` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -118,7 +128,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.80.5 and Reverse Proxy 4.7.4 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.81.0 and Reverse Proxy 4.7.4 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
