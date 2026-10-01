@@ -408,6 +408,7 @@ jobs:
       - working-directory: kitt-agent-cli
         run: python -m pytest -q
       - name: Verify planning contract composition
+        shell: bash
         run: |
           python - <<'PY'
           from kitt_protocol import AgentRole, HostExecutionState, KittRequestMetadata
