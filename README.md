@@ -18,11 +18,11 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
-## Ecosystem 0.10.3 — hardened Agent Engineering stack
+## Ecosystem 0.10.4 — structural request identity and immutable releases
 
-The 0.10.3 distribution composes Agent CLI **0.80.4**, Protocol **0.5.2**, Memory **0.6.1**, Assistant Runtime **0.2.26**, AI Workers **0.1.40** and Reverse Proxy **4.7.3** from their current `main` branches.
+The 0.10.4 distribution composes Agent CLI **0.80.5**, Protocol **0.5.2**, Memory **0.6.1**, Assistant Runtime **0.2.26**, AI Workers **0.1.40** and Reverse Proxy **4.7.4** from their current `main` branches.
 
-The Agent control plane now owns replayable EventLedger/RunCoordinator state, a single turn execution budget with delegated child leases, content-derived ContextEpochs, exact ArtifactStore recovery references, authority snapshots, identity-scoped saved permissions, verified workspace snapshot rollback, structural agent roles, managed background processes and privacy-safe `kitt learn` telemetry. Memory remains the separate durable authority and now accepts digest-only lifecycle evidence through the same leased idempotent job pipeline. Reverse Proxy 4.7.3 consumes the Protocol-owned `KittRequestMetadata` plus typed context/tools, transports provider usage, and does not become an orchestrator or memory owner.
+The Agent control plane now owns replayable EventLedger/RunCoordinator state, a single turn execution budget with delegated child leases, content-derived ContextEpochs, exact ArtifactStore recovery references, authority snapshots, identity-scoped saved permissions, verified workspace snapshot rollback, structural agent roles, managed background processes and privacy-safe `kitt learn` telemetry. Memory remains the separate durable authority and now accepts digest-only lifecycle evidence through the same leased idempotent job pipeline. Reverse Proxy 4.7.4 consumes the Protocol-owned `KittRequestMetadata` plus typed context/tools, transports provider usage, and does not become an orchestrator or memory owner. Agent CLI 0.80.5 now requires `conversation_id`, `turn_id` and `route` at the execution streaming boundary instead of manufacturing placeholder metadata in low-level call paths.
 
 See the Agent repository's `docs/AGENT_ENGINEERING.md` for the detailed invariants and ownership boundaries.
 
@@ -110,7 +110,7 @@ The catalog resolver and CI enforce this relationship so the Agent is not silent
 
 ### Human approval continuity
 
-The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.80.4` persists `PENDING` approvals without a wall-clock timeout, revalidates authority snapshots before resume and scopes remembered permissions by workspace/executable identity. `kitt-assistant-runtime 0.2.26` transports the same saved-permission identity in daemon mode, while `kitt-reverse-proxy 4.7.3` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
+The main-tracking Agent stack keeps tool/command approval prompts active until the user decides. `kitt-agent-cli 0.80.5` persists `PENDING` approvals without a wall-clock timeout, revalidates authority snapshots before resume and scopes remembered permissions by workspace/executable identity. `kitt-assistant-runtime 0.2.26` transports the same saved-permission identity in daemon mode, while `kitt-reverse-proxy 4.7.4` keeps recoverable model-response sessions available for Continue/Retry. Grant TTLs remain short-lived and single-use after approval.
 
 Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-specific. Enable them with `--with-ai-workers`.
 
@@ -118,7 +118,7 @@ Heavy STT/ML dependencies remain opt-in because they are hardware- and workload-
 
 ### Integrated Reverse Proxy control center
 
-The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.80.4 and Reverse Proxy 4.7.3 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
+The current Agent stack tracks the latest compatible `main` revisions, including Agent CLI 0.80.5 and Reverse Proxy 4.7.4 at the time of this update. From the full-screen TUI, open **KITT Reverse Proxy** through `Ctrl+P` or `/reverse-proxy`. The modal is painted immediately, then loads its control-plane snapshot, and can start a provider-plugin service directly from **Novo serviço**. Use it to:
 
 - run multiple reverse-proxy instances at once;
 - use named browser profiles and provider plugins;
