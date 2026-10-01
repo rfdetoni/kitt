@@ -51,7 +51,7 @@ rfdetoni/kitt composes the current `main` revision of every selected context.
 
 Arrows are collaboration/dependency relationships, not permission to import sibling internals.
 
-## Agent Engineering ownership in 0.10.3
+## Agent Engineering ownership in 0.10.4
 
 The Agent Engineering contracts introduced by Protocol 0.5 are intentionally
 cross-language value contracts, not new shared runtime authorities:
@@ -76,7 +76,7 @@ second durable source of truth for the same lifecycle.
 
 Provider transport follows the same one-authority rule: Agent CLI emits typed
 `kitt_context`, native tool schemas and Protocol `KittRequestMetadata` as `kitt_meta`; Reverse Proxy lowers those
-contracts for WebChat without reparsing generated prompt headings. The legacy
+contracts for WebChat without reparsing generated prompt headings. Agent CLI 0.80.5 requires conversation, turn and route identity at the execution boundary, while Reverse Proxy 4.7.4 validates and transports that metadata without making it provider-visible. The legacy
 `[KITT TURN CONTEXT]` / textual `Tool Contract:` path is intentionally removed
 from the current ecosystem rather than maintained as a second semantic channel.
 
