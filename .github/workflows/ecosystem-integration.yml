@@ -406,9 +406,23 @@ jobs:
           kitt-ai-workers/packages/kitt-evolution/kitt
           kitt-ai-workers/packages/kitt-evals/kitt
       - working-directory: kitt-agent-cli
-        run: python -m unittest discover -s tests -v
-      - working-directory: kitt-agent-cli
-        run: python -m unittest discover -s tests/prime_architecture -v
+        run: python -m pytest -q
+      - name: Verify planning contract composition
+        run: |
+          python - <<'PY'
+          from kitt_protocol import AgentRole, HostExecutionState, KittRequestMetadata
+          from kitt.core.task_plan import TaskPlanCoordinator
+          metadata = KittRequestMetadata(
+              request_id="composition", conversation_id="composition", turn_id="composition",
+              route="agent-loop", agent_role=AgentRole.IMPLEMENT,
+              parent_request_id="parent", task_id="task",
+          )
+          assert metadata.to_mapping()["task_id"] == "task"
+          facts = HostExecutionState("composition", "composition", 0, 0, 0, False, False, True)
+          assert facts.to_mapping()["completion_ready"] is True
+          assert TaskPlanCoordinator.MAX_TASKS == 12
+          print("Host planning contract composition: ok")
+          PY
       - name: Verify composed namespace
         run: >-
           python -c "import kitt; import kitt.core.runtime; import kitt.daemon.client; import kitt.remote.server; import kitt.evolution; import kitt.evals.corpus; assert hasattr(kitt, 'DAEMON_PROTOCOL_VERSION'); print('composed namespace: ok', kitt.__file__)"
