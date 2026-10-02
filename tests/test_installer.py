@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from installer.catalog import CatalogError, EcosystemCatalog, Resolution
 from installer.cli import _env_flag, _quiet_install_output, build_parser
-from installer.core import EcosystemInstaller, InstallerOptions
+from installer.core import EcosystemInstaller, InstallerError, InstallerOptions
 from installer.platforms import PlatformAdapter
 from installer.release_manifest import load_release_refs
 from installer.ui import _SelectionState, _handle_key
@@ -446,6 +446,56 @@ class NativeBuildTests(unittest.TestCase):
                 installer._cargo_build_cached(module)
             argv = run.call_args.args[0]
             self.assertNotIn("--no-default-features", argv)
+
+
+    def test_release_assistant_rejects_lock_mismatch_before_build(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        module = catalog.modules["assistant"]
+        refs = load_release_refs(ROOT, catalog)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / ".staging" / "sources" / "kitt-assistant"
+            source.mkdir(parents=True)
+            (source / "Cargo.toml").write_text("[workspace]\n", encoding="utf-8")
+            (source / "Cargo.lock").write_text(
+                """version = 4
+
+[[package]]
+name = "kitt-protocol"
+version = "0.0.0"
+source = "git+https://github.com/rfdetoni/kitt-protocol.git#0000000000000000000000000000000000000000"
+
+[[package]]
+name = "kitt-memory-core"
+version = "0.0.0"
+source = "git+https://github.com/rfdetoni/kitt-memory.git#0000000000000000000000000000000000000000"
+
+[[package]]
+name = "kitt-memory-sqlite"
+version = "0.0.0"
+source = "git+https://github.com/rfdetoni/kitt-memory.git#0000000000000000000000000000000000000000"
+""",
+                encoding="utf-8",
+            )
+            installer = __import__(
+                "installer.source_free",
+                fromlist=["SourceFreeEcosystemInstaller"],
+            ).SourceFreeEcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(
+                    root=root,
+                    bin_dir=root / "bin",
+                    component_refs=refs,
+                ),
+            )
+            with patch.object(installer, "_run") as run:
+                with self.assertRaisesRegex(
+                    InstallerError,
+                    "Assistant Cargo.lock does not match release pins",
+                ):
+                    installer._cargo_build_cached(module)
+            run.assert_not_called()
 
 
 class RepositoryStateTests(unittest.TestCase):

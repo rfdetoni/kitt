@@ -123,6 +123,59 @@ jobs:
           assert set(installed["resolved_modules"]) == expected, installed["resolved_modules"]
           print("main end-to-end installation: ok")
           PY
+      - name: Perform release-channel smoke installation
+        shell: bash
+        run: |
+          set -euo pipefail
+          original_home="$HOME"
+          export RUSTUP_HOME="${RUSTUP_HOME:-$original_home/.rustup}"
+          export HOME="$RUNNER_TEMP/kitt-release-home"
+          mkdir -p "$HOME"
+          python -m installer \
+            --modules agent-cli \
+            --minimal \
+            --channel release \
+            --portable \
+            --yes \
+            --root "$RUNNER_TEMP/kitt-release-runtime" \
+            --bin-dir "$RUNNER_TEMP/kitt-release-bin" \
+            --no-start-services \
+            --verbose
+      - name: Verify immutable release revisions
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/kitt-release-runtime/.venv-agent/bin/python" -m pip check
+          "$RUNNER_TEMP/kitt-release-bin/kitt" --help >/dev/null
+          ROOT="$GITHUB_WORKSPACE" RUNTIME="$RUNNER_TEMP/kitt-release-runtime" python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["ROOT"])
+          runtime = Path(os.environ["RUNTIME"])
+          manifest = json.loads((root / "ecosystem.release.json").read_text(encoding="utf-8"))
+          installed = json.loads((runtime / "installed-state.json").read_text(encoding="utf-8"))
+
+          selected = {"protocol", "memory", "agent-cli"}
+          assert installed["source_channel"] == "release", installed
+          assert installed["source_ref"] == "main", installed
+          assert set(installed["resolved_modules"]) == selected, installed["resolved_modules"]
+
+          expected_refs = {
+              component_id: item["sha"]
+              for component_id, item in manifest["components"].items()
+          }
+          assert installed["component_refs"] == expected_refs, installed["component_refs"]
+
+          for component_id in selected:
+              item = manifest["components"][component_id]
+              actual = installed["repositories"][item["repository"]]
+              assert actual == item["sha"], (component_id, actual, item["sha"])
+
+          assert not (runtime / ".staging" / "sources").exists()
+          print("release-channel immutable smoke: ok")
+          PY
 
   ecosystem:
     if: always()
