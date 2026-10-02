@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from installer.catalog import CatalogError, EcosystemCatalog, Resolution
 from installer.cli import _env_flag, _quiet_install_output, build_parser
-from installer.core import EcosystemInstaller, InstallerOptions
+from installer.core import EcosystemInstaller, InstallerError, InstallerOptions
 from installer.platforms import PlatformAdapter
 from installer.release_manifest import load_release_refs
 from installer.ui import _SelectionState, _handle_key
@@ -399,6 +399,56 @@ class RequirementTests(unittest.TestCase):
 
 
 class NativeBuildTests(unittest.TestCase):
+    def test_release_assistant_lock_mismatch_fails_before_build(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        module = catalog.modules["assistant"]
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / ".staging" / "sources" / "kitt-assistant"
+            source.mkdir(parents=True)
+            (source / "Cargo.toml").write_text("[workspace]\n", encoding="utf-8")
+            (source / "Cargo.lock").write_text(
+                """version = 3
+
+[[package]]
+name = "kitt-protocol"
+version = "0.0.0"
+source = "git+https://github.com/rfdetoni/kitt-protocol#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+[[package]]
+name = "kitt-memory-core"
+version = "0.0.0"
+source = "git+https://github.com/rfdetoni/kitt-memory#bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+[[package]]
+name = "kitt-memory-sqlite"
+version = "0.0.0"
+source = "git+https://github.com/rfdetoni/kitt-memory#bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+""",
+                encoding="utf-8",
+            )
+            installer = __import__(
+                "installer.source_free",
+                fromlist=["SourceFreeEcosystemInstaller"],
+            ).SourceFreeEcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(
+                    root=root,
+                    bin_dir=root / "bin",
+                    component_refs={
+                        "protocol": "1" * 40,
+                        "memory": "2" * 40,
+                    },
+                ),
+            )
+
+            with self.assertRaisesRegex(
+                InstallerError,
+                "Assistant Cargo.lock does not match release pins",
+            ):
+                installer._cargo_build_cached(module)
+
     def test_assistant_falls_back_to_no_default_features_without_alsa(self) -> None:
         catalog = EcosystemCatalog.load(ROOT)
         module = catalog.modules["assistant"]
