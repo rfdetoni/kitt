@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "channel": "release",
-  "ecosystem_version": "0.13.1",
+  "ecosystem_version": "0.13.2",
   "components": {
     "protocol": {"repository": "rfdetoni/kitt-protocol", "sha": "f1c17df15c64411c24c8b35ef41cf6299f4571b9"},
     "memory": {"repository": "rfdetoni/kitt-memory", "sha": "ad0e99b62ff5a8602f61fb5ea94a218d895cce8d"},
