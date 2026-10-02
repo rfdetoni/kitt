@@ -36,7 +36,6 @@ class InstallerOptions:
     bin_dir: Path
     force: bool = False
     ref: str | None = None
-    channel: str = "edge"
     component_refs: dict[str, str] | None = None
     with_ai_workers: bool = False
     portable: bool = False

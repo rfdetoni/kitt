@@ -47,9 +47,7 @@ jobs:
         with:
           python-version: '3.14'
       - name: Validate edge and release component policy
-        run: |
-          python scripts/validate_ecosystem_main.py
-          python scripts/validate_release_manifest.py
+        run: python scripts/validate_ecosystem_main.py
       - name: Validate bounded-context architecture
         run: python scripts/validate_architecture.py
       - name: Run installer/catalog regressions

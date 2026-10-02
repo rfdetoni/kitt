@@ -89,7 +89,7 @@ A promotion must preserve or intentionally version:
 - provider-gateway contracts used by the Agent;
 - native fallback semantics.
 
-If a change crosses more than one bounded context, prefer a staged compatibility window: add compatible contract support first, promote both sides, then remove the old contract in a later release.
+If a breaking change crosses bounded contexts, update the affected repositories and release manifest as one coordinated ecosystem change; backward-compatibility shims are not required.
 
 ## Tactical DDD guidance
 
@@ -120,6 +120,6 @@ system policy. A pending or submitted-uncertain request cannot be silently evict
 and replayed. Cancellation terminates transport work; it cannot undo provider work
 already submitted.
 
-Main installation records the actual per-run repository SHAs. CI checks the
-Protocol/Proxy generated schema at those same revisions. The release evidence is
-a historical snapshot, not a persistent ecosystem lock or an exactly-once promise.
+Edge installation records the actual per-run repository SHAs. Release installation
+uses the immutable SHAs in `ecosystem.release.json`. CI validates both channels;
+the release manifest pins component identity but does not claim exactly-once effects.

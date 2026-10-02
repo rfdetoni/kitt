@@ -492,15 +492,9 @@ kitt-reverse-proxy
 The Agent CLI requires kitt-memory and uses its standalone kitt-memoryd as the sole durable memory authority. kitt-memoryd is installed with the preset and auto-started by the Agent when first needed. The Agent CLI keeps its safe Python fallback when the optional native Toolbox is not installed. The Reverse Proxy remains an independent Node service. Assistant, shared-memory daemon, AI Workers and resident voice components are not installed.
 
 
-### Main-first component updates
+### Component update channels
 
-The minimal command above follows `main` for Protocol, Memory, Agent CLI and Reverse Proxy on every run. No extra flag is needed:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh -s -- --preset agent-proxy-minimal --minimal -y
-```
-
-Use `--ref <branch|tag|sha>` only when you intentionally want every selected K.I.T.T. module to use that alternate ref for a specific test.
+The command above uses the default `edge` channel and follows component `main` branches. Add `--channel release` to install the immutable component SHAs in `ecosystem.release.json`. Use `--ref <branch|tag|sha>` only for an edge diagnostic/bisect.
 
 ### Memory authority update
 

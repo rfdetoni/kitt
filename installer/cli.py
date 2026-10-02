@@ -14,7 +14,7 @@ from .core import InstallerError, InstallerOptions
 from .path_priority import ensure_managed_path
 from .platforms import PlatformAdapter
 from .progress import InstallProgress
-from .release_manifest import ReleaseManifest, ReleaseManifestError
+from .release_manifest import load_release_refs
 from .source_free import SourceFreeEcosystemInstaller
 from .ui import UserCancelled, choose_modules
 
@@ -229,7 +229,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         component_refs: dict[str, str] | None = None
         if channel == "release":
-            component_refs = ReleaseManifest.load(source_root).refs(catalog)
+            component_refs = load_release_refs(source_root, catalog)
 
         platform = PlatformAdapter.detect()
         if args.list:
@@ -243,7 +243,6 @@ def main(argv: list[str] | None = None) -> int:
             bin_dir=bin_dir,
             force=bool(args.force),
             ref=args.ref,
-            channel=channel,
             component_refs=component_refs,
             with_ai_workers=bool(args.with_ai_workers),
             portable=bool(args.portable),
@@ -311,7 +310,7 @@ def main(argv: list[str] | None = None) -> int:
             active_progress.finish(False)
         print(str(exc), file=sys.stderr)
         return 130
-    except (CatalogError, ReleaseManifestError, InstallerError, OSError, ValueError) as exc:
+    except (CatalogError, InstallerError, OSError, ValueError) as exc:
         if active_progress is not None:
             active_progress.finish(False)
         print(f"K.I.T.T. install failed: {exc}", file=sys.stderr)

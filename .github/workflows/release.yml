@@ -34,14 +34,14 @@ jobs:
         with:
           python-version: '3.14'
       - name: Validate immutable ecosystem release manifest
-        run: python scripts/validate_release_manifest.py
+        run: python scripts/validate_ecosystem_main.py --release
       - name: Verify release component SHAs exist
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/validate_release_manifest.py | while read -r component repository sha; do
+          python scripts/validate_ecosystem_main.py --release | while read -r component repository sha; do
             echo "verify $component $repository@$sha"
             gh api "repos/$repository/commits/$sha" --silent
           done

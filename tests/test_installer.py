@@ -10,7 +10,7 @@ from installer.catalog import CatalogError, EcosystemCatalog, Resolution
 from installer.cli import _env_flag, _quiet_install_output, build_parser
 from installer.core import EcosystemInstaller, InstallerOptions
 from installer.platforms import PlatformAdapter
-from installer.release_manifest import ReleaseManifest
+from installer.release_manifest import load_release_refs
 from installer.ui import _SelectionState, _handle_key
 
 
@@ -72,8 +72,7 @@ class CatalogTests(unittest.TestCase):
         )
 
     def test_release_manifest_pins_every_component_to_sha(self) -> None:
-        manifest = ReleaseManifest.load(ROOT)
-        refs = manifest.refs(self.catalog)
+        refs = load_release_refs(ROOT, self.catalog)
         self.assertEqual(set(refs), set(self.catalog.modules))
         for module_id, ref in refs.items():
             self.assertRegex(ref, r"^[0-9a-f]{40}$")

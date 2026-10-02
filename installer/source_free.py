@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import json
 import os
-import re
 import shutil
 import threading
 import time
@@ -170,7 +168,6 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
 
         try:
             self._sync_repositories_parallel(resolution)
-            self._pin_release_dependencies(resolution)
             staged_venv = self._build_install_artifacts_parallel(resolution)
             self._smoke_test(resolution, staged_venv)
             venv = self._commit_python_stack(staged_venv)
@@ -237,84 +234,6 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             for future in as_completed(futures):
                 future.result()
 
-    @staticmethod
-    def _replace_git_branch_with_rev(
-        path: Path,
-        package: str,
-        repository_fragment: str,
-        revision: str,
-    ) -> None:
-        if not path.is_file():
-            return
-        text = path.read_text(encoding="utf-8")
-        pattern = re.compile(
-            rf'({re.escape(package)}\s*=\s*\{{[^\n}}]*'
-            rf'{re.escape(repository_fragment)}[^\n}}]*)(branch\s*=\s*"main")'
-        )
-        updated, count = pattern.subn(
-            lambda match: match.group(1) + f'rev = "{revision}"',
-            text,
-        )
-        if count:
-            path.write_text(updated, encoding="utf-8")
-
-    def _pin_release_dependencies(self, resolution: Resolution) -> None:
-        """Pin sibling moving refs inside disposable release staging only."""
-        refs = self.options.component_refs
-        if not refs or "assistant" not in resolution.ids:
-            return
-        assistant = self._repo_dir(self.catalog.modules["assistant"])
-        protocol_ref = refs.get("protocol")
-        memory_ref = refs.get("memory")
-
-        if protocol_ref:
-            for cargo in assistant.rglob("Cargo.toml"):
-                self._replace_git_branch_with_rev(
-                    cargo, "kitt-protocol", "rfdetoni/kitt-protocol", protocol_ref
-                )
-            hud = assistant / "apps" / "kitt-hud"
-            hud_package = hud / "package.json"
-            if hud_package.is_file():
-                payload = json.loads(hud_package.read_text(encoding="utf-8"))
-                dependencies = payload.get("dependencies")
-                if isinstance(dependencies, dict):
-                    current = str(dependencies.get("@kitt/protocol") or "")
-                    if current.endswith("#main"):
-                        dependencies["@kitt/protocol"] = current[:-4] + protocol_ref
-                        hud_package.write_text(
-                            json.dumps(payload, indent=2) + "\n", encoding="utf-8"
-                        )
-            hud_lock = hud / "package-lock.json"
-            if hud_lock.is_file():
-                lock_payload = json.loads(hud_lock.read_text(encoding="utf-8"))
-                packages = lock_payload.get("packages")
-                if isinstance(packages, dict):
-                    root = packages.get("")
-                    if isinstance(root, dict):
-                        root_dependencies = root.get("dependencies")
-                        if isinstance(root_dependencies, dict):
-                            current = str(root_dependencies.get("@kitt/protocol") or "")
-                            if current.endswith("#main"):
-                                root_dependencies["@kitt/protocol"] = current[:-4] + protocol_ref
-                    protocol_package = packages.get("node_modules/@kitt/protocol")
-                    if isinstance(protocol_package, dict):
-                        resolved = str(protocol_package.get("resolved") or "")
-                        if "github.com/rfdetoni/kitt-protocol" in resolved:
-                            protocol_package["resolved"] = (
-                                "git+https://github.com/rfdetoni/kitt-protocol.git#"
-                                + protocol_ref
-                            )
-                hud_lock.write_text(
-                    json.dumps(lock_payload, indent=2) + "\n", encoding="utf-8"
-                )
-
-        if memory_ref:
-            for cargo in assistant.rglob("Cargo.toml"):
-                for package in ("kitt-memory-core", "kitt-memory-sqlite"):
-                    self._replace_git_branch_with_rev(
-                        cargo, package, "rfdetoni/kitt-memory", memory_ref
-                    )
-
     def _build_install_artifacts_parallel(self, resolution: Resolution) -> Path | None:
         selected = set(resolution.ids)
 
@@ -361,8 +280,8 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         return staged_venv
 
     def _refresh_kitt_main_dependencies(self, module: ModuleSpec, path: Path) -> None:
-        """Refresh the staged Assistant lock after edge resolution or release pinning."""
-        if module.id != "assistant":
+        """Refresh edge dependencies, but never move immutable release revisions."""
+        if module.id != "assistant" or self.options.component_refs:
             return
         env = self._cargo_env(module.id)
         for package in ("kitt-protocol", "kitt-memory-core", "kitt-memory-sqlite"):
@@ -374,6 +293,27 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             raise InstallerError(f"{module.repository} has no Cargo.toml for strategy {module.strategy}")
         lock = path / "Cargo.lock"
         generated_lock = not lock.exists()
+        if module.id == "assistant" and self.options.component_refs and lock.is_file():
+            packages = tomllib.loads(lock.read_text(encoding="utf-8")).get("package", [])
+            sources = {
+                item.get("name"): str(item.get("source") or "")
+                for item in packages
+                if isinstance(item, dict)
+            }
+            expected = {
+                "kitt-protocol": self.options.component_refs["protocol"],
+                "kitt-memory-core": self.options.component_refs["memory"],
+                "kitt-memory-sqlite": self.options.component_refs["memory"],
+            }
+            stale = [
+                name for name, sha in expected.items()
+                if not sources.get(name, "").endswith(f"#{sha}")
+            ]
+            if stale:
+                raise InstallerError(
+                    "Assistant Cargo.lock does not match release pins: "
+                    + ", ".join(stale)
+                )
         self._refresh_kitt_main_dependencies(module, path)
         command = ["cargo", "build", "--release", "--jobs", str(self._cargo_jobs())]
         if module.id == "assistant" and not self.platform.assistant_voice_build_available():
@@ -409,12 +349,25 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
             return
         print("\nBuild KITT Assistant HUD")
         env = self._npm_env()
+        refs = self.options.component_refs
+        if refs:
+            protocol = (
+                "@kitt/protocol@git+https://github.com/rfdetoni/"
+                f"kitt-protocol.git#{refs['protocol']}"
+            )
+            self._run(
+                ["npm", "install", "--package-lock-only", "--ignore-scripts",
+                 "--no-audit", "--no-fund", protocol],
+                cwd=hud,
+                env=env,
+            )
         self._run(["npm", "ci", "--no-audit", "--no-fund", "--prefer-offline"], cwd=hud, env=env)
-        self._run(
-            ["npm", "update", "@kitt/protocol", "--no-audit", "--no-fund", "--prefer-offline"],
-            cwd=hud,
-            env=env,
-        )
+        if not refs:
+            self._run(
+                ["npm", "update", "@kitt/protocol", "--no-audit", "--no-fund", "--prefer-offline"],
+                cwd=hud,
+                env=env,
+            )
         self._run(["npm", "run", "build"], cwd=hud, env=env)
 
     def _build_reverse_proxy(self, resolution: Resolution) -> None:
@@ -483,33 +436,39 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                 ])
 
         if local_packages:
-            # Resolve only non-KITT dependencies from package metadata, then
-            # install selected KITT checkouts with --no-deps. Direct sibling
-            # git URLs therefore cannot silently escape an immutable release.
-            external_dependencies: list[str] = []
-            for package in local_packages:
-                pyproject = package / "pyproject.toml"
-                if not pyproject.is_file():
-                    continue
-                payload = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                project = payload.get("project")
-                dependencies = (
-                    project.get("dependencies", [])
-                    if isinstance(project, dict)
-                    else []
-                )
-                for dependency in dependencies if isinstance(dependencies, list) else []:
-                    value = str(dependency).strip()
-                    lowered = value.lower()
-                    if lowered.startswith("kitt-") or "github.com/rfdetoni/kitt-" in lowered:
+            if self.options.component_refs:
+                # Release composition installs external dependencies only.
+                # Selected KITT packages are applied from root-selected checkouts.
+                external_dependencies: list[str] = []
+                for package in local_packages:
+                    pyproject = package / "pyproject.toml"
+                    if not pyproject.is_file():
                         continue
-                    if value and value not in external_dependencies:
-                        external_dependencies.append(value)
-            if external_dependencies:
-                self._run([
-                    str(python), "-m", "pip", "install", "--disable-pip-version-check",
-                    "--prefer-binary", *external_dependencies,
-                ])
+                    payload = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                    project = payload.get("project")
+                    dependencies = (
+                        project.get("dependencies", [])
+                        if isinstance(project, dict)
+                        else []
+                    )
+                    for dependency in dependencies if isinstance(dependencies, list) else []:
+                        value = str(dependency).strip()
+                        lowered = value.lower()
+                        if lowered.startswith("kitt-") or "github.com/rfdetoni/kitt-" in lowered:
+                            continue
+                        if value and value not in external_dependencies:
+                            external_dependencies.append(value)
+                if external_dependencies:
+                    self._run([
+                        str(python), "-m", "pip", "install", "--disable-pip-version-check",
+                        "--prefer-binary", *external_dependencies,
+                    ])
+            else:
+                for package in local_packages:
+                    self._run([
+                        str(python), "-m", "pip", "install", "--disable-pip-version-check",
+                        "--prefer-binary", "--no-build-isolation", str(package),
+                    ])
 
             # Install the Agent on its own and last. Multiple KITT distributions
             # intentionally share the kitt namespace, so a single multi-wheel
