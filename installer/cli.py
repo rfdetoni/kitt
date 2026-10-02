@@ -179,8 +179,8 @@ def _ensure_launcher_priority(platform: PlatformAdapter, bin_dir: Path) -> None:
 def _record_source_ref(
     root: Path,
     ref: str | None,
-    channel: str,
-    component_refs: dict[str, str] | None,
+    channel: str = "edge",
+    component_refs: dict[str, str] | None = None,
 ) -> None:
     """Persist the update channel used for the completed installation."""
     state_path = root / "installed-state.json"
