@@ -25,13 +25,9 @@ permissions:
   contents: read
 
 jobs:
-  portable-installer:
-    name: ${{ matrix.os }} installer
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  installer-validation:
+    name: Installer validation
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -55,6 +51,43 @@ jobs:
         run: python -m installer --modules agent-cli --dry-run --portable
       - name: List public installer surface
         run: python -m installer --list
+      - name: Validate POSIX bootstrap syntax
+        run: sh -n install.sh
+      - name: Validate PowerShell bootstrap syntax
+        shell: pwsh
+        run: |
+          $Tokens = $null
+          $Errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path ./install.ps1), [ref]$Tokens, [ref]$Errors
+          ) | Out-Null
+          if ($Errors.Count -gt 0) {
+            $Errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
+
+  platform-lifecycle:
+    name: ${{ matrix.os }} lifecycle
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+      - name: Run native lifecycle regressions
+        run: python -m unittest tests.test_installer_portability -v
+      - name: Validate native prerequisite discovery
+        run: python -m installer --modules agent-cli --dry-run --portable
       - name: Validate POSIX bootstrap syntax
         if: runner.os != 'Windows'
         shell: sh
