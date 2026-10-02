@@ -18,6 +18,14 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.12.0 — bounded gateway lifecycle
+
+This distribution composes Agent CLI **0.83.3**, Protocol **0.8.0**, Reverse Proxy **4.9.1**, Memory **0.8.1**, Toolbox **0.3.0**, Assistant Runtime **0.2.30** (native/HUD **0.1.16**) and AI Workers **0.1.42** from `main`.
+
+The gateway shares the Agent wallet across bounded repairs, enforces processing locality, commits context acknowledgements after successful responses, and preserves uncertain request identity. Streaming, cancellation, daemon shutdown, file cursors and IPC resources have explicit bounds. Contracts remain owned by Protocol; consumers reuse Agent policy.
+
+See [docs/GATEWAY_RELEASE_0.12.0.md](docs/GATEWAY_RELEASE_0.12.0.md) for findings, validation, source revisions and remaining limitations. Installation still resolves `main` once per run and records its actual SHAs.
+
 ## Ecosystem 0.11.0 — host-owned planning and scoped verification
 
 The 0.11.0 distribution composes Agent CLI **0.82.0**, Protocol **0.7.0**, Reverse Proxy **4.8.0**, Memory **0.7.0**, Toolbox **0.2.9**, Assistant **0.1.15** / Runtime **0.2.27** and AI Workers **0.1.40** from their current `main` branches.

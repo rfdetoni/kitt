@@ -102,3 +102,24 @@ Do **not** introduce a generic `domain/application/infrastructure` folder hierar
 `scripts/validate_architecture.py` validates the catalog dependency graph and checks that every catalog repository is represented in this document. CI runs it together with the main-first ecosystem validation.
 
 This guard intentionally checks high-value ownership/dependency invariants rather than cosmetic package names.
+
+## Gateway lifecycle in distribution 0.12.0
+
+Agent owns the execution wallet, privacy decisions, task identity, approvals and
+tool execution. Protocol owns shared wire contracts and the authoritative context
+schema. Proxy owns browser/session transport, repair attempts, cancellation,
+stream framing and transport idempotency. Memory owns durable mutation receipts;
+Toolbox owns native file snapshots and byte cursors. Assistant and Workers reuse
+Agent policy rather than constructing separate privacy or approval authorities.
+
+Agent reserves attempts and input allowance before dispatch. Proxy consumes that
+grant across every repair under a single session lease and deadline. Context
+acknowledgements commit only after a successful response; session reset invalidates
+them. Context and repair evidence remain untrusted data beneath the English
+system policy. A pending or submitted-uncertain request cannot be silently evicted
+and replayed. Cancellation terminates transport work; it cannot undo provider work
+already submitted.
+
+Main installation records the actual per-run repository SHAs. CI checks the
+Protocol/Proxy generated schema at those same revisions. The release evidence is
+a historical snapshot, not a persistent ecosystem lock or an exactly-once promise.

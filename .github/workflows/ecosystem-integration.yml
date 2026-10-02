@@ -65,6 +65,36 @@ jobs:
           export HOME="$RUNNER_TEMP/kitt-home"
           mkdir -p "$HOME"
           python -m installer             --preset agent             --yes             --root "$RUNNER_TEMP/kitt-runtime"             --bin-dir "$RUNNER_TEMP/kitt-bin"             --no-start-services             --verbose
+      - name: Resolve installed contract revisions
+        id: contracts
+        shell: bash
+        run: |
+          RUNTIME="$RUNNER_TEMP/kitt-runtime" python - <<'PYCONTRACTS'
+          import json, os
+          from pathlib import Path
+          state = json.loads((Path(os.environ["RUNTIME"]) / "installed-state.json").read_text())
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              for name in ("protocol", "reverse-proxy"):
+                  sha = state["repositories"][f"rfdetoni/kitt-{name}"]
+                  assert len(sha) == 40 and all(c in "0123456789abcdef" for c in sha)
+                  output.write(f"{name}={sha}\n")
+          PYCONTRACTS
+      - name: Checkout installed Protocol contract
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-protocol
+          ref: ${{ steps.contracts.outputs.protocol }}
+          path: contract-protocol
+          persist-credentials: false
+      - name: Checkout installed Proxy contract
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-reverse-proxy
+          ref: ${{ steps.contracts.outputs.reverse-proxy }}
+          path: contract-proxy
+          persist-credentials: false
+      - name: Require matching gateway schemas
+        run: python scripts/validate_gateway_schema.py --protocol contract-protocol --proxy contract-proxy
       - name: Verify installed runtime
         shell: bash
         run: |
