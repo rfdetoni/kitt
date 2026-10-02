@@ -272,7 +272,8 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                 self._replace_git_branch_with_rev(
                     cargo, "kitt-protocol", "rfdetoni/kitt-protocol", protocol_ref
                 )
-            hud_package = assistant / "apps" / "kitt-hud" / "package.json"
+            hud = assistant / "apps" / "kitt-hud"
+            hud_package = hud / "package.json"
             if hud_package.is_file():
                 payload = json.loads(hud_package.read_text(encoding="utf-8"))
                 dependencies = payload.get("dependencies")
@@ -283,6 +284,29 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                         hud_package.write_text(
                             json.dumps(payload, indent=2) + "\n", encoding="utf-8"
                         )
+            hud_lock = hud / "package-lock.json"
+            if hud_lock.is_file():
+                lock_payload = json.loads(hud_lock.read_text(encoding="utf-8"))
+                packages = lock_payload.get("packages")
+                if isinstance(packages, dict):
+                    root = packages.get("")
+                    if isinstance(root, dict):
+                        root_dependencies = root.get("dependencies")
+                        if isinstance(root_dependencies, dict):
+                            current = str(root_dependencies.get("@kitt/protocol") or "")
+                            if current.endswith("#main"):
+                                root_dependencies["@kitt/protocol"] = current[:-4] + protocol_ref
+                    protocol_package = packages.get("node_modules/@kitt/protocol")
+                    if isinstance(protocol_package, dict):
+                        resolved = str(protocol_package.get("resolved") or "")
+                        if "github.com/rfdetoni/kitt-protocol" in resolved:
+                            protocol_package["resolved"] = (
+                                "git+https://github.com/rfdetoni/kitt-protocol.git#"
+                                + protocol_ref
+                            )
+                hud_lock.write_text(
+                    json.dumps(lock_payload, indent=2) + "\n", encoding="utf-8"
+                )
 
         if memory_ref:
             for cargo in assistant.rglob("Cargo.toml"):
@@ -337,8 +361,8 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         return staged_venv
 
     def _refresh_kitt_main_dependencies(self, module: ModuleSpec, path: Path) -> None:
-        """Refresh edge dependencies, but never move immutable release revisions."""
-        if module.id != "assistant" or self.options.component_refs:
+        """Refresh the staged Assistant lock after edge resolution or release pinning."""
+        if module.id != "assistant":
             return
         env = self._cargo_env(module.id)
         for package in ("kitt-protocol", "kitt-memory-core", "kitt-memory-sqlite"):

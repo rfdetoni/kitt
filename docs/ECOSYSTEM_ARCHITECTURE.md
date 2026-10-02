@@ -72,9 +72,9 @@ from the current ecosystem rather than maintained as a second semantic channel.
 3. **Dependencies are directional.** A context can depend on a contract or companion without taking ownership of its implementation.
 4. **Infrastructure stays infrastructure.** HTTP clients, SQLite adapters, TUI renderers, browser automation and native bridges are not domain entities merely because DDD is used elsewhere.
 5. **Aggregates require consistency boundaries.** Use aggregate-like modeling only when a set of state changes must preserve one invariant/transactional lifecycle.
-6. **Composition follows main.** The root installer resolves every selected K.I.T.T. repository from `main` by default; explicit tags/SHAs are opt-in diagnostic overrides.
+6. **Edge follows main.** The default development channel resolves selected K.I.T.T. repositories from `main`; explicit tags/SHAs are opt-in edge diagnostics.
 7. **Fallback preserves behavior.** Optional native or resident components may accelerate/enrich behavior but may not silently change security semantics.
-8. **Two explicit composition channels.** Edge development resolves sibling `main` branches. Published releases resolve only immutable SHAs recorded in `ecosystem.release.json`; release composition must not silently fetch a newer sibling main through Cargo, npm or pip.
+8. **Release is immutable.** Published releases resolve only immutable SHAs recorded in `ecosystem.release.json`; release composition must not silently fetch a newer sibling main through Cargo, npm or pip.
 
 ## Compatibility invariants
 
