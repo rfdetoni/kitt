@@ -18,11 +18,11 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
-## Ecosystem 0.13.0 — immutable release composition
+## Ecosystem 0.13.1 — Agent 0.83.7 release snapshot
 
 The distribution now has two explicit channels: `edge` follows component `main` branches, while `release` installs only the SHAs in `ecosystem.release.json`. Release composition fails closed when the Assistant Cargo/npm locks do not match the Protocol/Memory pins, and Python sibling packages are installed from the root-selected checkouts instead of silently resolving K.I.T.T. dependencies from a newer `main`.
 
-The validated snapshot pins Agent CLI `82c0c48a7503`, Reverse Proxy `90e8b7b91293`, Assistant `978c5c9a66fb`, Protocol `f1c17df15c64`, Memory `ad0e99b62ff5`, Toolbox `3d81ad110354` and AI Workers `9336a4e21b3c`.
+The validated snapshot pins Agent CLI `c5802cbcd638` (v0.83.7), Reverse Proxy `90e8b7b91293`, Assistant `978c5c9a66fb`, Protocol `f1c17df15c64`, Memory `ad0e99b62ff5`, Toolbox `3d81ad110354` and AI Workers `9336a4e21b3c`.
 
 ## Ecosystem 0.12.0 — bounded gateway lifecycle
 
