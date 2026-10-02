@@ -88,8 +88,23 @@ jobs:
             fi
             tagged="$(git rev-list -n1 "$tag")"
             if [[ "$tagged" != "$head" ]]; then
-              echo "Version $current was already released at $tagged, but validated SHA $head contains unpublished changes. Bump VERSION instead of moving the immutable tag." >&2
-              exit 1
+              mapfile -t changed < <(git diff --name-only "$tagged..$head")
+              release_impact=()
+              for path in "${changed[@]}"; do
+                case "$path" in
+                  .github/*|tests/*|docs/*|README.md|SECURITY.md|LICENSE)
+                    ;;
+                  *)
+                    release_impact+=("$path")
+                    ;;
+                esac
+              done
+              if (( ${#release_impact[@]} )); then
+                echo "Version $current already exists at $tagged, but release-impacting files changed:" >&2
+                printf '  - %s\n' "${release_impact[@]}" >&2
+                echo "Bump VERSION instead of moving the immutable tag." >&2
+                exit 1
+              fi
             fi
           fi
 
