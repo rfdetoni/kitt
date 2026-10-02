@@ -83,6 +83,8 @@ Requirements are calculated from the selected module set rather than globally ha
 - Node.js **24+** and npm;
 - Rust **1.90+** and Cargo.
 
+The shell/PowerShell bootstrap can start with Python **3.10+** only to launch the installer. The selected runtime is then checked against the catalog and a complete Agent installation requires Python **3.14+**. CI exercises the complete stack at its declared floors (Python 3.14, Node 24 and Rust 1.90) rather than relying on newer toolchains.
+
 Windows, Linux and macOS are first-class targets. Other POSIX systems use the generic POSIX adapter when the selected upstream toolchains support the OS.
 
 `--portable` is an explicit degraded mode that skips native builds where a portable fallback exists. It is not the default for a complete installation.
