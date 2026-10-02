@@ -369,6 +369,7 @@ The ownership rule is intentional: components communicate through versioned cont
 - `--channel release` resolves manifest SHAs and requires matching component lockfiles.
 - `--ref <branch|tag|sha>` is an edge-only diagnostic override.
 - `installed-state.json` records channel and resolved revisions.
+- CI exercises a minimal `--channel release` installation and checks its installed SHAs against `ecosystem.release.json`.
 
 ---
 
