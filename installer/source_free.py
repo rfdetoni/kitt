@@ -384,7 +384,7 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         if not self._needs_python_env(resolution):
             return None
         if self._python is None:
-            raise InstallerError("Python 3.12+ is required for the selected modules")
+            raise InstallerError("Python 3.14+ is required for the selected modules")
 
         root = self.options.root
         staging = root / ".staging" / f"venv-{os.getpid()}-{int(time.time())}"
