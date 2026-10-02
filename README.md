@@ -18,9 +18,15 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.0 — immutable release composition
+
+The distribution now has two explicit channels: `edge` follows component `main` branches, while `release` installs only the SHAs in `ecosystem.release.json`. Release composition fails closed when the Assistant Cargo/npm locks do not match the Protocol/Memory pins, and Python sibling packages are installed from the root-selected checkouts instead of silently resolving K.I.T.T. dependencies from a newer `main`.
+
+The validated snapshot pins Agent CLI `82c0c48a7503`, Reverse Proxy `90e8b7b91293`, Assistant `978c5c9a66fb`, Protocol `f1c17df15c64`, Memory `ad0e99b62ff5`, Toolbox `3d81ad110354` and AI Workers `9336a4e21b3c`.
+
 ## Ecosystem 0.12.0 — bounded gateway lifecycle
 
-This distribution composes Agent CLI **0.83.5**, Protocol **0.9.0**, Reverse Proxy **4.9.1**, Memory **0.9.0**, Toolbox **0.3.0**, Assistant Runtime **0.2.31** (native **0.1.17**, HUD **0.1.16**) and AI Workers **0.1.42**.
+This distribution composes Agent CLI **0.83.3**, Protocol **0.8.0**, Reverse Proxy **4.9.1**, Memory **0.8.1**, Toolbox **0.3.0**, Assistant Runtime **0.2.30** (native/HUD **0.1.16**) and AI Workers **0.1.42** from `main`.
 
 The gateway shares the Agent wallet across bounded repairs, enforces processing locality, commits context acknowledgements after successful responses, and preserves uncertain request identity. Streaming, cancellation, daemon shutdown, file cursors and IPC resources have explicit bounds. Contracts remain owned by Protocol; consumers reuse Agent policy.
 
