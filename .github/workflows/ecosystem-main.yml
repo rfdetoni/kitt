@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths:
       - ecosystem.json
+      - ecosystem.release.json
       - installer/catalog.py
+      - installer/release_manifest.py
       - installer/cli.py
       - scripts/validate_ecosystem_main.py
       - scripts/validate_architecture.py
@@ -17,7 +19,9 @@ on:
   pull_request:
     paths:
       - ecosystem.json
+      - ecosystem.release.json
       - installer/catalog.py
+      - installer/release_manifest.py
       - installer/cli.py
       - scripts/validate_ecosystem_main.py
       - scripts/validate_architecture.py
@@ -42,8 +46,10 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.14'
-      - name: Validate main-first ecosystem policy
-        run: python scripts/validate_ecosystem_main.py
+      - name: Validate edge and release component policy
+        run: |
+          python scripts/validate_ecosystem_main.py
+          python scripts/validate_release_manifest.py
       - name: Validate bounded-context architecture
         run: python scripts/validate_architecture.py
       - name: Run installer/catalog regressions

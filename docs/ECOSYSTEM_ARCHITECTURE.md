@@ -74,7 +74,7 @@ from the current ecosystem rather than maintained as a second semantic channel.
 5. **Aggregates require consistency boundaries.** Use aggregate-like modeling only when a set of state changes must preserve one invariant/transactional lifecycle.
 6. **Composition follows main.** The root installer resolves every selected K.I.T.T. repository from `main` by default; explicit tags/SHAs are opt-in diagnostic overrides.
 7. **Fallback preserves behavior.** Optional native or resident components may accelerate/enrich behavior but may not silently change security semantics.
-8. **CI snapshots are ephemeral.** Cross-repository CI resolves moving refs to concrete SHAs once at the start of a run so that run is internally consistent. Those SHAs are evidence for that run, not a persistent ecosystem lock.
+8. **Two explicit composition channels.** Edge development resolves sibling `main` branches. Published releases resolve only immutable SHAs recorded in `ecosystem.release.json`; release composition must not silently fetch a newer sibling main through Cargo, npm or pip.
 
 ## Compatibility invariants
 

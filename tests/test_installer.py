@@ -10,6 +10,7 @@ from installer.catalog import CatalogError, EcosystemCatalog, Resolution
 from installer.cli import _env_flag, _quiet_install_output, build_parser
 from installer.core import EcosystemInstaller, InstallerOptions
 from installer.platforms import PlatformAdapter
+from installer.release_manifest import ReleaseManifest
 from installer.ui import _SelectionState, _handle_key
 
 
@@ -70,6 +71,19 @@ class CatalogTests(unittest.TestCase):
             )
         )
 
+    def test_release_manifest_pins_every_component_to_sha(self) -> None:
+        manifest = ReleaseManifest.load(ROOT)
+        refs = manifest.refs(self.catalog)
+        self.assertEqual(set(refs), set(self.catalog.modules))
+        for module_id, ref in refs.items():
+            self.assertRegex(ref, r"^[0-9a-f]{40}$")
+            self.assertEqual(
+                self.catalog.resolve_ref(
+                    self.catalog.modules[module_id], component_refs=refs
+                ),
+                ref,
+            )
+
     def test_unknown_module_fails_closed(self) -> None:
         with self.assertRaises(CatalogError):
             self.catalog.resolve(["not-a-kitt-module"])
@@ -114,6 +128,16 @@ class InstallerCliTests(unittest.TestCase):
             parser = build_parser()
             self.assertEqual(parser.parse_args([]).ref, "main")
             self.assertEqual(parser.parse_args(["--ref", "feature/test"]).ref, "feature/test")
+
+    def test_edge_is_default_channel_and_release_is_explicit(self) -> None:
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("KITT_CHANNEL", None)
+            parser = build_parser()
+            self.assertEqual(parser.parse_args([]).channel, "edge")
+            self.assertEqual(
+                parser.parse_args(["--channel", "release"]).channel,
+                "release",
+            )
 
     def test_environment_flags_accept_common_truthy_values(self) -> None:
         for value in ("1", "true", "TRUE", "yes", "on"):

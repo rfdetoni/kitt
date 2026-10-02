@@ -14,6 +14,7 @@ from .core import InstallerError, InstallerOptions
 from .path_priority import ensure_managed_path
 from .platforms import PlatformAdapter
 from .progress import InstallProgress
+from .release_manifest import ReleaseManifest, ReleaseManifestError
 from .source_free import SourceFreeEcosystemInstaller
 from .ui import UserCancelled, choose_modules
 
@@ -89,11 +90,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="resolve only strict 'requires' dependencies; do not auto-install optional companions",
     )
     parser.add_argument(
+        "--channel",
+        choices=("edge", "release"),
+        default=os.environ.get("KITT_CHANNEL") or "edge",
+        help=(
+            "component resolution channel: edge follows main; release uses "
+            "ecosystem.release.json immutable SHAs (default: edge)"
+        ),
+    )
+    parser.add_argument(
         "--ref",
         default=os.environ.get("KITT_REF") or "main",
         help=(
-            "component branch/tag/SHA installed from every selected repository "
-            "(default: main for every K.I.T.T. module)"
+            "diagnostic branch/tag/SHA override for every selected repository; "
+            "release channel requires the default main sentinel"
         ),
     )
     parser.add_argument("--root", type=Path, help="installation root")
@@ -166,7 +176,12 @@ def _ensure_launcher_priority(platform: PlatformAdapter, bin_dir: Path) -> None:
         )
 
 
-def _record_source_ref(root: Path, ref: str | None) -> None:
+def _record_source_ref(
+    root: Path,
+    ref: str | None,
+    channel: str,
+    component_refs: dict[str, str] | None,
+) -> None:
     """Persist the update channel used for the completed installation."""
     state_path = root / "installed-state.json"
     try:
@@ -178,6 +193,11 @@ def _record_source_ref(root: Path, ref: str | None) -> None:
 
     source_ref = (ref or "main").strip() or "main"
     payload["source_ref"] = source_ref
+    payload["source_channel"] = channel
+    if component_refs:
+        payload["component_refs"] = dict(sorted(component_refs.items()))
+    else:
+        payload.pop("component_refs", None)
 
     temporary = state_path.with_suffix(".ref.tmp")
     try:
@@ -202,6 +222,15 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         catalog = EcosystemCatalog.load(source_root)
+        channel = str(args.channel).strip().lower()
+        if channel == "release" and (str(args.ref).strip() or "main") != "main":
+            raise InstallerError(
+                "--channel release cannot be combined with a non-main --ref override"
+            )
+        component_refs: dict[str, str] | None = None
+        if channel == "release":
+            component_refs = ReleaseManifest.load(source_root).refs(catalog)
+
         platform = PlatformAdapter.detect()
         if args.list:
             _print_catalog(catalog)
@@ -214,6 +243,8 @@ def main(argv: list[str] | None = None) -> int:
             bin_dir=bin_dir,
             force=bool(args.force),
             ref=args.ref,
+            channel=channel,
+            component_refs=component_refs,
             with_ai_workers=bool(args.with_ai_workers),
             portable=bool(args.portable),
             dry_run=bool(args.dry_run),
@@ -257,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
                 with _quiet_install_output() as log_path:
                     quiet_log = log_path
                     installer.install(resolution)
-                    _record_source_ref(root, args.ref)
+                    _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
             except Exception:
                 active_progress.finish(False)
@@ -272,7 +303,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             installer.install(resolution)
             if not args.dry_run:
-                _record_source_ref(root, args.ref)
+                _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
         return 0
     except UserCancelled as exc:
@@ -280,7 +311,7 @@ def main(argv: list[str] | None = None) -> int:
             active_progress.finish(False)
         print(str(exc), file=sys.stderr)
         return 130
-    except (CatalogError, InstallerError, OSError, ValueError) as exc:
+    except (CatalogError, ReleaseManifestError, InstallerError, OSError, ValueError) as exc:
         if active_progress is not None:
             active_progress.finish(False)
         print(f"K.I.T.T. install failed: {exc}", file=sys.stderr)

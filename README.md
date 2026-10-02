@@ -366,6 +366,16 @@ Package-manager locks such as `uv.lock`, `package-lock.json` and `Cargo.lock` re
 
 ---
 
+## Composition channels
+
+K.I.T.T. has two explicit composition channels. The default `edge` channel follows each selected component's `main` branch and records the resolved commits as provenance. The `release` channel resolves every selected component from the immutable SHAs in `ecosystem.release.json` and pins sibling Cargo/npm/pip references inside disposable build staging so a release cannot silently drift to a newer `main`.
+
+Use `--channel release` for a reproducible published snapshot. `--ref <branch|tag|sha>` remains an edge-only diagnostic override for debugging and bisecting; it is intentionally rejected with the release channel.
+
+Package-manager locks such as `uv.lock`, `package-lock.json` and `Cargo.lock` remain component-owned dependency artifacts. The root release manifest chooses K.I.T.T. repository revisions; package-manager locks choose third-party dependency revisions inside each component.
+
+---
+
 ## Security & privacy
 
 K.I.T.T. is designed around explicit trust boundaries:

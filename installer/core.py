@@ -36,6 +36,8 @@ class InstallerOptions:
     bin_dir: Path
     force: bool = False
     ref: str | None = None
+    channel: str = "edge"
+    component_refs: dict[str, str] | None = None
     with_ai_workers: bool = False
     portable: bool = False
     dry_run: bool = False
@@ -210,7 +212,9 @@ class EcosystemInstaller:
             else:
                 parents = ", ".join(resolution.auto_selected_by.get(module.id, ()))
                 reason = f"automatic via {parents}" if parents else "automatic"
-            ref = self.catalog.resolve_ref(module, self.options.ref)
+            ref = self.catalog.resolve_ref(
+                module, self.options.ref, self.options.component_refs
+            )
             print(f"  - {module.name:<22} {reason:<28} {ref[:12]}")
         if self.options.with_ai_workers and "ai-workers" in resolution.ids:
             print("  - AI/STT worker extras      enabled")

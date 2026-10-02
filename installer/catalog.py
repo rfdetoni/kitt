@@ -168,12 +168,21 @@ class EcosystemCatalog:
         reasons = {key: tuple(sorted(value)) for key, value in auto_by.items()}
         return Resolution(requested=requested_ids, modules=ordered, auto_selected_by=reasons)
 
-    def resolve_ref(self, module: ModuleSpec, override_ref: str | None = None) -> str:
-        """Resolve the live component ref.
-
-        K.I.T.T. evolves as one ecosystem, so component installs track main by
-        default. A caller may still provide an explicit branch, tag or SHA for a
-        one-off reproducible/test installation.
-        """
-        requested = (override_ref or "main").strip()
-        return requested or "main"
+    def resolve_ref(
+        self,
+        module: ModuleSpec,
+        override_ref: str | None = None,
+        component_refs: dict[str, str] | None = None,
+    ) -> str:
+        """Resolve one component ref for edge or immutable release installation."""
+        requested = (override_ref or "main").strip() or "main"
+        if requested != "main":
+            return requested
+        if component_refs is not None:
+            try:
+                return component_refs[module.id]
+            except KeyError as exc:
+                raise CatalogError(
+                    f"release manifest has no ref for component {module.id!r}"
+                ) from exc
+        return "main"

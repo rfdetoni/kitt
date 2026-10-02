@@ -30,6 +30,21 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - name: Validate immutable ecosystem release manifest
+        run: python scripts/validate_release_manifest.py
+      - name: Verify release component SHAs exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validate_release_manifest.py | while read -r component repository sha; do
+            echo "verify $component $repository@$sha"
+            gh api "repos/$repository/commits/$sha" --silent
+          done
       - name: Verify release tag matches ecosystem version
         shell: bash
         run: |
@@ -59,13 +74,15 @@ jobs:
               --repo "$GITHUB_REPOSITORY" \
               --verify-tag \
               --generate-notes \
-              --title "$RELEASE_TAG"
+              --title "$RELEASE_TAG" \
+              ecosystem.release.json
           elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             gh release create "$RELEASE_TAG" \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --generate-notes \
-              --title "$RELEASE_TAG"
+              --title "$RELEASE_TAG" \
+              ecosystem.release.json
           else
             echo "Expected release tag $RELEASE_TAG was not found." >&2
             exit 1
