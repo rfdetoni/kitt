@@ -136,7 +136,7 @@ class PlatformAdapter:
 
     def find_python(
         self,
-        minimum: tuple[int, int] = (3, 12),
+        minimum: tuple[int, int] = (3, 14),
         *,
         require_venv: bool = True,
     ) -> CommandInfo | None:
@@ -164,7 +164,7 @@ class PlatformAdapter:
 
     def command_info(self, name: str) -> CommandInfo | None:
         if name == "python":
-            return self.find_python((3, 12))
+            return self.find_python((3, 14))
         executable = shutil.which(name)
         if not executable:
             return None
@@ -183,7 +183,7 @@ class PlatformAdapter:
     def _python_venv_hint(self) -> str:
         info = self._python_without_venv
         version = info.version[:2] if info else ()
-        version_text = ".".join(map(str, version)) if version else "3.12+"
+        version_text = ".".join(map(str, version)) if version else "3.14+"
         if self.name == "linux":
             package = f"python{version_text}-venv" if version else "python3-venv"
             return (
@@ -194,7 +194,7 @@ class PlatformAdapter:
         if self.name == "macos":
             return (
                 f"Python {version_text} was found without a working venv/ensurepip. "
-                "Install/reinstall Python with Homebrew: brew install python@3.12"
+                "Install/reinstall Python with Homebrew: brew install python@3.14"
             )
         if self.name == "windows":
             return (
@@ -447,7 +447,7 @@ class PlatformAdapter:
             if "git" in missing_set:
                 commands.append("winget install --id Git.Git -e")
             if "python" in missing_set:
-                commands.append("winget install --id Python.Python.3.12 -e")
+                commands.append("winget install --id Python.Python.3.14 -e")
             if {"node", "npm"} & missing_set:
                 commands.append("winget install --id OpenJS.NodeJS.LTS -e")
             if {"rust", "cargo", "rustc"} & missing_set:
@@ -460,7 +460,7 @@ class PlatformAdapter:
             if "git" in missing_set:
                 packages.append("git")
             if "python" in missing_set:
-                packages.append("python@3.12")
+                packages.append("python@3.14")
             if {"node", "npm"} & missing_set:
                 packages.append("node")
             hint = f"brew install {' '.join(dict.fromkeys(packages))}" if packages else ""

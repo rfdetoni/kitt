@@ -56,7 +56,7 @@ Show-KittBootstrapProgress -Percent 2 -Status 'Checking Python'
 $Python = Find-KittPython
 if (-not $Python) {
   Complete-KittBootstrapProgress
-  throw 'K.I.T.T. requires Python 3.10+ for the installer (Agent requires Python 3.12+).'
+  throw 'K.I.T.T. requires Python 3.10+ for the installer (selected Python modules require Python 3.14+).'
 }
 Show-KittBootstrapProgress -Percent 10 -Status 'Python ready'
 

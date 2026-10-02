@@ -49,7 +49,7 @@ show_progress 2 "Checking Python"
 PYTHON="$(find_python || true)"
 if [ -z "$PYTHON" ]; then
   finish_progress
-  echo "K.I.T.T. requires Python 3.10+ for the installer (Agent requires Python 3.12+)." >&2
+  echo "K.I.T.T. requires Python 3.10+ for the installer (selected Python modules require Python 3.14+)." >&2
   exit 1
 fi
 show_progress 10 "Python ready"

@@ -97,6 +97,14 @@ Use value objects for identity/configuration with stable invariants. Use domain 
 
 Do **not** introduce a generic `domain/application/infrastructure` folder hierarchy into every repository by policy. Each repository should express the same dependency direction using its native language and existing structure.
 
+## Distribution toolchains and release supply chain
+
+The root validates requirements from the selected module graph instead of forcing identical toolchains on every repository. The complete Agent graph currently requires Python 3.14, Node 24 and Rust 1.90. Component floors may be lower; composition uses the highest applicable minimum. Bootstrap scripts may start with Python 3.10 only to launch the installer, after which catalog prerequisite checks enforce the runtime floor.
+
+Release identity is the root semantic tag plus exact component SHAs from `ecosystem.release.json`; `latest` is never used as release identity. Root GitHub Actions remain pinned by commit SHA. Prebuilt component binaries, SBOM/provenance attestations and release signing are deferred until there is an end-to-end cross-platform artifact production and verification path; this slice does not add placeholder supply-chain metadata.
+
+CI keeps the full installer suite on Linux and uses focused lifecycle checks on Linux, Windows and macOS for install/update prerequisites, service stop/start, launchers, cleanup and path handling. Reusable workflows are not extracted while the duplicated setup is only a few local steps rather than a literally equivalent multi-job workflow.
+
 ## Governance
 
 `scripts/validate_architecture.py` validates the catalog dependency graph and checks that every catalog repository is represented in this document. CI runs it together with the main-first ecosystem validation.
