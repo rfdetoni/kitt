@@ -18,6 +18,14 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.3 — integrated P1/P2 snapshot
+
+This release composes the post-wave validated heads: Agent CLI **0.83.9**, Reverse Proxy **4.9.4**, Protocol **0.9.0** (wire v1), Memory **0.9.1**, Toolbox **0.4.0**, Assistant **0.1.18** / Runtime **0.2.32**, and AI Workers **0.1.42**.
+
+Protocol v2 was deliberately not introduced: the Protocol-generated context schema and the Proxy copy are aligned, request metadata fields remain compatible, and the Agent/Proxy structural-contract work required no shared wire break. The Proxy's `agent-contract v2` is its WebChat response contract and is not KITT Protocol v2.
+
+The `release` channel pins the exact validated SHAs in `ecosystem.release.json`; `edge` continues to resolve component `main` branches. Existing integration gates prove immutable release installation, schema parity, and fail-closed lock mismatch behavior.
+
 ## Ecosystem 0.13.1 — Agent 0.83.7 release snapshot
 
 The distribution now has two explicit channels: `edge` follows component `main` branches, while `release` installs only the SHAs in `ecosystem.release.json`. Release composition fails closed when the Assistant Cargo/npm locks do not match the Protocol/Memory pins, and Python sibling packages are installed from the root-selected checkouts instead of silently resolving K.I.T.T. dependencies from a newer `main`.

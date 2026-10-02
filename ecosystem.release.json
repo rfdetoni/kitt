@@ -1,14 +1,35 @@
 {
   "schema_version": 1,
   "channel": "release",
-  "ecosystem_version": "0.13.2",
+  "ecosystem_version": "0.13.3",
   "components": {
-    "protocol": {"repository": "rfdetoni/kitt-protocol", "sha": "f1c17df15c64411c24c8b35ef41cf6299f4571b9"},
-    "memory": {"repository": "rfdetoni/kitt-memory", "sha": "ad0e99b62ff5a8602f61fb5ea94a218d895cce8d"},
-    "toolbox": {"repository": "rfdetoni/kitt-toolbox", "sha": "3d81ad11035499ad9bb9db84cb30b383b75320ef"},
-    "assistant": {"repository": "rfdetoni/kitt-assistant", "sha": "978c5c9a66fbfe4698be8aa1e0b35e1bcf3c2c90"},
-    "agent-cli": {"repository": "rfdetoni/kitt-agent-cli", "sha": "c5802cbcd6380722fb3aa4a6e7722ee973856c85"},
-    "ai-workers": {"repository": "rfdetoni/kitt-ai-workers", "sha": "9336a4e21b3c7be6272aa4b52f8fc6a09ef6d251"},
-    "reverse-proxy": {"repository": "rfdetoni/kitt-reverse-proxy", "sha": "90e8b7b912931866cbe14b7574762338894dd6f0"}
+    "protocol": {
+      "repository": "rfdetoni/kitt-protocol",
+      "sha": "f1c17df15c64411c24c8b35ef41cf6299f4571b9"
+    },
+    "memory": {
+      "repository": "rfdetoni/kitt-memory",
+      "sha": "51afa10181498258e3b1cd90e1dae6f006223841"
+    },
+    "toolbox": {
+      "repository": "rfdetoni/kitt-toolbox",
+      "sha": "88345de2cbce7e08945c1a122c3e4be11bb49247"
+    },
+    "assistant": {
+      "repository": "rfdetoni/kitt-assistant",
+      "sha": "69996c3df018207dc3085b512c99f68b1a07d261"
+    },
+    "agent-cli": {
+      "repository": "rfdetoni/kitt-agent-cli",
+      "sha": "38caa5518e769ab10e2213f296da99c9a88656ab"
+    },
+    "ai-workers": {
+      "repository": "rfdetoni/kitt-ai-workers",
+      "sha": "ec1dc0949941b3cbf1ac60a2d1a6903ec27da7ed"
+    },
+    "reverse-proxy": {
+      "repository": "rfdetoni/kitt-reverse-proxy",
+      "sha": "e93703ff93b5926de99f7727aae2d5a64d837724"
+    }
   }
 }
