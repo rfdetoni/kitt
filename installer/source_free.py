@@ -351,16 +351,9 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         env = self._npm_env()
         refs = self.options.component_refs
         if refs:
-            protocol = (
-                "@kitt/protocol@git+https://github.com/rfdetoni/"
-                f"kitt-protocol.git#{refs['protocol']}"
-            )
-            self._run(
-                ["npm", "install", "--package-lock-only", "--ignore-scripts",
-                 "--no-audit", "--no-fund", protocol],
-                cwd=hud,
-                env=env,
-            )
+            lock_text = (hud / "package-lock.json").read_text(encoding="utf-8")
+            if f"kitt-protocol.git#{refs['protocol']}" not in lock_text:
+                raise InstallerError("Assistant package-lock.json does not match release protocol pin")
         self._run(["npm", "ci", "--no-audit", "--no-fund", "--prefer-offline"], cwd=hud, env=env)
         if not refs:
             self._run(

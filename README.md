@@ -14,17 +14,17 @@
 
 K.I.T.T. is a modular, local-first AI ecosystem centered on a high-performance autonomous coding agent. Flexible orchestration stays in Python and TypeScript; deterministic CPU/data-plane work can run in Rust; heavy AI/ML workloads are isolated into on-demand workers; browser-backed provider access remains inside a dedicated gateway.
 
-This repository is the **distribution and composition point** for the ecosystem. It tracks the current `main` branch of each selected component, installs the selected stack and validates that separately owned packages compose as one K.I.T.T. installation.
+This repository is the **distribution and composition point** for the ecosystem. `edge` tracks component `main` branches; `release` installs the immutable snapshot in `ecosystem.release.json`.
 
 ---
 
 ## Ecosystem 0.12.0 — bounded gateway lifecycle
 
-This distribution composes Agent CLI **0.83.3**, Protocol **0.8.0**, Reverse Proxy **4.9.1**, Memory **0.8.1**, Toolbox **0.3.0**, Assistant Runtime **0.2.30** (native/HUD **0.1.16**) and AI Workers **0.1.42** from `main`.
+This distribution composes Agent CLI **0.83.5**, Protocol **0.9.0**, Reverse Proxy **4.9.1**, Memory **0.9.0**, Toolbox **0.3.0**, Assistant Runtime **0.2.31** (native **0.1.17**, HUD **0.1.16**) and AI Workers **0.1.42**.
 
 The gateway shares the Agent wallet across bounded repairs, enforces processing locality, commits context acknowledgements after successful responses, and preserves uncertain request identity. Streaming, cancellation, daemon shutdown, file cursors and IPC resources have explicit bounds. Contracts remain owned by Protocol; consumers reuse Agent policy.
 
-See [docs/GATEWAY_RELEASE_0.12.0.md](docs/GATEWAY_RELEASE_0.12.0.md) for findings, validation, source revisions and remaining limitations. Installation still resolves `main` once per run and records its actual SHAs.
+See [docs/GATEWAY_RELEASE_0.12.0.md](docs/GATEWAY_RELEASE_0.12.0.md) for findings, validation, source revisions and remaining limitations.
 
 ## Ecosystem 0.11.0 — host-owned planning and scoped verification
 
@@ -288,6 +288,7 @@ Useful options:
 ```text
 --preset agent|agent-proxy-minimal|assistant|web|full
 --modules <id[,id...]>
+--channel edge|release
 --with-ai-workers
 --force
 --no-start-services
@@ -356,23 +357,12 @@ The ownership rule is intentional: components communicate through versioned cont
 
 ## Installer & release integrity
 
-`ecosystem.json` is the module catalog. There is no persistent cross-repository lockfile: every selected K.I.T.T. module resolves from `main` by default.
+`ecosystem.json` defines the module graph. `ecosystem.release.json` pins the immutable release SHAs.
 
-The installer remains idempotent and records the exact commit SHA actually fetched for each repository in `<KITT_HOME>/installed-state.json`. This gives each installation provenance without freezing future updates. Re-running the same installer command fetches the current `main` of every selected module.
-
-`--ref <branch|tag|sha>` is retained as an explicit one-off override for debugging, bisecting or reproducible testing. CI resolves the requested moving refs to SHAs at the start of each run so one CI execution is internally consistent, but those SHAs are not persisted as an ecosystem lock.
-
-Package-manager locks such as `uv.lock`, `package-lock.json` and `Cargo.lock` remain component-owned dependency artifacts; they are not used by the root installer to choose which K.I.T.T. repository revision to install.
-
----
-
-## Composition channels
-
-K.I.T.T. has two explicit composition channels. The default `edge` channel follows each selected component's `main` branch and records the resolved commits as provenance. The `release` channel resolves every selected component from the immutable SHAs in `ecosystem.release.json` and pins sibling Cargo/npm/pip references inside disposable build staging so a release cannot silently drift to a newer `main`.
-
-Use `--channel release` for a reproducible published snapshot. `--ref <branch|tag|sha>` remains an edge-only diagnostic override for debugging and bisecting; it is intentionally rejected with the release channel.
-
-Package-manager locks such as `uv.lock`, `package-lock.json` and `Cargo.lock` remain component-owned dependency artifacts. The root release manifest chooses K.I.T.T. repository revisions; package-manager locks choose third-party dependency revisions inside each component.
+- `--channel edge` (default) resolves component `main` branches.
+- `--channel release` resolves manifest SHAs and requires matching component lockfiles.
+- `--ref <branch|tag|sha>` is an edge-only diagnostic override.
+- `installed-state.json` records channel and resolved revisions.
 
 ---
 
