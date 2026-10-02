@@ -124,9 +124,69 @@ jobs:
           print("main end-to-end installation: ok")
           PY
 
+  release-smoke:
+    name: Install immutable release smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      KITT_INSTALL_JOBS: "2"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Validate immutable release manifest
+        run: python scripts/validate_ecosystem_main.py --release
+      - name: Install minimal release snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          export HOME="$RUNNER_TEMP/kitt-release-home"
+          mkdir -p "$HOME"
+          python -m installer \
+            --modules agent-cli \
+            --minimal \
+            --channel release \
+            --portable \
+            --yes \
+            --root "$RUNNER_TEMP/kitt-release-runtime" \
+            --bin-dir "$RUNNER_TEMP/kitt-release-bin" \
+            --no-start-services \
+            --verbose
+      - name: Verify installed revisions match release manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          runtime="$RUNNER_TEMP/kitt-release-runtime"
+          "$RUNNER_TEMP/kitt-release-bin/kitt" --help >/dev/null
+          RUNTIME="$runtime" python - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          repo_root = Path.cwd()
+          manifest = json.loads((repo_root / "ecosystem.release.json").read_text(encoding="utf-8"))
+          installed = json.loads((Path(os.environ["RUNTIME"]) / "installed-state.json").read_text(encoding="utf-8"))
+
+          expected = {
+              item["repository"]: item["sha"]
+              for component_id, item in manifest["components"].items()
+              if component_id in {"protocol", "memory", "agent-cli"}
+          }
+          assert installed["source_channel"] == "release", installed
+          assert installed["source_ref"] == "main", installed
+          assert installed["repositories"] == expected, (installed["repositories"], expected)
+          assert installed["component_refs"] == {
+              component_id: item["sha"]
+              for component_id, item in manifest["components"].items()
+          }, installed["component_refs"]
+          print("release snapshot smoke: ok")
+          PY
+
   ecosystem:
     if: always()
-    needs: [installers, main-install]
+    needs: [installers, main-install, release-smoke]
     runs-on: ubuntu-latest
     steps:
       - name: Require release gates
@@ -134,3 +194,4 @@ jobs:
         run: |
           test "${{ needs.installers.result }}" = success
           test "${{ needs.main-install.result }}" = success
+          test "${{ needs.release-smoke.result }}" = success
