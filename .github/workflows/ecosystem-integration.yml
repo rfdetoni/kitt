@@ -177,6 +177,46 @@ jobs:
           print("release-channel immutable smoke: ok")
           PY
 
+
+      - name: Perform release-channel Assistant lock smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          original_home="$HOME"
+          export RUSTUP_HOME="${RUSTUP_HOME:-$original_home/.rustup}"
+          export HOME="$RUNNER_TEMP/kitt-release-assistant-home"
+          mkdir -p "$HOME"
+          python -m installer \
+            --modules assistant \
+            --channel release \
+            --yes \
+            --root "$RUNNER_TEMP/kitt-release-assistant-runtime" \
+            --bin-dir "$RUNNER_TEMP/kitt-release-assistant-bin" \
+            --no-start-services \
+            --verbose
+          test -x "$RUNNER_TEMP/kitt-release-assistant-bin/kittctl"
+          ROOT="$GITHUB_WORKSPACE" RUNTIME="$RUNNER_TEMP/kitt-release-assistant-runtime" python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["ROOT"])
+          runtime = Path(os.environ["RUNTIME"])
+          manifest = json.loads((root / "ecosystem.release.json").read_text(encoding="utf-8"))
+          installed = json.loads((runtime / "installed-state.json").read_text(encoding="utf-8"))
+
+          selected = {"protocol", "memory", "assistant"}
+          assert installed["source_channel"] == "release", installed
+          assert set(installed["resolved_modules"]) == selected, installed["resolved_modules"]
+
+          for component_id in selected:
+              item = manifest["components"][component_id]
+              actual = installed["repositories"][item["repository"]]
+              assert actual == item["sha"], (component_id, actual, item["sha"])
+
+          print("release-channel Assistant lock smoke: ok")
+          PY
+
   ecosystem:
     if: always()
     needs: [installers, main-install]

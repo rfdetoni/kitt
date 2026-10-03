@@ -18,6 +18,13 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.4 — final consumer lock reconciliation
+
+This release keeps the same Protocol 0.9/wire-v1 architecture and updates the composed Assistant and AI Workers SHAs after final cross-repository lock reconciliation. Assistant now validates against Agent CLI **0.83.9**, resolves Memory **0.9.1**, and aligns the native HUD with Protocol **0.9.0**; AI Workers locks resolve Agent CLI **0.83.9** and Protocol **0.9.0**.
+
+Protocol v2 remains deliberately unnecessary: the structural Agent ↔ Reverse Proxy boundary is already canonical, Protocol/Proxy context schemas are identical, and no shared wire break is required. The Reverse Proxy `agent-contract v2` remains a provider/WebChat response contract, not KITT Protocol v2.
+
+Release integration now also exercises a non-portable Assistant release smoke so the current manifest cannot silently pin Memory/Protocol SHAs that disagree with the Assistant Cargo/npm locks.
 ## Ecosystem 0.13.3 — integrated P1/P2 snapshot
 
 This release composes the post-wave validated heads: Agent CLI **0.83.9**, Reverse Proxy **4.9.4**, Protocol **0.9.0** (wire v1), Memory **0.9.1**, Toolbox **0.4.0**, Assistant **0.1.18** / Runtime **0.2.32**, and AI Workers **0.1.42**.
