@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "channel": "release",
-  "ecosystem_version": "0.13.4",
+  "ecosystem_version": "0.13.5",
   "components": {
     "protocol": {
       "repository": "rfdetoni/kitt-protocol",
-      "sha": "f1c17df15c64411c24c8b35ef41cf6299f4571b9"
+      "sha": "48c71b3624e9029a35a839461fe745d55c3d9dae"
     },
     "memory": {
       "repository": "rfdetoni/kitt-memory",
-      "sha": "51afa10181498258e3b1cd90e1dae6f006223841"
+      "sha": "3a3e9695ce8293e07ffd4839781a850834ad34dd"
     },
     "toolbox": {
       "repository": "rfdetoni/kitt-toolbox",
@@ -17,15 +17,15 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "8e69c651074ef8722703bc12783c6f7689bf00ae"
+      "sha": "10fbcac32174da1b070d7fa09a898d706364a0f8"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "38caa5518e769ab10e2213f296da99c9a88656ab"
+      "sha": "c2cab4875b7db4bf410555d8b0a945702c8da012"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
-      "sha": "601bddbbcaccab65c1b6184a7f9bdb5370d9fdda"
+      "sha": "99fa086c75f0cc0e2aa362ebff791e27fa8d837f"
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
