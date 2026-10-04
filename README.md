@@ -22,7 +22,7 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 This snapshot composes Agent CLI **0.83.11**, Protocol **0.9.0**, Memory **0.9.1**, Reverse Proxy **4.9.4**, Toolbox **0.4.0**, Assistant **0.1.18** / Runtime **0.2.32**, and AI Workers **0.1.42**.
 
-The Agent hardens artifact GC against shared-blob reference races, renews long-running mutation leases, and recovers prompt capacity after blocked cancellations while bounding total live producer threads. Memory now has real `kitt-memoryd` process restart/reclaim evidence for leased jobs. Protocol adds generated/adversarial decoder coverage without changing wire v1.
+The Agent hardens artifact GC against shared-blob reference races, renews long-running mutation leases, and recovers prompt capacity after blocked cancellations while bounding total live producer threads. Memory now has real `kitt-memoryd` process restart/reclaim evidence for leased jobs. Protocol adds generated/adversarial decoder coverage without changing wire v1. Because those Protocol/Memory changes are test/workflow-only, the immutable release manifest intentionally keeps their published runtime tag SHAs (`v0.9.0` / `v0.9.1`) instead of pretending the evidence commits are new package releases.
 
 Ecosystem CI keeps the full Ubuntu installation/release gates and adds minimal portable Agent installation smokes on **Windows** and **macOS**, verifying platform-specific installer state, launchers and Agent startup without duplicating the heavy native suite.
 
