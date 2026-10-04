@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "channel": "release",
-  "ecosystem_version": "0.13.5",
+  "ecosystem_version": "0.13.6",
   "components": {
     "protocol": {
       "repository": "rfdetoni/kitt-protocol",
@@ -17,15 +17,15 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "10fbcac32174da1b070d7fa09a898d706364a0f8"
+      "sha": "95d6f15e58e0912c735c8c8f06e4283b5200e6d8"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "c2cab4875b7db4bf410555d8b0a945702c8da012"
+      "sha": "f27733ab083271fb7b91fd961acae2df3e7dfdbc"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
-      "sha": "99fa086c75f0cc0e2aa362ebff791e27fa8d837f"
+      "sha": "444ac2c88a69472fd8a76d7b3a924c2eb70b1a4b"
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
