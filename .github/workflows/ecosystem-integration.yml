@@ -217,9 +217,28 @@ jobs:
           print("release-channel Assistant lock smoke: ok")
           PY
 
+
+  portable-install:
+    name: Portable installer (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Install minimal portable Agent
+        run: python scripts/smoke_portable_install.py
+
   ecosystem:
     if: always()
-    needs: [installers, main-install]
+    needs: [installers, main-install, portable-install]
     runs-on: ubuntu-latest
     steps:
       - name: Require release gates
@@ -227,3 +246,4 @@ jobs:
         run: |
           test "${{ needs.installers.result }}" = success
           test "${{ needs.main-install.result }}" = success
+          test "${{ needs.portable-install.result }}" = success
