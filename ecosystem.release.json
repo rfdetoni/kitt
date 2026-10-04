@@ -5,11 +5,11 @@
   "components": {
     "protocol": {
       "repository": "rfdetoni/kitt-protocol",
-      "sha": "48c71b3624e9029a35a839461fe745d55c3d9dae"
+      "sha": "f1c17df15c64411c24c8b35ef41cf6299f4571b9"
     },
     "memory": {
       "repository": "rfdetoni/kitt-memory",
-      "sha": "3a3e9695ce8293e07ffd4839781a850834ad34dd"
+      "sha": "51afa10181498258e3b1cd90e1dae6f006223841"
     },
     "toolbox": {
       "repository": "rfdetoni/kitt-toolbox",
