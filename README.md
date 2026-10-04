@@ -18,6 +18,14 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.5 — runtime integrity and cross-platform evidence
+
+This snapshot composes Agent CLI **0.83.11**, Protocol **0.9.0**, Memory **0.9.1**, Reverse Proxy **4.9.4**, Toolbox **0.4.0**, Assistant **0.1.18** / Runtime **0.2.32**, and AI Workers **0.1.42**.
+
+The Agent hardens artifact GC against shared-blob reference races, renews long-running mutation leases, and recovers prompt capacity after blocked cancellations while bounding total live producer threads. Memory now has real `kitt-memoryd` process restart/reclaim evidence for leased jobs. Protocol adds generated/adversarial decoder coverage without changing wire v1.
+
+Ecosystem CI keeps the full Ubuntu installation/release gates and adds minimal portable Agent installation smokes on **Windows** and **macOS**, verifying platform-specific installer state, launchers and Agent startup without duplicating the heavy native suite.
+
 ## Ecosystem 0.13.4 — final consumer lock reconciliation
 
 This release keeps the same Protocol 0.9/wire-v1 architecture and updates the composed Assistant and AI Workers SHAs after final cross-repository lock reconciliation. Assistant now validates against Agent CLI **0.83.9**, resolves Memory **0.9.1**, and aligns the native HUD with Protocol **0.9.0**; AI Workers locks resolve Agent CLI **0.83.9** and Protocol **0.9.0**.
