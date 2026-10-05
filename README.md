@@ -20,11 +20,11 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ## Ecosystem 0.13.13 — lossless WebChat contract recovery
 
-This snapshot promotes Reverse Proxy **4.9.8** at `006bc3837bd7` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
+This snapshot promotes Reverse Proxy **4.9.9** at `e0649db56988` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
 
 Agent v2, tool envelopes and structured JSON share bounded syntax recovery that preserves code formatting and rejects ambiguous or truncated data. Repairs retain known actions and unaffected nested arguments within the existing attempt/deadline budget. Schemas use Ajv without coercion; file hydration requires a matching current-response artifact; separate tool calls remain separate.
 
-Buffered contracts can prefer completed raw CDP responses with full-prompt correlation and an already trusted extraction profile. Verified delta/snapshot modes preserve repeated source text. This avoids HTML/Markdown damage; conflicting valid DOM/network payloads fail recoverably. See [Reverse Proxy 4.9.8 behavior and limits](https://github.com/rfdetoni/kitt-reverse-proxy/blob/main/docs/RELEASE_4.9.8.md).
+Buffered contracts can prefer completed raw CDP responses with full-prompt correlation and an already trusted extraction profile. Verified delta/snapshot modes preserve repeated source text and reject competing complete interpretations when the DOM requires repair. This avoids HTML/Markdown damage; conflicting valid DOM/network payloads fail recoverably. See [Reverse Proxy 4.9.9 behavior and limits](https://github.com/rfdetoni/kitt-reverse-proxy/blob/main/docs/RELEASE_4.9.9.md).
 
 Compatibility validation covers Proxy regressions/build/audits, Protocol fixtures and gateway schema parity, Agent contract/budget/tool-payload/evidence tests and all 20 Agent tool schemas, plus root installer/catalog tests. No shared wire contract or consumer dependency changes are needed. Authenticated live provider sessions were not exercised.
 
