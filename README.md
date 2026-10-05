@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.9 — task-plan child-manager wiring fix
+
+This snapshot composes Agent CLI **0.83.15** at `6ba6252fa8b2`, Assistant at `375ccf83e5bc`, and AI Workers at `723044242bdc`.
+
+Agent CLI fixes the pre-dispatch crash `'ChildTools' object has no attribute 'repo'` by wiring `TaskPlanCoordinator` to the retained-agent manager rather than the spawn-only tool adapter. Assistant and AI Workers locks are aligned to the same Agent revision. Reverse Proxy **4.9.4**, Protocol **0.9.0**, Memory **0.9.1**, and Toolbox remain unchanged because no shared contract changed.
+
 ## Ecosystem 0.13.8 — reverse-proxy pre-dispatch hardening
 
 This snapshot composes Agent CLI **0.83.14** at `ad3ea5fc3786`, Assistant at `ff6a8e5545a1`, and AI Workers at `bfa1c47fb1bb`. The Agent now reserves actual estimated input instead of consuming the full remaining gateway prompt allowance, retries only connectivity failures that are provably pre-accept, and emits explicit diagnostics for failures before provider transport.
