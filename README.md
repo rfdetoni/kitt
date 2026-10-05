@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.10 — Reverse Proxy baseline pressure admission
+
+This snapshot composes Reverse Proxy **4.9.5** at `babedb81bfc9` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
+
+Headed Chromium startup can exceed the configured RSS threshold before any named Agent session exists. Reverse Proxy 4.9.5 now admits exactly one initial named session in that baseline-only condition, while retaining strict session-count limits, protected-session behavior and idle-session recycling under later pressure.
+
 ## Ecosystem 0.13.9 — task-plan child-manager wiring fix
 
 This snapshot composes Agent CLI **0.83.15** at `6ba6252fa8b2`, Assistant at `375ccf83e5bc`, and AI Workers at `723044242bdc`.
