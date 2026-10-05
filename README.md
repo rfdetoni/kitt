@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.7 — final local agentic acceptance hardening
+
+This snapshot composes Agent CLI **0.83.13** at `5757bb21808c`. The Agent now has executed acceptance evidence for original AuthoritySnapshot enforcement on managed-process control, real Git worktree isolation/integration/discard, compaction retention of critical execution diagnostics, deterministic no-progress/reread detection, explicit approval for opaque interpreter wrappers even under `allow-all`, privacy-safe `kitt learn`, and no automatic A/B promotion.
+
+PR validation also exercises real **Docker and Podman** provision/pause/resume/replacement persistence. Protocol **0.9.0**, Memory **0.9.1**, Reverse Proxy **4.9.4**, Toolbox **0.4.0**, Assistant **0.1.18** / Runtime **0.2.32**, and AI Workers **0.1.42** remain unchanged because this slice adds no cross-repository schema or contract change.
+
 ## Ecosystem 0.13.6 — conversation concurrency and recovery acceptance
 
 This snapshot composes Agent CLI **0.83.12** with consumers validated against the same Agent SHA. Active turns in one conversation are serialized at admission, while distinct conversations remain parallel. Deterministic acceptance checks now cover FIFO resource contention without deadlock, selective rollback, exact workspace snapshot/artifact recovery and bounded large-artifact query/page retrieval.
