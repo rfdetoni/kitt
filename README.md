@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.8 — reverse-proxy pre-dispatch hardening
+
+This snapshot composes Agent CLI **0.83.14** at `ad3ea5fc3786`, Assistant at `ff6a8e5545a1`, and AI Workers at `bfa1c47fb1bb`. The Agent now reserves actual estimated input instead of consuming the full remaining gateway prompt allowance, retries only connectivity failures that are provably pre-accept, and emits explicit diagnostics for failures before provider transport.
+
+Assistant CI/runtime and AI Workers Evals/Evolution locks are aligned to the same Agent SHA. Reverse Proxy **4.9.4**, Protocol **0.9.0**, Memory **0.9.1**, and Toolbox **0.4.0** remain unchanged because this correction does not alter the shared wire contract or gateway runtime.
+
 ## Ecosystem 0.13.7 — final local agentic acceptance hardening
 
 This snapshot composes Agent CLI **0.83.13** at `5757bb21808c`. The Agent now has executed acceptance evidence for original AuthoritySnapshot enforcement on managed-process control, real Git worktree isolation/integration/discard, compaction retention of critical execution diagnostics, deterministic no-progress/reread detection, explicit approval for opaque interpreter wrappers even under `allow-all`, privacy-safe `kitt learn`, and no automatic A/B promotion.
