@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.11 — bounded full-content logging
+
+This snapshot composes Reverse Proxy **4.9.6** at `7d7c6528b732` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
+
+Reverse Proxy full-content debug tracing now respects the existing structured-log depth bound. Cyclic runtime objects such as request lifecycle/timer state can no longer recurse until `Maximum call stack size exceeded`, while full prompt/response content remains visible within the bounded structure.
+
 ## Ecosystem 0.13.10 — Reverse Proxy baseline pressure admission
 
 This snapshot composes Reverse Proxy **4.9.5** at `babedb81bfc9` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
