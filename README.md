@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.12 — WebChat Agent contract recovery
+
+This snapshot composes Reverse Proxy **4.9.7** at `aa4503532f58` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
+
+Reverse Proxy now tolerates deterministic WebChat JSON wrappers such as a standalone `JSON` label while keeping mixed prose fail-closed. Contract repair preserves the original user task but no longer replays typed workspace/orchestrator context, reducing repeated `agent_contract_invalid` recovery loops without changing the Agent↔Proxy wire contract.
+
 ## Ecosystem 0.13.11 — bounded full-content logging
 
 This snapshot composes Reverse Proxy **4.9.6** at `7d7c6528b732` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
