@@ -18,6 +18,10 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.20 — RPC source capture, human login and managed endpoint trust
+
+Reverse Proxy 4.9.15 learns positional RPC replies from passive browser traffic, retrieves omitted CDP request bodies and starts correlation at actual submission. ChatGPT login uses human system Chrome before automation attaches. Agent CLI 0.83.18 trusts the exact user-selected managed service endpoint before saving its router, fixing refusal on newly allocated ports. Assistant 0.1.21/runtime 0.2.34 and AI Workers 0.1.44 align their Agent locks. See [validation and limits](docs/ECOSYSTEM_BROWSER_0.13.20.md).
+
 ## Ecosystem 0.13.19 — Browser submission acceptance
 
 Reverse Proxy 4.9.14 requires observable submission acceptance before waiting for a response, preserves user drafts during generation and shares semantic streaming selectors between sending and monitoring. Failed submission produces the existing terminal UI error without automatically duplicating a browser turn. The other six component revisions remain unchanged. See [evidence and capture limits](docs/ECOSYSTEM_SUBMISSION_0.13.19.md).

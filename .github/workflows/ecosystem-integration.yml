@@ -3,7 +3,7 @@ name: ecosystem-integration
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, 'fix/**']
   schedule:
     - cron: "17 4 * * *"
   workflow_dispatch:
