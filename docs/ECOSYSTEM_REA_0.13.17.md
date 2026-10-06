@@ -2,7 +2,7 @@
 
 ## Scope
 
-This release composes Agent CLI **0.83.17** at `8d3d047b77c1a361a507ab8063c70539b234bfb1` and preserves all other component pins from ecosystem 0.13.16. No Protocol, Reverse Proxy, Memory, Toolbox, Assistant or AI Workers contract changed.
+This release composes Agent CLI **0.83.17** at `8d3d047b77c1a361a507ab8063c70539b234bfb1`. Assistant advances to pin-only commit `d9540e0dfdf86fc26266bea78e59b97f1eb8eb4c` and AI Workers to pin-only commit `6d9deabe1bcecb6ffb471cba4a31cde0dcd2d68b`, aligning their Python locks to the exact Agent revision. Protocol, Reverse Proxy, Memory and Toolbox pins remain those from ecosystem 0.13.16; no companion runtime contract changed.
 
 ## Changes
 
@@ -31,7 +31,9 @@ Agent CLI PR #69 passed:
 - Windows package/compile/help smoke;
 - Docker image workflow.
 
-Focused regressions cover schema 10 → 11 migration, Evidence v2 round-trip, protection against weaker evidence downgrading stronger evidence, verification-obligation closure, and plugin-owned stdio MCP registration.
+Assistant PR #23 then passed Rust/core, Python runtime, HUD web and Windows/macOS/Linux lifecycle jobs while installing the aligned Agent dependency. AI Workers PR #18 passed worker protocol/STT boundaries, Evolution security/promotion, evaluation smoke, static checks and the installed dependency graph.
+
+Focused Agent regressions cover schema 10 → 11 migration, Evidence v2 round-trip, protection against weaker evidence downgrading stronger evidence, verification-obligation closure, and plugin-owned stdio MCP registration.
 
 ## Limits
 
