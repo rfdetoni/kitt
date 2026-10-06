@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.15 — verified CDP source integrity
+
+This snapshot promotes Reverse Proxy **4.9.11** while retaining the component revisions from 0.13.14. CDP attachment and teardown execute in order, buffered bytes precede live chunks, redirects and unsuccessful HTTP responses cannot become trusted contracts, and SSE decoding preserves source indentation and multiline data.
+
+A mandatory Chromium CI fixture earns a profile from a healthy DOM response and then verifies complete raw contracts with deliberately damaged HTML, fragmented UTF-8 and LF/CRLF/CR streams. Proxy CI and Docker checks passed before promotion. Protocol/Proxy schemas remain identical; consumer dependency locks and wire version are unchanged. See [changes, evidence and limits](docs/ECOSYSTEM_CDP_0.13.15.md).
+
 ## Ecosystem 0.13.14 — execution and recovery hardening
 
 This snapshot composes Agent CLI **0.83.16**, Protocol **0.9.1**, Memory **0.9.2**, Toolbox **0.4.2**, Assistant **0.1.20** / Runtime **0.2.33**, AI Workers **0.1.43**, and Reverse Proxy **4.9.10**. Consumer locks resolve the same Agent, Protocol and Memory revisions as the release manifest; wire version remains 1.
