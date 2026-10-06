@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.14 — execution and recovery hardening
+
+This snapshot composes Agent CLI **0.83.16**, Protocol **0.9.1**, Memory **0.9.2**, Toolbox **0.4.2**, Assistant **0.1.20** / Runtime **0.2.33**, AI Workers **0.1.43**, and Reverse Proxy **4.9.10**. Consumer locks resolve the same Agent, Protocol and Memory revisions as the release manifest; wire version remains 1.
+
+The Agent contains fallback reads, bounds regex execution, reserves both move paths, captures directory mutations and reconnects daemon streams from the delivered cursor. Strict public SDK decoding, transactional receipt batches, deterministic bounded symbol search, real retrieval ablations and trusted raw-CDP timeout recovery close the reviewed cross-module gaps. See [changes, validation and limits](docs/ECOSYSTEM_HARDENING_0.13.14.md).
+
 ## Ecosystem 0.13.13 — lossless WebChat contract recovery
 
 This snapshot promotes Reverse Proxy **4.9.9** at `e0649db56988` while keeping Agent CLI **0.83.15** and the existing Protocol/Memory/Assistant/AI Workers/Toolbox revisions unchanged.
