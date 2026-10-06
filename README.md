@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.18 — Gemini contract presentation recovery
+
+This snapshot promotes Reverse Proxy **4.9.13**, preserving the other six component pins and consumer locks. A complete plain JSON object and its exact fenced renderer mirror decode as one unchanged decision. Display artifacts no longer decorate Agent or structured-output payloads; differing decisions, duplicate keys and repair drift remain rejected.
+
+The supplied Gemini contract now produces its original `kitt_runtime / repo.list` call in one upstream attempt. Component CI, Docker and two real Chromium checks passed before promotion. The logs show an untrusted shadow tap: this release fixes the concrete DOM fallback payload, without claiming a live Gemini capture fix. See [reproduction, evidence and limits](docs/ECOSYSTEM_GEMINI_0.13.18.md).
+
 ## Ecosystem 0.13.17 — governed REA evidence integration
 
 This snapshot promotes Agent CLI **0.83.17** at `8d3d047b77c1`. Assistant and AI Workers move only to pin-alignment commits (`d9540e0dfdf8` and `6d9deabe1bce`) so their Python locks resolve that exact Agent revision; Protocol **0.9.1**, Memory, Toolbox and Reverse Proxy **4.9.12** remain unchanged. The Agent adds an optional disabled-by-default REA adapter that registers only an already-installed local `rea mcp` server through the existing MCP policy boundary.
