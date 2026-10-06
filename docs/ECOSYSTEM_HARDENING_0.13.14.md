@@ -24,7 +24,7 @@ This immutable release composes the fixes from the Agent CLI and companion-modul
 | Public wire decoding | Shared invalid corpus runs through all three public SDKs; version lexemes and required payload also validated |
 | Provider bytes | SSE rejects invalid UTF-8; raw-CDP timeout recovery requires a previously trusted explicit extraction mode, full-prompt match, successful completion and strict contract validation |
 | Memory latency and receipts | Context budget 8 seconds, receipt telemetry 1 second; outage fails the turn recoverably; batch validates all items before one SQLite transaction |
-| Daemon reconnection | Resumes from delivered cursor, deduplicates replay and bounds attachment buffering; EOF/resync stops delivery without resubmitting mutations |
+| Daemon reconnection | Resumes from delivered cursor, deduplicates replay and bounds attachment buffering; EOF/resync stops delivery without resubmitting mutations; incremental-replay integration waits for the terminal event instead of assuming a half-second turn |
 | Symbol search | Selects bounded candidates before cloning; same-line repeated JavaScript declarations reproduce and prevent a source-order cutoff regression |
 | Retrieval evaluation | Graph disabled/enabled and lexical reranking change the actual stages before selection; indexed dependency-neighbor fixture and distinct-output tests |
 | Composition | Version metadata, Cargo/npm/uv locks and Assistant CI checkout refs align with the immutable component revisions |
