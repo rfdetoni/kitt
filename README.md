@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.17 — governed REA evidence integration
+
+This snapshot promotes Agent CLI **0.83.17** at `8d3d047b77c1`. Assistant and AI Workers move only to pin-alignment commits (`d9540e0dfdf8` and `6d9deabe1bce`) so their Python locks resolve that exact Agent revision; Protocol **0.9.1**, Memory, Toolbox and Reverse Proxy **4.9.12** remain unchanged. The Agent adds an optional disabled-by-default REA adapter that registers only an already-installed local `rea mcp` server through the existing MCP policy boundary.
+
+Evidence records now retain authority, kind, confidence, coverage, limitations, producer metadata and provenance in SQLite schema 11. Task-plan state projects verification obligations and residual unknowns from existing host-owned facts rather than adding a second scheduler or ledger. Agent PR gates passed release-critical regressions, clean-room/static/ownership checks and Linux/Windows container/package smokes. Assistant CI then passed Rust/core, Python runtime, HUD and Windows/macOS/Linux lifecycle gates; AI Workers passed its critical dependency and evaluation suite. No shared Protocol or Reverse Proxy wire change was required. See [release evidence and limits](docs/ECOSYSTEM_REA_0.13.17.md).
+
 ## Ecosystem 0.13.16 — hybrid delivery and DOM fallback
 
 This snapshot promotes Reverse Proxy **4.9.12**, preserving the other six component revisions and their consumer locks. Streaming consumer failures propagate unchanged and cancel the DOM monitor, without an unhandled tap rejection or a false provider decode error. Fallback waits for an empty or lagging DOM to catch up without replay; final divergence and truncation still fail explicitly.
