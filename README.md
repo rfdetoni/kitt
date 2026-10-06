@@ -18,6 +18,12 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.16 — hybrid delivery and DOM fallback
+
+This snapshot promotes Reverse Proxy **4.9.12**, preserving the other six component revisions and their consumer locks. Streaming consumer failures propagate unchanged and cancel the DOM monitor, without an unhandled tap rejection or a false provider decode error. Fallback waits for an empty or lagging DOM to catch up without replay; final divergence and truncation still fail explicitly.
+
+The Chromium gate now exercises the full hybrid reader through trust acquisition, raw contracts with damaged HTML and failed-consumer cancellation. Component CI and Docker passed before promotion; Protocol/Proxy schemas remain identical. See [reproductions, validation and limits](docs/ECOSYSTEM_HYBRID_0.13.16.md).
+
 ## Ecosystem 0.13.15 — verified CDP source integrity
 
 This snapshot promotes Reverse Proxy **4.9.11** while retaining the component revisions from 0.13.14. CDP attachment and teardown execute in order, buffered bytes precede live chunks, redirects and unsuccessful HTTP responses cannot become trusted contracts, and SSE decoding preserves source indentation and multiline data.
