@@ -18,6 +18,10 @@ This repository is the **distribution and composition point** for the ecosystem.
 
 ---
 
+## Ecosystem 0.13.19 — Browser submission acceptance
+
+Reverse Proxy 4.9.14 requires observable submission acceptance before waiting for a response, preserves user drafts during generation and shares semantic streaming selectors between sending and monitoring. Failed submission produces the existing terminal UI error without automatically duplicating a browser turn. The other six component revisions remain unchanged. See [evidence and capture limits](docs/ECOSYSTEM_SUBMISSION_0.13.19.md).
+
 ## Ecosystem 0.13.18 — Gemini contract presentation recovery
 
 This snapshot promotes Reverse Proxy **4.9.13**, preserving the other six component pins and consumer locks. A complete plain JSON object and its exact fenced renderer mirror decode as one unchanged decision. Display artifacts no longer decorate Agent or structured-output payloads; differing decisions, duplicate keys and repair drift remain rejected.
