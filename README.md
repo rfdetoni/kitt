@@ -1,5 +1,11 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.23 — automatic durable loops and Agent-owned proxy lifecycle
+
+Agent CLI **0.84.2** now applies the durable Plan → Execute → Validate → Retry contract automatically to persisted `mode=auto` user turns. Assistant **0.1.25 / runtime 0.2.38** routes the authoritative daemon/TUI path through the same contract, including Goal-aware approvals and cancellation.
+
+Reverse Proxy **4.9.16** inherits managed log settings and Agent process ownership for Agent-started instances; those instances use dedicated proxy log files and terminate with their owning Agent. AI Workers **0.1.48** aligns its Agent locks. Protocol **0.9.1**, Memory **0.9.2** and Toolbox **0.4.2** remain unchanged.
+
 ## Ecosystem 0.13.22 — focused contract-step verification
 
 This snapshot promotes Agent CLI **0.84.1**, preserving the durable task-contract behavior from 0.84.0 while separating turn execution, mutation snapshot collection, reviewer runtime and post-turn verification into focused responsibilities. Assistant **0.1.24 / runtime 0.2.37** and AI Workers **0.1.47** lock the same validated Agent revision.
