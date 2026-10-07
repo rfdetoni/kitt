@@ -104,6 +104,7 @@ jobs:
           "$runtime/.venv-agent/bin/python" -m pip check
           "$bindir/kitt" --help >/dev/null
           "$bindir/kitt-reverse-proxy" --help >/dev/null
+          "$runtime/.venv-agent/bin/python" scripts/smoke_auto_contract_loop.py
           set +e
           kittctl_usage="$("$bindir/kittctl" 2>&1)"
           kittctl_rc=$?
