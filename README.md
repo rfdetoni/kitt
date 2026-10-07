@@ -4,7 +4,7 @@
 
 Agent CLI **0.84.8** fixes the remaining post-contract silence: inner Goal turns now forward bounded thinking, context, tool and edit progress through the existing outer `mode=auto` turn, so the TUI remains visibly active while T01/T02/... execute. Contract planning itself also emits visible thinking state.
 
-Interactive kitt-memory recall is bounded and fail-soft for prompt enrichment, with dedicated `memory_context` and `prompt_build` latency telemetry. Assistant **0.1.30 / runtime 0.2.43** and AI Workers **0.1.54** align immutable Agent locks. Reverse Proxy **4.9.16**, Protocol **0.9.1**, Memory **0.9.2** and Toolbox **0.4.2** remain unchanged because no shared wire contract changed.
+Interactive kitt-memory recall is bounded and fail-soft for prompt enrichment, with dedicated `memory_context` and `prompt_build` latency telemetry. The existing GoalScheduler remains the sole durable execution authority; progress forwarding is ephemeral UI transport only. Assistant **0.1.30 / runtime 0.2.43** and AI Workers **0.1.54** align immutable Agent locks. Reverse Proxy **4.9.16**, Protocol **0.9.1**, Memory **0.9.2** and Toolbox **0.4.2** remain unchanged because no shared wire contract changed.
 
 ## Ecosystem 0.13.26 — visible first-prompt bootstrap
 
