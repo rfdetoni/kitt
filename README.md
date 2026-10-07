@@ -1,5 +1,11 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.26 — visible first-prompt bootstrap
+
+Agent CLI **0.84.7** fixes the TUI state transition that made the first prompt look frozen on the home screen while daemon attachment and automatic-contract bootstrap were already running. The session now opens immediately with the submitted prompt, `STARTING` status and the core task visible; `TurnStarted` reconciles that optimistic state without duplicating the prompt.
+
+Assistant **0.1.29 / runtime 0.2.42** aligns daemon-owned execution with Agent 0.84.7. AI Workers **0.1.53** aligns Evals/Evolution locks. Reverse Proxy **4.9.16**, Protocol **0.9.1**, Memory **0.9.2** and Toolbox **0.4.2** remain unchanged because no shared execution or wire contract changed.
+
 ## Ecosystem 0.13.25 — durable loop completion ownership
 
 Agent CLI **0.84.6** fixes the observed automatic-loop stall without increasing execution budgets: GOAL-owned contract items that do not have a nested TaskPlan no longer receive TaskPlan host-verification context or its completion gate, leaving post-turn checks to the existing `GoalStepVerifier`. Real TaskPlans retain their host context and completion gate unchanged.
