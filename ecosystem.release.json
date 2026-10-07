@@ -25,7 +25,7 @@
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
-      "sha": "6e37d5cf58dd2e95bd7da0704255f75d34fa2a7a"
+      "sha": "fa4a753bd4d67dd858ae8310ce6609472750eeee"
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
