@@ -1,5 +1,11 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.22 — focused contract-step verification
+
+This snapshot promotes Agent CLI **0.84.1**, preserving the durable task-contract behavior from 0.84.0 while separating turn execution, mutation snapshot collection, reviewer runtime and post-turn verification into focused responsibilities. Assistant **0.1.24 / runtime 0.2.37** and AI Workers **0.1.47** lock the same validated Agent revision.
+
+Protocol **0.9.1**, Memory **0.9.2**, Toolbox **0.4.2** and Reverse Proxy **4.9.15** remain unchanged because the refactor does not alter shared wire contracts. See [validation and architecture notes](docs/ECOSYSTEM_CONTRACT_REFACTOR_0.13.22.md).
+
 ## Ecosystem 0.13.21 — durable task-contract execution
 
 This snapshot promotes Agent CLI **0.84.0** with a bounded persistent Plan → Execute → Validate → Retry contract loop on the existing Goals scheduler. Contract items advance only under the current scheduler lease and only after host-owned verification plus independent evidence-backed validation; the final validator compares the integrated result with the authoritative original request.
