@@ -6,8 +6,8 @@ The automatic durable contract was being created and its first item was executin
 
 ## Agent CLI 0.84.6
 
-- GOAL-owned turns with no nested TaskPlan defer completion to the existing `GoalStepVerifier`.
-- Real TaskPlans retain the generic host-completion gate.
+- GOAL-owned turns with no nested TaskPlan omit TaskPlan host-verification context and defer completion to the existing `GoalStepVerifier`.
+- Real TaskPlans retain both their host context and generic host-completion gate.
 - Contract-item prompts explicitly prohibit creating/verifying a second TaskPlan for the current Goals item.
 - Tool-call budgets are unchanged; duplicate verification is removed instead of raising limits.
 - 0.84.4 hardening remains included: task+FINAL minimum contracts, risk-gated pre-mutation plan review, item-scoped resolvable blockers, semantic LSP runtime wiring and provider cache observation telemetry.
