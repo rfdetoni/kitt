@@ -4,7 +4,7 @@
 
 The automatic durable contract was being created and its first item was executing. The stall occurred after workspace mutations: the inner GOAL-owned turn had no TaskPlan, but the generic TaskPlan host-completion gate still required per-turn mutation verification. That recovery path asked the model for registered verification, which led to `plan.verify` even though no TaskPlan existed. Repeated fallback validation then consumed the turn tool budget before the outer contract verifier could own completion.
 
-## Agent CLI 0.84.5
+## Agent CLI 0.84.6
 
 - GOAL-owned turns with no nested TaskPlan defer completion to the existing `GoalStepVerifier`.
 - Real TaskPlans retain the generic host-completion gate.
@@ -14,11 +14,11 @@ The automatic durable contract was being created and its first item was executin
 
 ## Assistant 0.1.28 / runtime 0.2.41
 
-Assistant locks daemon-owned execution to Agent CLI 0.84.5. The previous immutable daemon startup-identity fix remains: an old resident daemon cannot appear compatible merely because package metadata was replaced on disk.
+Assistant locks daemon-owned execution to Agent CLI 0.84.6. The previous immutable daemon startup-identity fix remains: an old resident daemon cannot appear compatible merely because package metadata was replaced on disk.
 
-## AI Workers 0.1.51
+## AI Workers 0.1.52
 
-Evals and Evolution immutable Agent locks move to 0.84.5. Worker behavior is unchanged.
+Evals and Evolution immutable Agent locks move to 0.84.6. Worker behavior is unchanged.
 
 ## Unchanged contracts
 
