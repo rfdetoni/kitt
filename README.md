@@ -1,5 +1,11 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.25 — durable loop completion ownership
+
+Agent CLI **0.84.6** fixes the observed automatic-loop stall without increasing execution budgets: GOAL-owned contract items that do not have a nested TaskPlan no longer receive TaskPlan host-verification context or its completion gate, leaving post-turn checks to the existing `GoalStepVerifier`. Real TaskPlans retain their host context and completion gate unchanged.
+
+Assistant **0.1.28 / runtime 0.2.41** aligns daemon-owned `mode=auto` execution with Agent 0.84.6 while preserving the immutable startup-identity fix from 0.1.27. AI Workers **0.1.52** aligns Evals/Evolution locks. Reverse Proxy **4.9.16**, Protocol **0.9.1**, Memory **0.9.2** and Toolbox **0.4.2** remain unchanged because no shared wire contract changed.
+
 ## Ecosystem 0.13.24 — managed Reverse Proxy log-directory refresh
 
 Agent CLI **0.84.3** fixes a post-upgrade lifecycle bug where an older resident Reverse Proxy control plane could remain on port 2999 and silently ignore the newer managed `log_file` settings. Before managed start/restart, the Agent now refreshes that control plane from the installed Reverse Proxy binary and verifies the returned Proxy log path uses the Agent log directory.
