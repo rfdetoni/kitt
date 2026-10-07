@@ -8,7 +8,7 @@
 | Assistant | 0.1.25 | 19e6088052ace2813d02e2e394fec2aac851f229 |
 | Assistant runtime | 0.2.38 | included in Assistant revision |
 | AI Workers / Evals / Evolution | 0.1.48 | 8208a44c1703e3212c5458668aa6baed10939be6 |
-| Reverse Proxy | 4.9.16 | cc03515b90af86c6a4a07765c82df283da9fb6f4 |
+| Reverse Proxy | 4.9.16 | cc03515b90afcc995699969e86cc22539d8b7dc7 |
 | Protocol | 0.9.1 | unchanged |
 | Memory | 0.9.2 | unchanged |
 | Toolbox | 0.4.2 | unchanged |
