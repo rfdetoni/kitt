@@ -1,5 +1,11 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.24 — managed Reverse Proxy log-directory refresh
+
+Agent CLI **0.84.3** fixes a post-upgrade lifecycle bug where an older resident Reverse Proxy control plane could remain on port 2999 and silently ignore the newer managed `log_file` settings. Before managed start/restart, the Agent now refreshes that control plane from the installed Reverse Proxy binary and verifies the returned Proxy log path uses the Agent log directory.
+
+Assistant **0.1.26 / runtime 0.2.39** and AI Workers **0.1.49** align their immutable Agent locks. Reverse Proxy remains **4.9.16** because it already implements managed logging and ownership; Protocol **0.9.1**, Memory **0.9.2** and Toolbox **0.4.2** remain unchanged.
+
 ## Ecosystem 0.13.23 — automatic durable loops and Agent-owned proxy lifecycle
 
 Agent CLI **0.84.2** now applies the durable Plan → Execute → Validate → Retry contract automatically to persisted `mode=auto` user turns. Assistant **0.1.25 / runtime 0.2.38** routes the authoritative daemon/TUI path through the same contract, including Goal-aware approvals and cancellation.
