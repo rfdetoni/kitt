@@ -1,5 +1,13 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.28 — cancellation, bounded indexing and dependency fixes
+
+Agent CLI **0.84.9** cancels contract planning before durable work is admitted, preserves selected files and attachments through planning/execution/validation, runs Node check/build scripts for full verification and enforces the shared UTF-8 tool argument limit. Reverse Proxy **4.9.17** reserves sessions across admission and interrupts cancelled browser actions.
+
+Toolbox **0.4.3** contains symbol reads, bounds scans and caches the index between requests. Memory **0.9.3** returns SQLite pool connections on both success and error. Protocol **0.9.2** exports the 64 KiB tool argument cap in all three SDKs. AI Workers **0.1.55** preserves offline STT loading. Assistant **0.1.31 / runtime 0.2.44** flushes lifecycle events immediately and suppresses late events after cancellation. Dependency locks and the release manifest pin the compatible revisions.
+
+See [release notes](docs/RELEASE_0.13.28.md).
+
 ## Ecosystem 0.13.27 — live durable-contract progress
 
 Agent CLI **0.84.8** fixes the remaining post-contract silence: inner Goal turns now forward bounded thinking, context, tool and edit progress through the existing outer `mode=auto` turn, so the TUI remains visibly active while T01/T02/... execute. Contract planning itself also emits visible thinking state.
