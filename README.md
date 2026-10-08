@@ -1,5 +1,11 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.14.0 — Structured Agent results
+
+Agent **0.85.0**, Proxy **5.0.0** and Protocol **0.10.0** use Agent contract v3. Structured plans and review/validation/completion reports are objects directly in content, removing nested JSON string serialization and textual report markers. Resilient recovery accepts only a unique mandatory-shape interpretation; strict consumers reject duplicate fields, trailing prose and multiple decisions.
+
+Assistant **0.1.33 / runtime 0.3.0** and Workers/Evals/Evolution **0.1.57** align immutable Agent/Protocol locks. Upgrade the ecosystem together; v2 negotiation and prefixed-report fallbacks are removed. WebChat still owns token limits. See [release notes](docs/RELEASE_0.14.0.md).
+
 ## Ecosystem 0.13.29 — WebChat owns token limits
 
 Agent CLI **0.84.10** and Reverse Proxy **4.9.18** delegate reverse-proxy context and output token limits to WebChat. Local profile placeholders and token quotas no longer reject or truncate prompts, reviews, conversation messages or tool observations. Token estimates are telemetry; operational and security controls remain active.

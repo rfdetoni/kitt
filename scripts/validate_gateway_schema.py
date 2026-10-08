@@ -17,7 +17,11 @@ def main() -> None:
         sys.executable, str(args.protocol.resolve() / 'scripts/export_context_schema.py'),
         '--check', '--output', str(args.proxy.resolve() / 'src/contracts/context-schema.ts'),
     ], check=True)
-    print('Protocol / Proxy context schema: identical')
+    subprocess.run([
+        sys.executable, str(args.protocol.resolve() / 'scripts/export_agent_contract.py'),
+        '--check', '--output', str(args.proxy.resolve() / 'src/contracts/agent-contract.ts'),
+    ], check=True)
+    print('Protocol / Proxy context and Agent response schemas: identical')
 
 
 if __name__ == '__main__':

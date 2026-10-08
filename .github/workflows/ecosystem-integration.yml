@@ -102,6 +102,7 @@ jobs:
           runtime="$RUNNER_TEMP/kitt-runtime"
           bindir="$RUNNER_TEMP/kitt-bin"
           "$runtime/.venv-agent/bin/python" -m pip check
+          "$runtime/.venv-agent/bin/python" scripts/verify_agent_contract.py --proxy-runtime "$runtime/runtime/reverse-proxy"
           "$bindir/kitt" --help >/dev/null
           "$bindir/kitt-reverse-proxy" --help >/dev/null
           set +e
