@@ -1,3 +1,7 @@
+## Ecosystem 0.15.0 — KAP/1 textual model actions
+
+Protocol **0.11.0**, Reverse Proxy **5.1.0** and Agent CLI **0.86.0** replace WebChat-authored Agent JSON envelopes with concise bounded KAP/1 text. The host converts validated model actions into OpenAI-compatible tool calls and structured API responses. Planning, review, architect and multiline file edits use typed fields. Invalid, ambiguous or drifting repair attempts must not execute tools. Upgrade these components together; contract v3 is not supported. See [release notes](docs/RELEASE_0.15.0.md).
+
 # K.I.T.T. Ecosystem
 
 ## Ecosystem 0.14.3 — Submit filled Gemini drafts
