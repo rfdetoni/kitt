@@ -1,5 +1,13 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.29 — High-risk contract review context
+
+Agent CLI **0.84.10** fixes the failure between contract planning and pre-mutation review on 8K reverse-proxy profiles. Reviews use a bounded output reserve; the LLM client receives the selected ceiling without shared-state mutation. User intent is counted once, and prompt preparation failures receive scoped diagnostics.
+
+Assistant **0.1.32 / runtime 0.2.45** and AI Workers/Evals/Evolution **0.1.56** align their immutable Agent locks. The release manifest records the compatible revisions. Reverse Proxy **4.9.17**, Toolbox **0.4.3**, Memory **0.9.3** and Protocol **0.9.2** continue to provide the existing compatible contracts.
+
+See [release notes](docs/RELEASE_0.13.29.md).
+
 ## Ecosystem 0.13.28 — cancellation, bounded indexing and dependency fixes
 
 Agent CLI **0.84.9** cancels contract planning before durable work is admitted, preserves selected files and attachments through planning/execution/validation, runs Node check/build scripts for full verification and enforces the shared UTF-8 tool argument limit. Reverse Proxy **4.9.17** reserves sessions across admission and interrupts cancelled browser actions.
