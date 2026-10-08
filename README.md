@@ -1,5 +1,9 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.14.3 — Submit filled Gemini drafts
+
+Reverse Proxy **5.0.2** selects an enabled send control instead of stopping at a disabled variant and falling back to Enter. Submission logs identify the dispatch method and acceptance. Agent **0.85.0**, Protocol **0.10.0** and the remaining consumers retain compatible contract v3 revisions. See [release notes](docs/RELEASE_0.14.3.md).
+
 ## Ecosystem 0.14.2 — Reject ambiguous model repairs
 
 Reverse Proxy **5.0.1** returns HTTP 409 without another repair attempt for conflicting interpretations or duplicate decision fields, including ambiguity introduced by a repair. Agent **0.85.0**, Protocol **0.10.0** and the other components retain their compatible contract v3 revisions. WebChat owns token limits. See [release notes](docs/RELEASE_0.14.2.md).
