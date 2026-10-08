@@ -1,3 +1,7 @@
+## Ecosystem 0.15.1 — Immutable Assistant release lock alignment
+
+Fix the `--preset full --channel release` installation failure when the Assistant's Cargo.lock pins Protocol 0.10.0 but the ecosystem manifest pins Protocol 0.11.0. Assistant 0.1.34 / runtime 0.3.1 synchronize native/HUD Cargo locks, HUD npm lock and Python uv.lock with Protocol 0.11.0 and Agent 0.86.0. The release installer continues to reject mismatched immutable revisions. See [release notes](docs/RELEASE_0.15.1.md).
+
 ## Ecosystem 0.15.0 — KAP/1 textual model actions
 
 Protocol **0.11.0**, Reverse Proxy **5.1.0** and Agent CLI **0.86.0** replace WebChat-authored Agent JSON envelopes with concise bounded KAP/1 text. The host converts validated model actions into OpenAI-compatible tool calls and structured API responses. Planning, review, architect and multiline file edits use typed fields. Invalid, ambiguous or drifting repair attempts must not execute tools. Upgrade these components together; contract v3 is not supported. See [release notes](docs/RELEASE_0.15.0.md).
