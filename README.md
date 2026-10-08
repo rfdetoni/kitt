@@ -1,5 +1,11 @@
 # K.I.T.T. Ecosystem
 
+## Ecosystem 0.13.30 — Nested JSON contract recovery
+
+Reverse Proxy **4.9.19** recovers unescaped nested JSON in Agent contract content only when exactly one interpretation matches the mandatory contract shape. Competing tool arguments remain blocked. Agent **0.84.10** and all other modules retain their compatible revisions and WebChat token ownership.
+
+See [release notes](docs/RELEASE_0.13.30.md).
+
 ## Ecosystem 0.13.29 — WebChat owns token limits
 
 Agent CLI **0.84.10** and Reverse Proxy **4.9.18** delegate reverse-proxy context and output token limits to WebChat. Local profile placeholders and token quotas no longer reject or truncate prompts, reviews, conversation messages or tool observations. Token estimates are telemetry; operational and security controls remain active.
