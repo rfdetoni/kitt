@@ -17,19 +17,19 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "def9ab71a0350ae22c54e13150339d3b91b55acf"
+      "sha": "8bc4b6300dcf7e2b1489d013f339eeac463218f3"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "9b2181dbff0c24cbf61a3ca4ca6c43d06fabe447"
+      "sha": "0a06eac924162a063945384ae79e30e5384689f9"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
-      "sha": "1318c1cdce033b6a0124a7de33f5f85bfc959d6c"
+      "sha": "a56d7edefe44e9f5d3156920b8672d2aec28e9a0"
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
-      "sha": "e2b2ed53a9a0793f10d276acfdbfb1666ec55ad8"
+      "sha": "0fd8a81df5cbe884210e878faada6dd9cfed4950"
     }
   }
 }

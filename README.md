@@ -1,10 +1,10 @@
 # K.I.T.T. Ecosystem
 
-## Ecosystem 0.13.29 — High-risk contract review context
+## Ecosystem 0.13.29 — WebChat owns token limits
 
-Agent CLI **0.84.10** fixes the failure between contract planning and pre-mutation review on 8K reverse-proxy profiles. Reviews use a bounded output reserve; the LLM client receives the selected ceiling without shared-state mutation. User intent is counted once, and prompt preparation failures receive scoped diagnostics.
+Agent CLI **0.84.10** and Reverse Proxy **4.9.18** delegate reverse-proxy context and output token limits to WebChat. Local profile placeholders and token quotas no longer reject or truncate prompts, reviews, conversation messages or tool observations. Token estimates are telemetry; operational and security controls remain active.
 
-Assistant **0.1.32 / runtime 0.2.45** and AI Workers/Evals/Evolution **0.1.56** align their immutable Agent locks. The release manifest records the compatible revisions. Reverse Proxy **4.9.17**, Toolbox **0.4.3**, Memory **0.9.3** and Protocol **0.9.2** continue to provide the existing compatible contracts.
+Assistant **0.1.32 / runtime 0.2.45** and AI Workers/Evals/Evolution **0.1.56** align their immutable Agent locks. The UI identifies WebChat ownership, and failed prompt preparation receives scoped diagnostics. Toolbox **0.4.3**, Memory **0.9.3** and Protocol **0.9.2** retain compatible native and wire contracts.
 
 See [release notes](docs/RELEASE_0.13.29.md).
 

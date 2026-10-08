@@ -1,23 +1,27 @@
-# KITT Ecosystem 0.13.29
+# KITT Ecosystem 0.13.29 — WebChat owns token limits
 
-The supplied Gemini logs showed successful contract generation in approximately 13 seconds, followed by a second Agent turn stopping during prompt preparation. Replaying the exact objective and generated eight-item contract reproduced a required-tool-schema budget failure: the pre-mutation review inherited a 4,096-token coding output reserve on an 8,192-token profile.
+The supplied Gemini logs showed successful contract generation in approximately 13 seconds, followed by a second Agent turn stopping before another provider request. Replaying the objective and generated eight-item contract reproduced a required-tool-schema budget failure caused by treating a local 8K profile placeholder as WebChat capacity.
 
 | Component | Version | Change |
 | --- | --- | --- |
-| Agent CLI | 0.84.10 | Bound review output to 2,048 tokens, propagate per-request ceilings, count intent once, and log prompt-preparation failures |
-| Assistant | 0.1.32 / runtime 0.2.45 | Align runtime lock and CI to the corrected Agent revision |
+| Agent CLI | 0.84.10 | Delegate reverse-proxy token limits, preserve prompts/tool observations, count intent once and log prompt failures |
+| Reverse Proxy | 4.9.18 | Keep token estimates as telemetry; ignore legacy token quotas |
+| Assistant | 0.1.32 / runtime 0.2.45 | Align runtime/CI and display WebChat context ownership |
 | AI Workers, Evals, Evolution | 0.1.56 | Align Agent locks |
-| Reverse Proxy | 4.9.17 | Existing compatible transport |
 | Toolbox / Memory / Protocol | 0.4.3 / 0.9.3 / 0.9.2 | Existing compatible native and wire contracts |
 
-The original objective, validated items and required policy context remain intact. High-risk review still precedes mutation; read-only capabilities, cancellation and host verification continue to apply. Output ceilings are scoped to each request, so parallel turns do not modify a shared LLM profile. The full typed envelope retains USER_INTENT for provenance while input estimates count its user message once.
+Reverse-proxy turns have no local input/output token reserve or model-window ceiling. Per-turn, child and durable-goal token quotas do not enforce limits for this provider. max_tokens and max_prompt_tokens are not sent by Agent. Local profile placeholders do not truncate follow-up messages or tool observations, and they do not trigger automatic history compaction. WebChat controls its context and output behavior.
 
-Diagnostics record whether prompt preparation succeeded and emit the exception type with turn/conversation identifiers on terminal failures. Request bodies and exception content are excluded from this new diagnostic.
+Token accounting remains available for observability. The UI displays WebChat ownership rather than a fabricated local capacity percentage. The typed envelope retains USER_INTENT provenance while input estimates count the user message once. Native/API providers retain their existing token budgets.
+
+Attempts, model/tool calls, duration, costs, queue/session capacity, subagent counts, cancellation, approvals, byte limits, schema validation and workspace path bounds remain enforced. Context retrieval stays selective. High-risk review still precedes mutation, and required instructions and schemas remain intact.
+
+Diagnostics record prompt-preparation success/failure and the exception type with turn/conversation scope. This new diagnostic excludes request bodies and exception content.
 
 ## Validation
 
-The new regression exercised real planning and review with an 8K profile and a deterministic provider response. It failed before the fix and now completes both calls while preserving the objective, all items and input-plus-output bounds. Client checks cover reduced output ceilings, configured limits, default calls and shared-profile immutability. Oversized requests still fail with a scoped terminal diagnostic.
+269 Agent tests passed with one skipped; all 206 Proxy tests, TypeScript checks and production build passed. Regressions cover requests larger than local profile windows, one-token quotas, complete planning/review inputs, untruncated tool observations, parent/child/goal accounting, preserved operational limits, native token enforcement and WebChat UI rendering. Proxy lifecycle tests exceed the former million-token ceiling and ignore a legacy one-token allowance while retaining deadlines and attempt bounds.
 
-Local checks passed: 266 Agent tests with one skipped, 33 Workers/Evals/Evolution tests, 11 focused Assistant tests, compilation, critical Ruff checks and Agent clean-room provenance verification. Release gates also exercise the compatible Assistant runtime/lifecycle, native composition and root installer. A fresh authenticated Gemini browser conversation was not run; the provided provider response was replayed locally.
+Local checks also passed: 33 Workers/Evals/Evolution tests, 11 focused Assistant tests, 58 installer tests, compilation, critical Ruff checks, JavaScript syntax and Agent clean-room provenance verification. Release gates validate the compatible runtime/lifecycle, native composition and clean main/release installations. An authenticated fresh Gemini conversation was not run; the supplied provider response was replayed locally.
 
 Immutable component revisions are in ecosystem.release.json. Main installation resolves main once per run; the release channel uses the manifest revisions.
