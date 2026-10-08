@@ -1,3 +1,7 @@
+## KITT ecosystem 0.15.2 — Automatic parallel children and agent monitoring
+
+The release-channel Agent CLI **0.86.1** provides automatic parallel execution for dependency-ready contract items with disjoint file scopes under Allow All/autonomous mode, host-owned verification, and a working `Ctrl+X, A` live monitor. Assistant Python runtime **0.3.2** locks to the Agent's immutable commit; Protocol and native modules remain unchanged. `run_command` accepts direct argv in Allow All but never bypasses explicit shell/path security boundaries. See [release notes](docs/RELEASE_0.15.2.md).
+
 ## Ecosystem 0.15.1 — Immutable Assistant release lock alignment
 
 Fix the `--preset full --channel release` installation failure when the Assistant's Cargo.lock pins Protocol 0.10.0 but the ecosystem manifest pins Protocol 0.11.0. Assistant 0.1.34 / runtime 0.3.1 synchronize native/HUD Cargo locks, HUD npm lock and Python uv.lock with Protocol 0.11.0 and Agent 0.86.0. The release installer continues to reject mismatched immutable revisions. See [release notes](docs/RELEASE_0.15.1.md).
