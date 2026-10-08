@@ -31,7 +31,29 @@ const {AGENT_CONTRACT_VERSION} = await import(pathToFileURL(root + '/dist/contra
 const {prepareAgentContractRequest,transformAgentContractCompletion} = await import(pathToFileURL(root + '/dist/runtime/agent-contract.js'));
 const values = JSON.parse(readFileSync(0, 'utf8'));
 const plan = prepareAgentContractRequest({messages:[{role:'user',content:'Return a structured result'}]}, {sessionId:'composition-check'});
-const content = values.map(value => transformAgentContractCompletion({id:'check',object:'chat.completion',created:1,model:'check',choices:[{index:0,message:{role:'assistant',content:JSON.stringify({action:'final_response',tool:null,tool_input:null,content:value,reasoning_summary:'',loop:null})},finish_reason:'stop'}]},plan).choices[0].message.content);
+function encodeKAP(path, value, lines) {
+  if (value === null) lines.push('NULL ' + path);
+  else if (Array.isArray(value)) {
+    lines.push('ARRAY ' + path);
+    value.forEach((item,index)=>encodeKAP(path+'.'+index,item,lines));
+  } else if (typeof value === 'object') {
+    lines.push('OBJECT ' + path);
+    for (const [key,item] of Object.entries(value)) encodeKAP(path+'.'+key,item,lines);
+  } else if (typeof value === 'string' && value.includes('\\n')) {
+    lines.push('TEXT ' + path, value, 'KITT/ENDTEXT');
+  } else if (typeof value === 'string') lines.push('STRING ' + path + ' = ' + value);
+  else if (typeof value === 'boolean') lines.push('BOOLEAN ' + path + ' = ' + value);
+  else lines.push((Number.isInteger(value)?'INTEGER ':'DECIMAL ') + path + ' = ' + value);
+}
+const content = values.map(value => {
+  const lines = ['KITT/1','ACTION FINAL'];
+  encodeKAP('content',value,lines);
+  const kap = [...lines,'KITT/END'].join('\\n');
+  return transformAgentContractCompletion({
+    id:'check',object:'chat.completion',created:1,model:'check',
+    choices:[{index:0,message:{role:'assistant',content:kap},finish_reason:'stop'}]
+  },plan).choices[0].message.content;
+});
 console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content}));
 '''
     result = subprocess.run(
