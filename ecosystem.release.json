@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "channel": "release",
-  "ecosystem_version": "0.15.0",
+  "ecosystem_version": "0.15.1",
   "components": {
     "protocol": {
       "repository": "rfdetoni/kitt-protocol",
