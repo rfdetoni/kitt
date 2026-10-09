@@ -10,7 +10,7 @@
 
 ## Compatible composition
 
-Agent 038e4e8f48e2e30827c50a81a88e9bc610307d3d, Proxy b932de2fb3921c1ca9def3fd1dbb3ce66578cfe3 and Assistant 4b564df06fd808e4441f1b6d3918ecee63de5dcd are immutable pins. Assistant Python runtime 0.3.3 requires Agent 0.86.2 and synchronizes uv.lock and CI's Agent reference. Native/HUD Assistant 0.1.34, Protocol 0.11.0 and remaining components are unchanged; contract v4 and KAP/1 grammar are unchanged.
+Agent 4831ee3bd98fef4e9530a38380c2f698c4736370, Proxy b932de2fb3921c1ca9def3fd1dbb3ce66578cfe3 and Assistant 95e0834e858e1399e418df686a469812cd476c50 are immutable pins. Assistant Python runtime 0.3.3 requires Agent 0.86.2 and synchronizes uv.lock and CI's Agent reference. Native/HUD Assistant 0.1.34, Protocol 0.11.0 and remaining components are unchanged; contract v4 and KAP/1 grammar are unchanged.
 
 ## Evidence and limits
 
