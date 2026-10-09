@@ -20,6 +20,10 @@ def main() -> None:
         {'items': [{'title': 'Preserve "quotes", tabs\tand newlines\n'}]},
         {'verdict': 'OK', 'issues': []},
         {'verdict': 'OK', 'evidence': ['workspace inspected'], 'issues': []},
+        {'verdict': 'FAIL', 'evidence': ['current file inspected'], 'issues': [{
+            'severity': 'P1', 'location': 'src/domain.ts',
+            'problem': 'requirement is unproven', 'fix': 'implement and validate it',
+        }]},
     ]
     # Host serialization at the real TypeScript boundary must be decoded by the
     # installed Python consumer, not by a second implementation in this script.
@@ -64,7 +68,9 @@ console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content}));
     if payload['version'] != AGENT_CONTRACT_VERSION:
         raise SystemExit('installed Agent / Protocol / Proxy contract version mismatch')
     actual = [parse_structured_result(content) for content in payload['content']]
-    if actual != expected or not parse_validation_report(payload['content'][2]).ok:
+    failed_review = parse_validation_report(payload['content'][3])
+    if (actual != expected or not parse_validation_report(payload['content'][2]).ok
+            or failed_review.ok or failed_review.issues[0]['location'] != 'src/domain.ts'):
         raise SystemExit('structured results changed across the installed runtime boundary')
     print('installed Agent / Protocol / Proxy structured results: ok')
 

@@ -1,3 +1,7 @@
+## Ecosystem 0.15.3 — KAP validation and provider fallback fixes
+
+Agent CLI **0.86.2** aligns completion and validation reports with KAP/1, supplies planned files to the validator, excludes untrusted provider fallbacks and diagnoses malformed process argv. Proxy **5.1.1** rejects competing actions before repair. Assistant runtime **0.3.3** pins the compatible Agent commit. See [release notes](docs/RELEASE_0.15.3.md).
+
 ## KITT ecosystem 0.15.2 — Automatic parallel children and agent monitoring
 
 The release-channel Agent CLI **0.86.1** provides automatic parallel execution for dependency-ready contract items with disjoint file scopes under Allow All/autonomous mode, host-owned verification, and a working `Ctrl+X, A` live monitor. Assistant Python runtime **0.3.2** locks to the Agent's immutable commit; Protocol and native modules remain unchanged. `run_command` accepts direct argv in Allow All but never bypasses explicit shell/path security boundaries. See [release notes](docs/RELEASE_0.15.2.md).
