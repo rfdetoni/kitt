@@ -1,9 +1,11 @@
 # Guia completo de máquinas virtuais no K.I.T.T.
 
-> **Escopo:** Agent CLI 0.86.7 / ecossistema 0.15.5, host Linux com QEMU.
+> **Escopo:** Agent CLI 0.86.8 / ecossistema 0.15.6, host Linux com QEMU.
 > Este documento descreve os comandos **existentes** e distingue os fluxos disponíveis daqueles que ainda exigem provisionamento manual ou validação com máquinas reais.
 >
 > **Importante:** o helper não baixa ISOs, não fabrica Tiny11, não instala automaticamente Windows/Linux a partir de uma ISO e não dá acesso do guest aos arquivos privados do host.
+
+**Novo no 0.15.6:** o assistente também aceita `--backend docker` ou `--backend podman`. Para QEMU dentro de contêiner, visualização no navegador, imagens Linux `base/wine/full` pré-construídas e instalação opcional, consulte o **[Guia Docker/Podman + RE Toolbox](VM_CONTAINERS_DOCKER_PODMAN.md)**. O QEMU nativo continua o padrão.
 
 ## Índice
 
@@ -27,6 +29,9 @@ O KITT oferece **três funções distintas**, que não devem ser confundidas:
 | Finalidade | Entrada | Imagem de origem | Resultado | Estado |
 | --- | --- | --- | --- | --- |
 | Assistente geral para guests | `kitt vm create` (ou `kitt vm wizard`) | ISO/QCOW2 **do usuário** | Configuração e disco de VM Windows ou Linux | Implementado |
+| QEMU em Docker/Podman | `kitt vm create --backend podman` | ISO/QCOW2 **do usuário** | QEMU com noVNC e disco privado persistente | Implementado no Agent 0.86.8; teste real de guest ainda pendente |
+| Linux RE toolbox (contêiner) | `kitt vm container build/pull/toolbox` | Imagem Debian pré-construída | Ghidra, Frida, Wine, GDB etc. conforme perfil | Implementado; não é uma VM |
+
 | Windows de referência/teste | `kitt vm windows prepare/install/start` | ISO ou QCOW2 **do usuário** | Windows com UEFI/TPM e VNC local | Implementado; instalação do OS interativa |
 | Linux para engenharia reversa | `kitt vm linux prepare/install/start` | ISO ou QCOW2 **do usuário** | Linux com perfil de ferramentas sugerido | Implementado; instalação do OS interativa |
 | Agente KITT isolado | `kitt vm doctor/run` | QCOW2 **já preparada**, com KITT/SSH | Execução de missão em snapshot descartável | Supervisor implementado; guest deve ser provisionado |
