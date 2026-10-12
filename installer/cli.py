@@ -110,6 +110,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bin-dir", type=Path, help="command launcher directory")
     parser.add_argument("--with-ai-workers", action="store_true", help="also install heavy AI/STT worker dependencies")
     parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
+    parser.add_argument("--with-vm-containers", action="store_true",
+        help="check Docker/Podman QEMU support; include KITT Agent CLI")
+    parser.add_argument("--vm-container-runtime", choices=["docker", "podman"], default="podman")
+    parser.add_argument("--vm-container-image-profile", choices=["base", "wine", "full"], default="full")
+    parser.add_argument("--vm-pull-images", action="store_true",
+        help="explicitly fetch QEMU and RE toolbox prebuilt images after installation")
     parser.add_argument(
         "--no-auto-prerequisites",
         action="store_true",
@@ -236,6 +242,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.with_vm_lab and not args.uninstall:
             from .vm_lab import check_vm_lab
             check_vm_lab()
+        if args.vm_pull_images and not args.with_vm_containers:
+            raise InstallerError("--vm-pull-images requires --with-vm-containers")
+        if args.with_vm_containers and not args.uninstall:
+            from .vm_containers import check_container_runtime
+            check_container_runtime(args.vm_container_runtime)
         if args.list:
             _print_catalog(catalog)
             return 0
@@ -276,6 +287,8 @@ def main(argv: list[str] | None = None) -> int:
             requested.append("ai-workers")
         if args.with_vm_lab and "agent-cli" not in requested:
             requested.append("agent-cli")
+        if args.with_vm_containers and "agent-cli" not in requested:
+            requested.append("agent-cli")
 
         if not requested:
             if non_interactive:
@@ -310,6 +323,10 @@ def main(argv: list[str] | None = None) -> int:
             if not args.dry_run:
                 _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
+        if args.with_vm_containers and args.vm_pull_images and not args.dry_run:
+            from .vm_containers import pull_prebuilt
+            pull_prebuilt(root, runtime=args.vm_container_runtime,
+                          profile=args.vm_container_image_profile)
         return 0
     except UserCancelled as exc:
         if active_progress is not None:
