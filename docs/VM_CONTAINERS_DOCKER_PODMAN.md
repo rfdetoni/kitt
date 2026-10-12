@@ -38,7 +38,7 @@ o instalador informa a falha de download separadamente.
 
 # VMs Windows/Linux em Docker ou Podman — imagens Linux RE pré-construídas
 
-Este recurso está disponível a partir do **KITT Agent CLI 0.86.10** e é **opcional**. O KITT continua usando QEMU nativo por padrão. Há dois conceitos separados: **QEMU dentro do contêiner**, que inicia um Windows/Linux completo a partir de mídia fornecida pelo usuário, e **toolbox Linux Debian pronta**, que contém ferramentas de análise mas não é uma VM.
+Este recurso está disponível a partir do **KITT Agent CLI 0.86.11** e é **opcional**. O KITT continua usando QEMU nativo por padrão. Há dois conceitos separados: **QEMU dentro do contêiner**, que inicia um Windows/Linux completo a partir de mídia fornecida pelo usuário, e **toolbox Linux Debian pronta**, que contém ferramentas de análise mas não é uma VM.
 
 ## 1. Imagens pré-construídas
 
@@ -133,7 +133,7 @@ Para especificações e opções avançadas, leia também o [guia técnico compl
 
 ## REA disponível diretamente no toolbox `full` (0.15.8)
 
-A imagem Linux `full` inclui `rea-agents@6.4.0` e Node.js 24.11, instalados em estágio separado no build Docker/Podman. Os perfis `base` e `wine` não recebem Node/REA. Isso não instala o REA automaticamente na VM Windows, na ISO Linux ou no host onde o KITT executa.
+A imagem Linux `full` inclui `rea-agents@6.4.0` e Node.js 24.11, instalados em estágio separado no build Docker/Podman. Os perfis `base` e `wine` não recebem Node/REA. O launcher 0.86.11 fornece um HOME/XDG temporário gravável mesmo sob UID não root, sem expor o diretório pessoal do host. Isso não instala o REA automaticamente na VM Windows, na ISO Linux ou no host onde o KITT executa.
 
 ```sh
 kitt vm container pull --runtime podman --image toolbox --profile full
