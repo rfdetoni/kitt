@@ -324,9 +324,16 @@ def main(argv: list[str] | None = None) -> int:
                 _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
         if args.with_vm_containers and args.vm_pull_images and not args.dry_run:
-            from .vm_containers import pull_prebuilt
-            pull_prebuilt(root, runtime=args.vm_container_runtime,
-                          profile=args.vm_container_image_profile)
+            from .vm_containers import VMContainerError, pull_prebuilt
+            try:
+                pull_prebuilt(root, runtime=args.vm_container_runtime,
+                              profile=args.vm_container_image_profile)
+            except (VMContainerError, OSError, subprocess.SubprocessError) as error:
+                print(
+                    f"K.I.T.T. installation completed. Optional VM images were not downloaded: {error}. "
+                    "Use 'kitt vm container build' or 'kitt vm container pull' later.",
+                    file=sys.stderr,
+                )
         return 0
     except UserCancelled as exc:
         if active_progress is not None:
