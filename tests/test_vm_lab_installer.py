@@ -28,7 +28,7 @@ class VMLabInstallerTests(unittest.TestCase):
             value = check_vm_lab()
         self.assertTrue(value["ready"])
         self.assertFalse(value["kvm"])
-        self.assertTrue(value["guest_image_required"])
+        self.assertFalse(value["guest_image_required"])
 
 
 if __name__ == "__main__":
