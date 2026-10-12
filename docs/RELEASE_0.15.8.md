@@ -2,9 +2,11 @@
 
 ## Coordinated components
 
-- Agent CLI **0.86.10**: prebuilt Docker/Podman `full` Linux toolbox includes pinned published `rea-agents@6.4.0` with Node.js 24.11.0 in addition to Ghidra 12.1.4, Frida 17.23.3, Wine and GDB/LLDB.
-- Assistant runtime **0.3.8**: synchronized Agent dependency and immutable lock SHA; no daemon/protocol changes.
+- Agent CLI **0.86.11**: prebuilt Docker/Podman `full` Linux toolbox includes pinned published `rea-agents@6.4.0` with Node.js 24.11.0 in addition to Ghidra 12.1.4, Frida 17.23.3, Wine and GDB/LLDB.
+- Assistant runtime **0.3.9**: synchronized Agent dependency and immutable lock SHA; no daemon/protocol changes.
 - KITT root **0.15.8**: coordinated manifest, README, Docker/Podman and complete VM documentation.
+
+Agent 0.86.11 fixes the interactive toolbox runtime for non-root Docker/Podman users by providing an ephemeral writable HOME and XDG cache/config, without mounting host credentials. Container **images remain tagged 0.86.10**, as their contents did not change.
 
 ## Integration scope
 
