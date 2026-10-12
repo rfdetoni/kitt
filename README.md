@@ -1,3 +1,14 @@
+## Ecosystem 0.15.4 — isolated VM autonomy and reverse engineering
+
+Agent CLI **0.86.6** adds the operator-provisioned Linux QEMU supervisor,
+optional MCP reverse-engineering evidence query, Ghidra/Frida guest adapters
+and bounded Windows/Wine differential probe missions. Assistant runtime
+**0.3.4** aligns its Agent lock. The installer exposes **--with-vm-lab**
+for Linux QEMU/OpenSSH prerequisites, without installing host packages.
+These capabilities require prepared, trusted guest VM images and real
+Windows/Wine testing; no end-to-end OS compatibility is implied.
+See [release notes](docs/RELEASE_0.15.4.md) and
+[VM install guide](docs/VM_AUTONOMY_INSTALL.md).
 ## Ecosystem 0.15.3 — KAP validation and provider fallback fixes
 
 Agent CLI **0.86.2** aligns completion and validation reports with KAP/1, supplies planned files to the validator, excludes untrusted provider fallbacks and diagnoses malformed process argv. Proxy **5.1.1** rejects competing actions before repair. Assistant runtime **0.3.3** pins the compatible Agent commit. See [release notes](docs/RELEASE_0.15.3.md).

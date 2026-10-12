@@ -109,6 +109,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", type=Path, help="installation root")
     parser.add_argument("--bin-dir", type=Path, help="command launcher directory")
     parser.add_argument("--with-ai-workers", action="store_true", help="also install heavy AI/STT worker dependencies")
+    parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
     parser.add_argument(
         "--no-auto-prerequisites",
         action="store_true",
@@ -232,6 +233,9 @@ def main(argv: list[str] | None = None) -> int:
             component_refs = load_release_refs(source_root, catalog)
 
         platform = PlatformAdapter.detect()
+        if args.with_vm_lab and not args.uninstall:
+            from .vm_lab import check_vm_lab
+            check_vm_lab()
         if args.list:
             _print_catalog(catalog)
             return 0
@@ -270,6 +274,8 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.with_ai_workers and "ai-workers" not in requested:
             requested.append("ai-workers")
+        if args.with_vm_lab and "agent-cli" not in requested:
+            requested.append("agent-cli")
 
         if not requested:
             if non_interactive:
