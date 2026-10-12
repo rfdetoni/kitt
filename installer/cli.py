@@ -109,7 +109,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", type=Path, help="installation root")
     parser.add_argument("--bin-dir", type=Path, help="command launcher directory")
     parser.add_argument("--with-ai-workers", action="store_true", help="also install heavy AI/STT worker dependencies")
-    parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
+    parser.add_argument("--with-vm-lab", action="store_true",
+        help="provision Debian Minimal guest automatically (requires QEMU, SSH, cloud-localds)")
+    parser.add_argument("--vm-gateway-port", type=int, default=3000,
+        help="port of host model gateway forwarded to guest; 0 disables it")
     parser.add_argument(
         "--no-auto-prerequisites",
         action="store_true",
@@ -310,6 +313,10 @@ def main(argv: list[str] | None = None) -> int:
             if not args.dry_run:
                 _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
+        if args.with_vm_lab and not args.dry_run:
+            from .vm_lab import prepare_guest
+            profile = prepare_guest(root, gateway_port=args.vm_gateway_port)
+            print(f"Debian Minimal guest ready: {profile}")
         return 0
     except UserCancelled as exc:
         if active_progress is not None:
