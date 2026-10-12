@@ -1,3 +1,7 @@
+**VMs Docker/Podman reforçadas em 0.15.7:** noVNC autenticado, snapshots
+offline, imagens fixadas por digest e broker SSH restrito.
+Detalhes: [guia de VMs Docker/Podman](docs/VM_CONTAINERS_DOCKER_PODMAN.md).
+
 ## VMs Docker/Podman + imagens Linux RE pré-construídas
 
 O KITT oferece um backend **opcional** QEMU dentro de Docker/Podman,
