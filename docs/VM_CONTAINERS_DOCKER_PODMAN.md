@@ -1,6 +1,44 @@
+## Atualização 0.15.7 — segurança e coordenação entre VMs
+
+O console noVNC passa a exigir senha aleatória por VM, inclusive para acesso
+pela rede Docker. Consulte explicitamente:
+
+```sh
+kitt vm container credentials --profile /caminho/da/vm/profile.json
+```
+
+`kitt vm container start` aguarda prontidão do console; logs persistem
+após falhas e são arquivados antes de um novo start. A VM usa o digest da
+imagem QEMU configurado em vez de depender de tag mutável.
+
+Snapshots offline, com validação SHA-256 do disco e cópia UEFI/TPM:
+
+```sh
+kitt vm container snapshot --profile /caminho/da/vm/profile.json --action save --name clean
+kitt vm container snapshot --profile /caminho/da/vm/profile.json --action restore --name clean --yes
+```
+
+Canal opcional, somente host → guest, para testes SSH por forced command:
+
+```sh
+kitt vm create --os windows --backend podman --source ~/ISOs/Windows11.iso --probe-port 18008 --yes
+kitt vm lab doctor --hosts /caminho/hosts.json
+kitt vm lab run --workspace /projeto --mission /projeto/mission.json --hosts /caminho/hosts.json
+```
+
+É necessário configurar autenticação SSH e o executor de probes dentro
+do guest; a porta restrita não instala SSH nem libera shell remoto.
+Sem `--probe-port`, a VM permanece sem NIC.
+
+Os perfis da versão 0.86.8 não contêm os novos segredos e pins; preserve
+os discos e recrie os perfis pelo wizard, sem editar o JSON manualmente.
+
+**O pull de imagem opcional não anula uma instalação do KITT bem-sucedida:**
+o instalador informa a falha de download separadamente.
+
 # VMs Windows/Linux em Docker ou Podman — imagens Linux RE pré-construídas
 
-Este recurso está disponível a partir do **KITT Agent CLI 0.86.8** e é **opcional**. O KITT continua usando QEMU nativo por padrão. Há dois conceitos separados: **QEMU dentro do contêiner**, que inicia um Windows/Linux completo a partir de mídia fornecida pelo usuário, e **toolbox Linux Debian pronta**, que contém ferramentas de análise mas não é uma VM.
+Este recurso está disponível a partir do **KITT Agent CLI 0.86.9** e é **opcional**. O KITT continua usando QEMU nativo por padrão. Há dois conceitos separados: **QEMU dentro do contêiner**, que inicia um Windows/Linux completo a partir de mídia fornecida pelo usuário, e **toolbox Linux Debian pronta**, que contém ferramentas de análise mas não é uma VM.
 
 ## 1. Imagens pré-construídas
 
@@ -86,7 +124,7 @@ Esse toolbox é um contêiner, **não uma VM**. Ele compartilha o kernel Linux d
 ## 7. Segurança e limites atuais
 
 - QEMU guest inicia **sem placa de rede**, mas o **contêiner QEMU** utiliza bridge networking para servir noVNC somente em `127.0.0.1`. Isso não bloqueia automaticamente a saída de rede do contêiner; utilize firewall do host quando necessário.
-- NoVNC não tem autenticação adicional: não exponha a porta publicamente.
+- NoVNC exige autenticação por VM: não exponha a porta publicamente.
 - Contêineres não usam `--privileged` ou socket de engine compartilhado. Acesso a `/dev/kvm` é opcional e depende de permissões já existentes; `--allow-tcg` permite emulação lenta, de forma explícita.
 - ISO e QCOW2 são fornecidos pelo operador; KITT não baixa Windows, não executa Tiny11 Builder e não instala automaticamente aplicativos dentro da ISO.
 - Disco do guest é persistente entre reinicializações; snapshot/rollback verificado e testes reais em seu host ainda são etapas separadas.
