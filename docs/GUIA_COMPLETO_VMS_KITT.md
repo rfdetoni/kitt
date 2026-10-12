@@ -5,7 +5,7 @@
 
 # Guia completo de máquinas virtuais no K.I.T.T.
 
-> **Escopo:** Agent CLI 0.86.10 / ecossistema 0.15.8, host Linux com QEMU.
+> **Escopo:** Agent CLI 0.86.11 / ecossistema 0.15.8, host Linux com QEMU.
 > Este documento descreve os comandos **existentes** e distingue os fluxos disponíveis daqueles que ainda exigem provisionamento manual ou validação com máquinas reais.
 >
 > **Importante:** o helper não baixa ISOs, não fabrica Tiny11, não instala automaticamente Windows/Linux a partir de uma ISO e não dá acesso do guest aos arquivos privados do host.
