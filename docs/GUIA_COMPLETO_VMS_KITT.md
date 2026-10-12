@@ -1,6 +1,11 @@
+> **Atualização 0.15.7 / Agent 0.86.9:** o backend Docker/Podman agora
+> exige autenticação noVNC, aceita snapshots offline e um canal SSH
+> explicitamente autorizado para probes entre VMs; consulte
+> [o guia Docker/Podman](VM_CONTAINERS_DOCKER_PODMAN.md).
+
 # Guia completo de máquinas virtuais no K.I.T.T.
 
-> **Escopo:** Agent CLI 0.86.8 / ecossistema 0.15.6, host Linux com QEMU.
+> **Escopo:** Agent CLI 0.86.9 / ecossistema 0.15.7, host Linux com QEMU.
 > Este documento descreve os comandos **existentes** e distingue os fluxos disponíveis daqueles que ainda exigem provisionamento manual ou validação com máquinas reais.
 >
 > **Importante:** o helper não baixa ISOs, não fabrica Tiny11, não instala automaticamente Windows/Linux a partir de uma ISO e não dá acesso do guest aos arquivos privados do host.
