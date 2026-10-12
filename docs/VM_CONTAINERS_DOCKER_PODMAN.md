@@ -44,9 +44,9 @@ Este recurso está disponível a partir do **KITT Agent CLI 0.86.10** e é **opc
 
 | Imagem | Finalidade | Conteúdo |
 | --- | --- | --- |
-| `kitt/qemu-vm:0.86.8` | Executar Windows/Linux no QEMU via Docker/Podman | QEMU + UEFI/TPM virtual + noVNC |
-| `kitt/linux-re:base-0.86.8` | Análise e desenvolvimento | GDB, LLDB, GCC/clang, Java, Python, Git, binutils, CMake etc. |
-| `kitt/linux-re:wine-0.86.8` | Teste Wine e cross-compile Win32 | Base + Wine64 + MinGW |
+| `kitt/qemu-vm:0.86.10` | Executar Windows/Linux no QEMU via Docker/Podman | QEMU + UEFI/TPM virtual + noVNC |
+| `kitt/linux-re:base-0.86.10` | Análise e desenvolvimento | GDB, LLDB, GCC/clang, Java, Python, Git, binutils, CMake etc. |
+| `kitt/linux-re:wine-0.86.10` | Teste Wine e cross-compile Win32 | Base + Wine64 + MinGW |
 | `kitt/linux-re:full-0.86.10` | Reverse engineering geral | Wine + Frida 17.23.3 + Ghidra 12.1.4 (SHA-256 verificado) + REA 6.4.0 e Node.js 24.11 |
 
 Essas imagens são construídas pela CI e configuradas para publicação no GHCR após merge na `main` do Agent. A disponibilidade pública do pacote depende de a publicação ter sido concluída; em caso de falha, há build local.
@@ -127,7 +127,7 @@ Esse toolbox é um contêiner, **não uma VM**. Ele compartilha o kernel Linux d
 - NoVNC exige autenticação por VM: não exponha a porta publicamente.
 - Contêineres não usam `--privileged` ou socket de engine compartilhado. Acesso a `/dev/kvm` é opcional e depende de permissões já existentes; `--allow-tcg` permite emulação lenta, de forma explícita.
 - ISO e QCOW2 são fornecidos pelo operador; KITT não baixa Windows, não executa Tiny11 Builder e não instala automaticamente aplicativos dentro da ISO.
-- Disco do guest é persistente entre reinicializações; snapshot/rollback verificado e testes reais em seu host ainda são etapas separadas.
+- Disco do guest é persistente entre reinicializações; snapshots offline estão disponíveis com `kitt vm container snapshot`, mas testes reais em seu host ainda são necessários.
 
 Para especificações e opções avançadas, leia também o [guia técnico completo no Agent CLI](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/VM_DOCKER_PODMAN.md) e o [guia geral de VMs do KITT](GUIA_COMPLETO_VMS_KITT.md).
 
