@@ -8,9 +8,9 @@ O KITT oferece um backend **opcional** QEMU dentro de Docker/Podman,
 com noVNC localhost para instalar Windows ou Linux a partir de sua ISO/QCOW2.
 Também existem imagens Debian de toolbox pré-construídas:
 `base` (GDB/LLDB/compiladores), `wine` (+Wine/MinGW) e `full`
-(+Ghidra/Frida com versões verificadas).
+(+Ghidra/Frida e REA 6.4.0 com Node.js 24).
 
-**[Guia de VMs Docker/Podman e ferramentas Linux RE](docs/VM_CONTAINERS_DOCKER_PODMAN.md)**
+**[Guia de VMs Docker/Podman e ferramentas Linux RE](docs/VM_CONTAINERS_DOCKER_PODMAN.md)** — inclui como executar o REA no perfil `full` sem instalar Node.js no KITT host.
 
 Exemplo: `kitt vm create --os linux --backend podman --source ~/ISOs/debian.iso --yes`.
 O backend QEMU nativo continua padrão; o Agent de programação normal não muda.
