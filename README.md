@@ -1,3 +1,16 @@
+## VM helper — create Windows or Linux guests
+
+**Documentação de referência:** [Guia completo de VMs do KITT — Windows, Linux, engenharia reversa, QEMU, comandos, segurança e solução de problemas](docs/GUIA_COMPLETO_VMS_KITT.md).
+
+Este guia reúne os fluxos interativos e automatizados, requisitos, exemplos de ISO/QCOW2, modos de isolamento, perfil da VM do agente e limites atuais.
+
+Run `kitt vm create` to select Windows or Linux and enter the path to your
+own ISO/QCOW2 image. The command delegates to the appropriate QEMU wizard;
+it never downloads an OS or alters the supplied media. For automation use
+`kitt vm create --os windows --source /path/to/windows.iso --yes` or
+`kitt vm create --os linux --source /path/to/linux.iso --yes`.
+Normal coding-agent behavior is unchanged. See
+[VM helper release notes](docs/RELEASE_0.15.5.md).
 ## Ecosystem 0.15.4 — isolated VM autonomy and reverse engineering
 
 Agent CLI **0.86.6** adds the operator-provisioned Linux QEMU supervisor,
