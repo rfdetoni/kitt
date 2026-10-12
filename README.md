@@ -1,3 +1,15 @@
+## VMs Docker/Podman + imagens Linux RE pré-construídas
+
+O KITT oferece um backend **opcional** QEMU dentro de Docker/Podman,
+com noVNC localhost para instalar Windows ou Linux a partir de sua ISO/QCOW2.
+Também existem imagens Debian de toolbox pré-construídas:
+`base` (GDB/LLDB/compiladores), `wine` (+Wine/MinGW) e `full`
+(+Ghidra/Frida com versões verificadas).
+
+**[Guia de VMs Docker/Podman e ferramentas Linux RE](docs/VM_CONTAINERS_DOCKER_PODMAN.md)**
+
+Exemplo: `kitt vm create --os linux --backend podman --source ~/ISOs/debian.iso --yes`.
+O backend QEMU nativo continua padrão; o Agent de programação normal não muda.
 ## VM helper — create Windows or Linux guests
 
 **Documentação de referência:** [Guia completo de VMs do KITT — Windows, Linux, engenharia reversa, QEMU, comandos, segurança e solução de problemas](docs/GUIA_COMPLETO_VMS_KITT.md).
