@@ -1,5 +1,9 @@
 ## VM helper — create Windows or Linux guests
 
+**Documentação de referência:** [Guia completo de VMs do KITT — Windows, Linux, engenharia reversa, QEMU, comandos, segurança e solução de problemas](docs/GUIA_COMPLETO_VMS_KITT.md).
+
+Este guia reúne os fluxos interativos e automatizados, requisitos, exemplos de ISO/QCOW2, modos de isolamento, perfil da VM do agente e limites atuais.
+
 Run `kitt vm create` to select Windows or Linux and enter the path to your
 own ISO/QCOW2 image. The command delegates to the appropriate QEMU wizard;
 it never downloads an OS or alters the supplied media. For automation use
