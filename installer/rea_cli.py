@@ -10,7 +10,6 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
-import sys
 
 REA_VERSION = "6.4.0"
 _PACKAGE = f"rea-agents@{REA_VERSION}"
