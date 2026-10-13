@@ -587,17 +587,18 @@ class ReLabProvisioningTests(unittest.TestCase):
                          ("docker", "full", "dockurr", "11"))
 
     @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux Docker only")
-    def test_dockur_credentials_exist_before_first_install_and_remain_stable(self) -> None:
-        from installer.re_lab import _create_secret
+    def test_dockur_defaults_allow_short_login_and_autologin(self) -> None:
+        from installer.re_lab import _ensure_windows_settings
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "windows.env"
-            _create_secret(path)
+            _ensure_windows_settings(path)
             content = path.read_text()
-            self.assertIn("USERNAME=Kitt\n", content)
-            self.assertIn("PASSWORD=", content)
-            self.assertIn("AUTOLOGIN=N\n", content)
+            self.assertIn("USERNAME=Docker\n", content)
+            self.assertIn("PASSWORD=admin\n", content)
+            self.assertIn("AUTOLOGIN=Y\n", content)
+            self.assertNotIn("USERNAME=Kitt", content)
             self.assertEqual(path.stat().st_mode & 0o077, 0)
-            _create_secret(path)
+            _ensure_windows_settings(path)
             self.assertEqual(path.read_text(), content)
 
     @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux Docker only")
@@ -620,6 +621,46 @@ class ReLabProvisioningTests(unittest.TestCase):
                     provision_re_lab(root, runtime="docker", profile="full",
                                      windows="dockurr", version="11")
             self.assertEqual((storage / "data.img").read_bytes(), b"existing guest")
+
+    @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux Docker only")
+    def test_previous_windows_credentials_never_change_installed_guest(self) -> None:
+        from installer.re_lab import ReLabError, provision_re_lab
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            python = root / ".venv-agent" / "bin" / "python"
+            python.parent.mkdir(parents=True)
+            python.symlink_to(__import__("sys").executable)
+            lab = root / "re-lab"
+            lab.mkdir(mode=0o700)
+            storage = lab / "windows"
+            storage.mkdir(mode=0o700)
+            (storage / "data.img").write_bytes(b"installed Windows")
+            credentials = lab / "windows.env"
+            old = "VERSION=11\nUSERNAME=Kitt\nPASSWORD=old-random-password\nAUTOLOGIN=N\n"
+            credentials.write_text(old)
+            credentials.chmod(0o600)
+            with (
+                patch("installer.re_lab.check_re_lab"),
+                patch("installer.re_lab._existing_container", return_value=True),
+                patch("installer.re_lab._run") as run,
+            ):
+                with self.assertRaisesRegex(ReLabError, "Back up the Windows disk"):
+                    provision_re_lab(root, runtime="docker", profile="full",
+                                     windows="dockurr", version="11")
+            run.assert_not_called()
+            self.assertEqual(credentials.read_text(), old)
+            self.assertEqual((storage / "data.img").read_bytes(), b"installed Windows")
+
+    @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux Docker only")
+    def test_previous_settings_are_replaced_only_before_guest_creation(self) -> None:
+        from installer.re_lab import _ensure_windows_settings
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "windows.env"
+            path.write_text("USERNAME=Kitt\nAUTOLOGIN=N\n")
+            path.chmod(0o600)
+            _ensure_windows_settings(path, fresh_guest=True)
+            self.assertIn("USERNAME=Docker\n", path.read_text())
+            self.assertIn("AUTOLOGIN=Y\n", path.read_text())
 
     @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux Docker only")
     def test_fresh_dockur_container_receives_credentials_and_localhost_console(self) -> None:
@@ -659,7 +700,7 @@ class ReLabProvisioningTests(unittest.TestCase):
             self.assertIn("NET_ADMIN", win)
             self.assertIn("none", linux)
             self.assertIn("--cap-drop", linux)
-            self.assertEqual(result["windows_user"], "Kitt")
+            self.assertEqual(result["windows_user"], "Docker")
 
 
     @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux virtualenv layout")

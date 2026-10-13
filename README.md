@@ -1,3 +1,5 @@
+**KITT 0.15.14 — login automático Dockur Windows:** o perfil RE lab passa a usar as credenciais padrão documentadas pelo Dockur (`Docker/admin`) com `AUTOLOGIN=Y`, eliminando a senha aleatória de 32 caracteres para novas instalações. Um guest Windows existente com credenciais antigas não é sobrescrito: consulte o [guia de migração segura](docs/RELEASE_0.15.14.md).
+
 **KITT 0.15.13 — Docker/Dockur RE lab com Python do venv:** corrigida a detecção do interpretador `bin/python` quando ele é um link simbólico legítimo, tanto para `--with-re-lab` quanto para `--vm-pull-images`. O KITT Full e o REA já instalados podem ser preservados: reexecute o instalador oficial. Veja [release 0.15.13](docs/RELEASE_0.15.13.md).
 
 **KITT 0.15.12 — Laboratório RE Full com Docker + Dockur Windows:** o instalador oficial agora aceita `--with-re-lab --re-runtime docker --re-profile full --re-windows dockurr --re-windows-version 11` no preset `full`. Cria contêiner Linux RE sem rede e Windows 11 Dockur com disco persistente, console localhost e credenciais configuradas somente na primeira instalação. Veja [guia 0.15.12](docs/RELEASE_0.15.12.md).

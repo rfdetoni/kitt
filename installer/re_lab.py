@@ -8,7 +8,6 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-import secrets
 import shutil
 import subprocess
 import sys
@@ -84,20 +83,33 @@ def _private_dir(path: Path) -> None:
         raise ReLabError(f"Lab directory must be private (0700): {path}")
 
 
-def _create_secret(path: Path) -> None:
+_WINDOWS_SETTINGS = (
+    "VERSION=11\nUSERNAME=Docker\nPASSWORD=admin\nAUTOLOGIN=Y\n"
+    "LANGUAGE=Portuguese\nRAM_SIZE=8G\nCPU_CORES=4\nDISK_SIZE=100G\nSAMBA=N\n"
+)
+
+
+def _ensure_windows_settings(path: Path, *, fresh_guest: bool = False) -> None:
+    """Use Dockur's documented defaults; never change an installed guest's account."""
     if path.exists() or path.is_symlink():
         if path.is_symlink() or not path.is_file() or (path.stat().st_mode & 0o077):
-            raise ReLabError("Existing Windows credentials are not a private regular file (0600)")
+            raise ReLabError("Existing Windows settings are not a private regular file (0600)")
+        if path.read_text(encoding="utf-8") == _WINDOWS_SETTINGS:
+            return
+        if not fresh_guest:
+            raise ReLabError(
+                "Existing Windows lab uses previous credentials or autologin settings. "
+                "Changing Docker variables will not update an installed Windows guest. "
+                "Back up the Windows disk and reprovision a fresh guest (see docs/RELEASE_0.15.14.md)."
+            )
+        path.write_text(_WINDOWS_SETTINGS, encoding="utf-8")
         return
-    password = secrets.token_hex(16)
-    lines = ["VERSION=11", "USERNAME=Kitt", f"PASSWORD={password}", "AUTOLOGIN=N",
-             "LANGUAGE=Portuguese", "RAM_SIZE=8G", "CPU_CORES=4", "DISK_SIZE=100G", "SAMBA=N"]
     try:
         fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     except FileExistsError as exc:
-        raise ReLabError("Windows credentials created concurrently; retry") from exc
+        raise ReLabError("Windows settings created concurrently; retry") from exc
     with os.fdopen(fd, "w", encoding="utf-8") as file:
-        file.write("\n".join(lines) + "\n")
+        file.write(_WINDOWS_SETTINGS)
 
 
 def _toolbox_tag(python: Path) -> str:
@@ -134,6 +146,12 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
             raise ReLabError("Windows disk state already exists without KITT first-install credentials. No account reset or disk deletion performed; use a fresh lab directory")
         if windows_exists and not creds.is_file():
             raise ReLabError("KITT Windows container exists without its original credentials file")
+        # Fail before touching the toolbox if an installed guest still uses the old
+        # random password or disabled autologin. Never overwrite a guest disk.
+        if windows_exists:
+            _ensure_windows_settings(creds)
+        elif creds.exists() or creds.is_symlink():
+            _ensure_windows_settings(creds, fresh_guest=not any(storage.iterdir()))
 
         if not toolbox_exists:
             tag = _toolbox_tag(python)
@@ -158,7 +176,7 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
         _start_existing("kitt-re-full")
 
         if not windows_exists:
-            _create_secret(creds)
+            _ensure_windows_settings(creds, fresh_guest=not any(storage.iterdir()))
             _run(["docker", "pull", "dockurr/windows"], timeout=1800)
             image = _image_id("dockurr/windows")
             _run(["docker", "create", "--name", "kitt-re-win11", "--restart", "unless-stopped",
@@ -170,5 +188,6 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
         _start_existing("kitt-re-win11")
 
         return {"workspace": str(workspace), "windows_url": "http://127.0.0.1:8006",
-                "windows_user": "Kitt", "credentials_file": str(creds),
-                "warning": "Dockur applies USERNAME/PASSWORD only during initial Windows installation; confirm login after setup. Docker inspect can reveal guest credentials."}
+                "windows_user": "Docker", "credentials_file": str(creds),
+                "warning": "Dockur default login: Docker/admin, AUTOLOGIN=Y. "
+                           "Only for an isolated test VM. Changes require a fresh Windows installation."}
