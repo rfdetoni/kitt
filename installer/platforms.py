@@ -442,6 +442,14 @@ class PlatformAdapter:
             hints.append(self._python_venv_hint())
             missing_set.remove("python")
 
+        if self.name == "linux" and "cc" in missing_set:
+            hints.append(
+                "Native Rust builds require a C compiler/linker (cc). "
+                "Debian/Ubuntu: sudo apt install build-essential pkg-config; "
+                "Fedora: sudo dnf install gcc gcc-c++ make."
+            )
+            missing_set.remove("cc")
+
         if self.name == "windows":
             commands = []
             if "git" in missing_set:
