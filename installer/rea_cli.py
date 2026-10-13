@@ -57,15 +57,17 @@ def _installed_version(executable: Path) -> bool:
                                 capture_output=True, text=True, check=False, timeout=20)
     except (OSError, subprocess.TimeoutExpired):
         return False
-    return result.returncode == 0 and (
-        result.stdout.strip().splitlines()[:1] == [REA_VERSION]
-        or result.stdout.strip().splitlines()[:1] == [f"rea {REA_VERSION}"]
+    first = result.stdout.strip().splitlines()[:1]
+    return result.returncode == 0 and bool(
+        first and re.fullmatch(r"(?:rea[ -])?v?" + re.escape(REA_VERSION), first[0], re.I)
     )
 
 
 def install_rea(root: Path, bin_dir: Path, *, dry_run: bool = False) -> dict:
     """Install pinned REA into KITT's user-owned prefix and expose an owned launcher."""
     prefix = root / "rea"
+    if prefix.is_symlink():
+        raise ReaInstallError("Refusing a symlinked REA installation prefix")
     destination = _binary(prefix)
     launcher = bin_dir / ("rea.cmd" if os.name == "nt" else "rea")
     if dry_run:
@@ -95,7 +97,24 @@ def install_rea(root: Path, bin_dir: Path, *, dry_run: bool = False) -> dict:
         if os.name == "nt":
             # Local npm-generated wrapper must be invoked from its owning directory.
             # Windows paths cannot contain double quotes, so they remain quoted.
-            launcher.write_text(f'@echo off\r\ncall "{destination}" %*\r\n', encoding="utf-8")
+            launcher.write_text(f'@echo off\r\nrem KITT_MANAGED_REA_CLI\r\ncall "{destination}" %*\r\n', encoding="utf-8")
         else:
             launcher.symlink_to(destination)
     return {"installed": True, "version": REA_VERSION, "launcher": str(launcher), "prefix": str(prefix)}
+
+
+def remove_rea_launcher(root: Path, bin_dir: Path) -> None:
+    """Only remove launcher links owned by this KITT installation."""
+    launcher = bin_dir / ("rea.cmd" if os.name == "nt" else "rea")
+    destination = _binary(root / "rea")
+    if launcher.is_symlink():
+        if launcher.resolve(strict=False) == destination.resolve(strict=False):
+            launcher.unlink()
+    elif os.name == "nt" and launcher.is_file():
+        try:
+            source = launcher.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            return
+        if ("rem KITT_MANAGED_REA_CLI" in source
+                and f'call "{destination}"' in source):
+            launcher.unlink()
