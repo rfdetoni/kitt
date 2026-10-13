@@ -58,7 +58,12 @@ const content = values.map(value => {
     choices:[{index:0,message:{role:'assistant',content:kap},finish_reason:'stop'}]
   },plan).choices[0].message.content;
 });
-console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content}));
+const compactText = ['K2 F','tasks[1]{id,status}:','  T01,done','K2/END'].join('\n');
+const compact = transformAgentContractCompletion({
+  id:'k2',object:'chat.completion',created:1,model:'check',
+  choices:[{index:0,message:{role:'assistant',content:compactText},finish_reason:'stop'}]
+},plan).choices[0].message.content;
+console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content,compact}));
 '''
     result = subprocess.run(
         ['node', '--input-type=module', '-e', javascript, str(args.proxy_runtime.resolve())],
@@ -68,6 +73,10 @@ console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content}));
     if payload['version'] != AGENT_CONTRACT_VERSION:
         raise SystemExit('installed Agent / Protocol / Proxy contract version mismatch')
     actual = [parse_structured_result(content) for content in payload['content']]
+    compact_expected = {'tasks': [{'id': 'T01', 'status': 'done'}]}
+    if (parse_structured_result(payload['compact']) != compact_expected
+            or parse_structured_result("K2 F\ntasks[1]{id,status}:\n  T01,done\nK2/END") != compact_expected):
+        raise SystemExit('KAP/2 compact result failed installed Agent / Proxy / Protocol contract')
     failed_review = parse_validation_report(payload['content'][3])
     if (actual != expected or not parse_validation_report(payload['content'][2]).ok
             or failed_review.ok or failed_review.issues[0]['location'] != 'src/domain.ts'):
