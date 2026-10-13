@@ -5,7 +5,7 @@
 - **KITT Agent CLI 0.86.13** — corrige a validação do estado UEFI/TPM ao criar e restaurar snapshots de VMs QEMU em Docker/Podman. Rejeita links simbólicos e tipos de arquivo inesperados, inclusive antes de substituir o disco durante uma restauração. A PR [Agent #94](https://github.com/rfdetoni/kitt-agent-cli/pull/94) passou nas pipelines do Agent.
 - **Reverse Proxy 5.1.2** — atualiza o pin imutável da release de 5.1.1 para 5.1.2, incluindo a recuperação fail-closed de respostas Gemini FINAL interrompidas, sem confiar em rascunhos conflitantes.
 - **Assistant runtime 0.3.10** — permanece na revisão já validada. A faixa declarada de dependência `kitt-agent-cli>=0.86.12,<0.87` inclui 0.86.13; não há necessidade de republicação sem alteração no Assistant.
-- **KITT instalador 0.15.10** — atualiza as revisões imutáveis no `ecosystem.release.json`. Protocol, Memory, Toolbox e AI Workers permanecem fixados nos commits anteriores.
+- **KITT instalador 0.15.10** — atualiza as revisões imutáveis no `ecosystem.release.json` e retorna código de erro quando a instalação solicitada de REA ou o download de imagens QEMU/toolbox falha, sem ocultar uma instalação parcial dos módulos principais. Protocol, Memory, Toolbox e AI Workers permanecem fixados nos commits anteriores.
 
 ## Escopo preservado
 
