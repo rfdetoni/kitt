@@ -5,7 +5,7 @@
   "components": {
     "protocol": {
       "repository": "rfdetoni/kitt-protocol",
-      "sha": "09407c8df06544926388412da3577b3768da5d63"
+      "sha": "f1ee72e248e611e03290a5f9bc1ccdffe520c715"
     },
     "memory": {
       "repository": "rfdetoni/kitt-memory",
@@ -17,19 +17,19 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "5109b09568abafb6c6e04416513828b54e1a73ef"
+      "sha": "99908813def86652e0bccefe001b8cd1e7479f0a"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "aae473fd50733c6e0541159a309828a757b61df3"
+      "sha": "e6bd8f996d17db1477be956d36956066e47503b8"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
-      "sha": "5515a1ebad44e03b5b2647e635795f7a0c0f84fa"
+      "sha": "6564a269f3882165e83ce7ef94c58132bec2d1be"
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
-      "sha": "78feed44bb917a6c2f2628a8efd2d55d60baaf4d"
+      "sha": "fbe9722c9a9987a37a71a257b0cd1558fda1b7ce"
     }
   }
 }
