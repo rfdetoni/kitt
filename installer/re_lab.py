@@ -39,8 +39,8 @@ def check_re_lab(*, runtime: str, profile: str, windows: str, version: str) -> N
         raise ReLabError("Docker Engine is missing; install Docker and grant access to its daemon")
     _run(["docker", "info"], timeout=20)
     for dev in ("/dev/kvm", "/dev/net/tun"):
-        if not os.path.exists(dev) or not os.access(dev, os.R_OK | os.W_OK):
-            raise ReLabError(f"{dev} must be accessible before provisioning Dockur; KITT will not use sudo/privileged")
+        if not os.path.exists(dev):
+            raise ReLabError(f"{dev} is missing. Dockur requires hardware virtualization and TUN support")
 
 
 def _image_id(tag: str) -> str:
