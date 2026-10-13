@@ -19,7 +19,7 @@ returned to the Agent.
   and remaining durable execution budget. This removes the incorrect
   fixed 240,000-ms cap at the metadata source.
 - Reverse Proxy **5.1.7** (SHA
-  `28e8d8d48c57074b213dae5c866b7c168e2ac83e`):
+  `1c040a94cd9398b0c492af4078889346f226118f`):
   its existing passive CDP response tap feeds correlated-byte
   progress into the UI monitoring watchdog. KAP/1 envelopes ending
   in `KITT/END` are understood by the strict, trusted raw-stream
@@ -53,3 +53,6 @@ provider POST and a successful, completed stream. The first live
 authenticated ChatGPT Web turn may still require DOM extraction until
 a trusted tap profile is learned; use `ui.tap.*` and
 `ui.response.progress` logs to inspect whether CDP chunks are available.
+
+The proxy tap defaults now allow 45 s until the first correlated chunk
+and 90 s between chunks, while preserving the 15-minute request ceiling.
