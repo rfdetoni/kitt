@@ -1,4 +1,4 @@
-**KITT 0.15.8 — REA no perfil Linux `full`:** o toolbox Docker/Podman inclui `rea-agents@6.4.0`, Node.js 24, Ghidra e Frida, sem alterar o Agent de programação normal. O Agent 0.86.11 disponibiliza HOME e cache temporários para execução sem root. Consulte o [guia de VMs e REA](docs/VM_CONTAINERS_DOCKER_PODMAN.md) e as [notas da release](docs/RELEASE_0.15.8.md).
+**KITT 0.15.8 — REA no preset do instalador `full` e no toolbox Linux `full`:** o toolbox Docker/Podman inclui `rea-agents@6.4.0`, Node.js 24, Ghidra e Frida, sem alterar o Agent de programação normal. O instalador `--preset full` também instala o REA 6.4.0 em prefixo privado, sem modificar o npm global; após instalar, habilite `kitt-rea` no workspace quando necessário. O Agent 0.86.11 disponibiliza HOME e cache temporários para execução sem root. Consulte o [guia de VMs e REA](docs/VM_CONTAINERS_DOCKER_PODMAN.md) e as [notas da release](docs/RELEASE_0.15.8.md).
 
 **VMs Docker/Podman reforçadas em 0.15.7:** noVNC autenticado, snapshots
 offline, imagens fixadas por digest e broker SSH restrito.
