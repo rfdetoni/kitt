@@ -119,6 +119,10 @@ class EcosystemInstaller:
                 else:
                     requested.setdefault(name, current)
 
+        # Native Cargo builds on Linux need a C linker; rustup does not provide it.
+        if self.platform.name == "linux" and not self.options.portable and "rust" in requested:
+            requested.setdefault("cc", ())
+
         rust_minimum = requested.get("rust", ())
         if "rust" in requested:
             minimum = requested.pop("rust")
