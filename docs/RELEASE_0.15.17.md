@@ -1,9 +1,9 @@
 # KITT 0.15.17 — Single-flight Agent and verified WebChat editor
 
 ## Pinned components
-- Agent CLI 0.86.14 — `0f3b457f3d61ef7cac1080ba47d0ab420f75a849`.
+- Agent CLI 0.86.14 — `4a7843476375be17f73a88f92ee8c2042c1685d2`.
 - Reverse Proxy 5.1.5 — `0dbcb6c88e25ee198da78b5de95b10d6e444530c`.
-- Assistant Python runtime 0.3.11 — `875b1486395b2db65880f14503a410d3c0e4ea71`.
+- Assistant Python runtime 0.3.11 — `b0c50eae45a79b836885097e79959e24e79c8cb1`.
 - Protocol, Memory, Toolbox, and AI Workers revisions unchanged.
 
 ## What changed
