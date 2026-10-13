@@ -378,6 +378,25 @@ class RequirementTests(unittest.TestCase):
             self.assertIn("rust>=1.90", report.missing)
             self.assertNotIn("rust>=1.85", report.missing)
 
+    def test_linux_native_build_fails_early_without_c_compiler(self) -> None:
+        catalog = EcosystemCatalog.load(ROOT)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            adapter = PlatformAdapter("linux", posix=True)
+            for portable, expected in ((False, True), (True, False)):
+                installer = EcosystemInstaller(
+                    catalog,
+                    adapter,
+                    InstallerOptions(root=root, bin_dir=root / "bin", portable=portable),
+                )
+                with (
+                    patch.object(adapter, "find_python", return_value=None),
+                    patch.object(adapter, "command_info", return_value=None),
+                ):
+                    report = installer._check_prerequisites((catalog.modules["assistant"],))
+                self.assertEqual("cc" in report.missing, expected)
+            self.assertIn("build-essential", adapter.prerequisite_hint(("cc",)))
+
     def test_missing_rust_minimum_uses_highest_required_version(self) -> None:
         self.assertEqual(
             EcosystemInstaller._missing_rust_minimum(("git", "rust>=1.88", "rust>=1.90")),
