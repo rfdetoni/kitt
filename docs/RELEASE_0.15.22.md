@@ -4,10 +4,10 @@ The full ecosystem release is composed from current module main heads and valida
 
 ## Components
 
-- kitt-protocol 0.12.0: canonical TypeScript/Python KAP/2 decoders, tabular and nested fields, literal source bodies, strict bounds and contract documentation
-- kitt-reverse-proxy 5.2.0: compact prompts; schema-checked operation shorthand; deterministic response/repair validation; CDP and ChatGPT DOM recovery accept complete K2 envelopes
-- kitt-agent-cli 0.87.0: structured K2 final decoding from shared SDK; version and protocol pins synchronized
-- kitt-assistant native 0.1.35, runtime 0.3.15; kitt-ai-workers 0.1.58: updated compatible dependency versions and locks
+- kitt-protocol 0.12.1: canonical TypeScript/Python KAP/2 decoders, tabular and nested fields, literal source bodies, strict bounds and contract documentation
+- kitt-reverse-proxy 5.2.1: compact prompts; schema-checked operation shorthand; deterministic response/repair validation; CDP and ChatGPT DOM recovery accept complete K2 envelopes
+- kitt-agent-cli 0.87.1: structured K2 final decoding from shared SDK; version and protocol pins synchronized
+- kitt-assistant native 0.1.36, runtime 0.3.16; kitt-ai-workers 0.1.59: updated compatible dependency versions and locks
 - memory and toolbox: existing IPC contracts remain unchanged and their pins are carried forward
 
 ## Examples
