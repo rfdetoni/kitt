@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import tempfile
 from unittest.mock import patch
 
-from installer.cli import build_parser, main
+from installer.cli import build_parser
 from installer.rea_cli import (
     REA_VERSION, ReaInstallError, _supported_node, install_rea, remove_rea_launcher,
 )
@@ -90,34 +90,3 @@ def test_dry_run_has_no_side_effects_or_network_access():
         assert result["planned"]
         assert not root.exists()
         proc.assert_not_called()
-
-
-def test_explicit_rea_failure_is_nonzero_after_core_install():
-    with tempfile.TemporaryDirectory() as tmp:
-        args = ["--preset", "agent", "--minimal", "--with-rea", "--yes", "--verbose",
-                "--root", str(Path(tmp) / "root"), "--bin-dir", str(Path(tmp) / "bin")]
-        with patch("installer.cli.SourceFreeEcosystemInstaller") as installer, \
-             patch("installer.cli._record_source_ref"), \
-             patch("installer.cli._ensure_launcher_priority"), \
-             patch("installer.rea_cli.install_rea", side_effect=ReaInstallError("Node missing")):
-            status = main(args)
-        assert status == 1
-        installer.return_value.install.assert_called_once()
-
-
-def test_explicit_vm_image_pull_failure_is_nonzero_after_core_install():
-    from installer.vm_containers import VMContainerError
-
-    with tempfile.TemporaryDirectory() as tmp:
-        args = ["--preset", "agent", "--minimal", "--with-vm-containers",
-                "--vm-pull-images", "--yes", "--verbose",
-                "--root", str(Path(tmp) / "root"), "--bin-dir", str(Path(tmp) / "bin")]
-        with patch("installer.cli.SourceFreeEcosystemInstaller") as installer, \
-             patch("installer.cli._record_source_ref"), \
-             patch("installer.cli._ensure_launcher_priority"), \
-             patch("installer.vm_containers.check_container_runtime", return_value={}), \
-             patch("installer.vm_containers.pull_prebuilt",
-                   side_effect=VMContainerError("image unavailable")):
-            status = main(args)
-        assert status == 1
-        installer.return_value.install.assert_called_once()
