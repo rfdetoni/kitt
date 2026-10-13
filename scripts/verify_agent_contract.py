@@ -63,7 +63,16 @@ const compact = transformAgentContractCompletion({
   id:'k2',object:'chat.completion',created:1,model:'check',
   choices:[{index:0,message:{role:'assistant',content:compactText},finish_reason:'stop'}]
 },plan).choices[0].message.content;
-console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content,compact}));
+const advancedText = [
+  'K2 F', '@summary: verified', 'tasks[1]:', '  -',
+  '    local_id: T01', '    check_ids[1]:', '      - node.typecheck',
+  '"X-Foo": enabled', 'data<<TXT:10', 'abc', 'K2/END', 'TXT', 'K2/END'
+].join('\n');
+const advanced = transformAgentContractCompletion({
+  id:'k2-extended',object:'chat.completion',created:1,model:'check',
+  choices:[{index:0,message:{role:'assistant',content:advancedText},finish_reason:'stop'}]
+},plan).choices[0].message.content;
+console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content,compact,advanced}));
 '''
     result = subprocess.run(
         ['node', '--input-type=module', '-e', javascript, str(args.proxy_runtime.resolve())],
@@ -77,6 +86,12 @@ console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content,compact}));
     if (parse_structured_result(payload['compact']) != compact_expected
             or parse_structured_result("K2 F\ntasks[1]{id,status}:\n  T01,done\nK2/END") != compact_expected):
         raise SystemExit('KAP/2 compact result failed installed Agent / Proxy / Protocol contract')
+    advanced_expected = {
+        'tasks': [{'local_id': 'T01', 'check_ids': ['node.typecheck']}],
+        'X-Foo': 'enabled', 'data': 'abc\nK2/END',
+    }
+    if parse_structured_result(payload['advanced']) != advanced_expected:
+        raise SystemExit('KAP/2 advanced result changed through installed TypeScript/Python boundary')
     failed_review = parse_validation_report(payload['content'][3])
     if (actual != expected or not parse_validation_report(payload['content'][2]).ok
             or failed_review.ok or failed_review.issues[0]['location'] != 'src/domain.ts'):
