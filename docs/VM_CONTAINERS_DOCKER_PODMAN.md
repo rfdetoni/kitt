@@ -38,16 +38,16 @@ o instalador informa a falha de download separadamente.
 
 # VMs Windows/Linux em Docker ou Podman — imagens Linux RE pré-construídas
 
-Este recurso está disponível a partir do **KITT Agent CLI 0.86.9** e é **opcional**. O KITT continua usando QEMU nativo por padrão. Há dois conceitos separados: **QEMU dentro do contêiner**, que inicia um Windows/Linux completo a partir de mídia fornecida pelo usuário, e **toolbox Linux Debian pronta**, que contém ferramentas de análise mas não é uma VM.
+Este recurso está disponível a partir do **KITT Agent CLI 0.86.11** e é **opcional**. O KITT continua usando QEMU nativo por padrão. Há dois conceitos separados: **QEMU dentro do contêiner**, que inicia um Windows/Linux completo a partir de mídia fornecida pelo usuário, e **toolbox Linux Debian pronta**, que contém ferramentas de análise mas não é uma VM.
 
 ## 1. Imagens pré-construídas
 
 | Imagem | Finalidade | Conteúdo |
 | --- | --- | --- |
-| `kitt/qemu-vm:0.86.8` | Executar Windows/Linux no QEMU via Docker/Podman | QEMU + UEFI/TPM virtual + noVNC |
-| `kitt/linux-re:base-0.86.8` | Análise e desenvolvimento | GDB, LLDB, GCC/clang, Java, Python, Git, binutils, CMake etc. |
-| `kitt/linux-re:wine-0.86.8` | Teste Wine e cross-compile Win32 | Base + Wine64 + MinGW |
-| `kitt/linux-re:full-0.86.8` | Reverse engineering geral | Wine + Frida 17.23.3 + Ghidra 12.1.4 (SHA-256 verificado) |
+| `kitt/qemu-vm:0.86.10` | Executar Windows/Linux no QEMU via Docker/Podman | QEMU + UEFI/TPM virtual + noVNC |
+| `kitt/linux-re:base-0.86.10` | Análise e desenvolvimento | GDB, LLDB, GCC/clang, Java, Python, Git, binutils, CMake etc. |
+| `kitt/linux-re:wine-0.86.10` | Teste Wine e cross-compile Win32 | Base + Wine64 + MinGW |
+| `kitt/linux-re:full-0.86.10` | Reverse engineering geral | Wine + Frida 17.23.3 + Ghidra 12.1.4 (SHA-256 verificado) + REA 6.4.0 e Node.js 24.11 |
 
 Essas imagens são construídas pela CI e configuradas para publicação no GHCR após merge na `main` do Agent. A disponibilidade pública do pacote depende de a publicação ter sido concluída; em caso de falha, há build local.
 
@@ -127,6 +127,30 @@ Esse toolbox é um contêiner, **não uma VM**. Ele compartilha o kernel Linux d
 - NoVNC exige autenticação por VM: não exponha a porta publicamente.
 - Contêineres não usam `--privileged` ou socket de engine compartilhado. Acesso a `/dev/kvm` é opcional e depende de permissões já existentes; `--allow-tcg` permite emulação lenta, de forma explícita.
 - ISO e QCOW2 são fornecidos pelo operador; KITT não baixa Windows, não executa Tiny11 Builder e não instala automaticamente aplicativos dentro da ISO.
-- Disco do guest é persistente entre reinicializações; snapshot/rollback verificado e testes reais em seu host ainda são etapas separadas.
+- Disco do guest é persistente entre reinicializações; snapshots offline estão disponíveis com `kitt vm container snapshot`, mas testes reais em seu host ainda são necessários.
 
 Para especificações e opções avançadas, leia também o [guia técnico completo no Agent CLI](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/VM_DOCKER_PODMAN.md) e o [guia geral de VMs do KITT](GUIA_COMPLETO_VMS_KITT.md).
+
+## REA disponível diretamente no toolbox `full` (0.15.8)
+
+A imagem Linux `full` inclui `rea-agents@6.4.0` e Node.js 24.11, instalados em estágio separado no build Docker/Podman. Os perfis `base` e `wine` não recebem Node/REA. O launcher 0.86.11 fornece um HOME/XDG temporário gravável mesmo sob UID não root, sem expor o diretório pessoal do host. Isso não instala o REA automaticamente na VM Windows, na ISO Linux ou no host onde o KITT executa.
+
+```sh
+kitt vm container pull --runtime podman --image toolbox --profile full
+kitt vm container toolbox --runtime podman --profile full --workspace "$HOME/projetos/analise-autorizada"
+# Dentro do container:
+rea --version
+rea doctor --provider ghidra --json
+rea analyze-javascript-application /workspace/aplicacao --json
+rea inspect-managed-artifact /workspace/assembly.dll --json
+```
+
+O REA via MCP **no host** continua opt-in: instalar o CLI de forma independente no mesmo ambiente do processo KITT e depois executar `kitt plugins enable kitt-rea`. O novo `rea_workflow` fornece sugestões de operações do REA para binários nativos, JavaScript/Electron, .NET, comparação de versões, dumps e PCAP sem executar diretamente. As operações continuam passando por política de ferramentas e aprovação; evidências canônicas do REA e desconhecidos são preservados no Evidence v2 do KITT. Consulte a [documentação técnica do Agent](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/REA.md).
+
+O toolbox é um contêiner com kernel compartilhado, não substitui QEMU para execução de binários suspeitos. Os testes de CI comprovam a construção e execução básica dos CLI; um ensaio com guest Windows/Linux reais continua necessário.
+
+## REA no preset completo do instalador KITT
+
+Além da imagem Docker/Podman `full`, o comando `--preset full` do instalador raiz agora instala `rea-agents@6.4.0` no prefixo privado do próprio KITT, caso um Node compatível e npm estejam disponíveis. Essa instalação não usa `npm install -g` no prefixo global e não habilita o MCP automaticamente. Para ativar no workspace autorizado, execute `kitt plugins enable kitt-rea`.
+
+Para instalar REA com outro preset use `--with-rea`. Para excluir do preset completo use `--skip-rea`. A falta de Node/npm ou a falha de download não cancela a instalação já concluída dos componentes centrais do KITT: uma mensagem específica indica que o REA ficou pendente. Nenhuma instalação implícita modifica o Node ou o prefixo global do npm. Consulte [notas da release](RELEASE_0.15.8.md).

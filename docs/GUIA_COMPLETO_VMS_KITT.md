@@ -5,7 +5,7 @@
 
 # Guia completo de máquinas virtuais no K.I.T.T.
 
-> **Escopo:** Agent CLI 0.86.9 / ecossistema 0.15.7, host Linux com QEMU.
+> **Escopo:** Agent CLI 0.86.11 / ecossistema 0.15.8, host Linux com QEMU.
 > Este documento descreve os comandos **existentes** e distingue os fluxos disponíveis daqueles que ainda exigem provisionamento manual ou validação com máquinas reais.
 >
 > **Importante:** o helper não baixa ISOs, não fabrica Tiny11, não instala automaticamente Windows/Linux a partir de uma ISO e não dá acesso do guest aos arquivos privados do host.
@@ -35,7 +35,7 @@ O KITT oferece **três funções distintas**, que não devem ser confundidas:
 | --- | --- | --- | --- | --- |
 | Assistente geral para guests | `kitt vm create` (ou `kitt vm wizard`) | ISO/QCOW2 **do usuário** | Configuração e disco de VM Windows ou Linux | Implementado |
 | QEMU em Docker/Podman | `kitt vm create --backend podman` | ISO/QCOW2 **do usuário** | QEMU com noVNC e disco privado persistente | Implementado no Agent 0.86.8; teste real de guest ainda pendente |
-| Linux RE toolbox (contêiner) | `kitt vm container build/pull/toolbox` | Imagem Debian pré-construída | Ghidra, Frida, Wine, GDB etc. conforme perfil | Implementado; não é uma VM |
+| Linux RE toolbox (contêiner) | `kitt vm container build/pull/toolbox` | Imagem Debian pré-construída | Ghidra, Frida, Wine, REA 6.4.0 no perfil `full`, GDB etc. conforme perfil | Implementado; não é uma VM |
 
 | Windows de referência/teste | `kitt vm windows prepare/install/start` | ISO ou QCOW2 **do usuário** | Windows com UEFI/TPM e VNC local | Implementado; instalação do OS interativa |
 | Linux para engenharia reversa | `kitt vm linux prepare/install/start` | ISO ou QCOW2 **do usuário** | Linux com perfil de ferramentas sugerido | Implementado; instalação do OS interativa |
@@ -609,3 +609,5 @@ O propósito do helper é **facilitar o setup do laboratório sem comprometer o 
 
 ---
 **Referências no Agent CLI:** [helper Windows/Linux](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/VM_CREATION_HELPER.md) · [VM Windows](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/WINDOWS_VM_WIZARD.md) · [VM Linux RE](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/LINUX_RE_VM_WIZARD.md) · [supervisor autônomo](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/VM_SUPERVISOR.md).
+
+**REA no perfil Docker/Podman `full`:** a partir do Agent CLI 0.86.10, `rea-agents@6.4.0` e Node.js 24.11 já vêm instalados no contêiner. Isso **não** instala REA em sistemas convidados criados por ISO nem ativa automaticamente o servidor MCP REA do host. Veja [as instruções completas](VM_CONTAINERS_DOCKER_PODMAN.md#rea-disponível-diretamente-no-toolbox-full-0158).

@@ -1,3 +1,5 @@
+**KITT 0.15.8 — REA no preset do instalador `full` e no toolbox Linux `full`:** o toolbox Docker/Podman inclui `rea-agents@6.4.0`, Node.js 24, Ghidra e Frida, sem alterar o Agent de programação normal. O instalador `--preset full` também instala o REA 6.4.0 em prefixo privado, sem modificar o npm global; após instalar, habilite `kitt-rea` no workspace quando necessário. O Agent 0.86.11 disponibiliza HOME e cache temporários para execução sem root. Consulte o [guia de VMs e REA](docs/VM_CONTAINERS_DOCKER_PODMAN.md) e as [notas da release](docs/RELEASE_0.15.8.md).
+
 **VMs Docker/Podman reforçadas em 0.15.7:** noVNC autenticado, snapshots
 offline, imagens fixadas por digest e broker SSH restrito.
 Detalhes: [guia de VMs Docker/Podman](docs/VM_CONTAINERS_DOCKER_PODMAN.md).
@@ -8,9 +10,9 @@ O KITT oferece um backend **opcional** QEMU dentro de Docker/Podman,
 com noVNC localhost para instalar Windows ou Linux a partir de sua ISO/QCOW2.
 Também existem imagens Debian de toolbox pré-construídas:
 `base` (GDB/LLDB/compiladores), `wine` (+Wine/MinGW) e `full`
-(+Ghidra/Frida com versões verificadas).
+(+Ghidra/Frida e REA 6.4.0 com Node.js 24).
 
-**[Guia de VMs Docker/Podman e ferramentas Linux RE](docs/VM_CONTAINERS_DOCKER_PODMAN.md)**
+**[Guia de VMs Docker/Podman e ferramentas Linux RE](docs/VM_CONTAINERS_DOCKER_PODMAN.md)** — inclui como executar o REA no perfil `full` sem instalar Node.js no KITT host.
 
 Exemplo: `kitt vm create --os linux --backend podman --source ~/ISOs/debian.iso --yes`.
 O backend QEMU nativo continua padrão; o Agent de programação normal não muda.

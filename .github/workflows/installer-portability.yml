@@ -47,6 +47,23 @@ jobs:
         run: python scripts/validate_ecosystem_main.py
       - name: Run installer unit tests
         run: python -m unittest discover -s tests -v
+      - name: Smoke real pinned REA npm installation for full preset
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from installer.rea_cli import install_rea, remove_rea_launcher
+          base = Path(os.environ["RUNNER_TEMP"]) / "kitt-rea-smoke"
+          root, bin_dir = base / "root", base / "bin"
+          installed = install_rea(root, bin_dir)
+          assert installed["installed"] and installed["version"] == "6.4.0"
+          assert (bin_dir / "rea").is_symlink()
+          twice = install_rea(root, bin_dir)
+          assert twice["installed"]
+          remove_rea_launcher(root, bin_dir)
+          assert not (bin_dir / "rea").exists()
+          print("pinned REA installed, version verified, and launcher ownership safe")
+          PY
       - name: Validate complete Agent dependency closure
         run: python -m installer --modules agent-cli --dry-run --portable
       - name: List public installer surface
