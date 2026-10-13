@@ -639,7 +639,8 @@ class ReLabProvisioningTests(unittest.TestCase):
             root = Path(temp)
             python = root / ".venv-agent" / "bin" / "python"
             python.parent.mkdir(parents=True)
-            python.touch()
+            python.symlink_to(__import__("sys").executable)
+            self.assertTrue(python.is_symlink())
             with (
                 patch("installer.re_lab.check_re_lab"),
                 patch("installer.re_lab._existing_container", return_value=False),
@@ -659,6 +660,29 @@ class ReLabProvisioningTests(unittest.TestCase):
             self.assertIn("none", linux)
             self.assertIn("--cap-drop", linux)
             self.assertEqual(result["windows_user"], "Kitt")
+
+
+    @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux virtualenv layout")
+    def test_optional_vm_image_pull_accepts_venv_python_symlink(self) -> None:
+        from installer.vm_containers import pull_prebuilt
+        from subprocess import CompletedProcess
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            python = root / ".venv-agent" / "bin" / "python"
+            python.parent.mkdir(parents=True)
+            python.symlink_to(__import__("sys").executable)
+            calls: list[list[str]] = []
+            def run(argv, **kwargs):
+                calls.append(argv)
+                return CompletedProcess(argv, 0)
+            with (
+                patch("installer.vm_containers.check_container_runtime"),
+                patch("installer.vm_containers.subprocess.run", side_effect=run),
+            ):
+                pull_prebuilt(root, runtime="docker", profile="full")
+            self.assertEqual(len(calls), 2)
+            self.assertEqual(calls[0][:3], [str(python), "-m", "kitt.cli.main"])
+            self.assertIn("toolbox", calls[1])
 
 
 if __name__ == "__main__":
