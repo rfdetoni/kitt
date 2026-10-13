@@ -21,3 +21,7 @@ Image PR CI verifies the exact installed REA CLI, Node, Ghidra and Frida. The ma
 Real Windows/Linux boot, rootless Podman/KVM access and cross-guest instrumented execution require operator-run acceptance checks and should not be considered verified by static CI.
 
 See [VM Docker/Podman guide](VM_CONTAINERS_DOCKER_PODMAN.md) and [REA technical integration](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/REA.md).
+
+## Preset raiz `full` também inclui REA
+
+`--preset full` instala o pacote publicado `rea-agents@6.4.0` dentro do prefixo privado do KITT, utilizando Node compatível e npm existentes no ambiente; `--skip-rea` desabilita esse componente, e `--with-rea` permite utilizá-lo com outros presets. A CLI do REA é exposta sem sobrescrever executáveis preexistentes do usuário. A integração MCP permanece sujeita à ativação explícita via `kitt plugins enable kitt-rea` no workspace autorizado. Um erro opcional de npm é exibido sem declarar que o restante do KITT falhou; a instalação pode ser repetida com `--with-rea`.
