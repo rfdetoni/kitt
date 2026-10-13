@@ -13,6 +13,7 @@ on:
       - scripts/validate_architecture.py
       - docs/ECOSYSTEM_ARCHITECTURE.md
       - tests/test_ecosystem_architecture.py
+      - tests/test_ecosystem_release_pins.py
       - tests/test_installer.py
       - tests/test_installer_update.py
       - .github/workflows/ecosystem-main.yml
@@ -27,10 +28,13 @@ on:
       - scripts/validate_architecture.py
       - docs/ECOSYSTEM_ARCHITECTURE.md
       - tests/test_ecosystem_architecture.py
+      - tests/test_ecosystem_release_pins.py
       - tests/test_installer.py
       - tests/test_installer_update.py
       - .github/workflows/ecosystem-main.yml
   workflow_dispatch:
+  schedule:
+    - cron: "41 5 * * *"
 
 permissions:
   contents: read
@@ -48,7 +52,11 @@ jobs:
           python-version: '3.14'
       - name: Validate edge and release component policy
         run: python scripts/validate_ecosystem_main.py
+      - name: Require release component pins to match current mains
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/validate_ecosystem_main.py --check-main-heads
       - name: Validate bounded-context architecture
         run: python scripts/validate_architecture.py
       - name: Run installer/catalog regressions
-        run: python -m unittest tests.test_installer tests.test_installer_update tests.test_ecosystem_architecture -v
+        run: python -m unittest tests.test_installer tests.test_installer_update tests.test_ecosystem_architecture tests.test_ecosystem_release_pins -v

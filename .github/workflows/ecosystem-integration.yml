@@ -53,8 +53,11 @@ jobs:
       - name: Install Linux native prerequisites
         run: sudo apt-get update && sudo apt-get install -y libasound2-dev pkg-config
       - name: Validate catalog and architecture
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python scripts/validate_ecosystem_main.py
+          python scripts/validate_ecosystem_main.py --check-main-heads
           python scripts/validate_architecture.py
       - name: Perform clean main installation
         shell: bash
