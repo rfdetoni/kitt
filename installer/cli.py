@@ -113,6 +113,12 @@ def build_parser() -> argparse.ArgumentParser:
     rea = parser.add_mutually_exclusive_group()
     rea.add_argument("--with-rea", action="store_true", help="install REA 6.4.0 in user prefix (included in --preset full)")
     rea.add_argument("--skip-rea", action="store_true", help="skip optional REA CLI from full preset")
+    parser.add_argument("--with-re-lab", action="store_true",
+        help="after full install, provision a Docker Linux RE full toolbox and fresh Dockur Windows 11 VM")
+    parser.add_argument("--re-runtime", choices=("docker",), default="docker")
+    parser.add_argument("--re-profile", choices=("full",), default="full")
+    parser.add_argument("--re-windows", choices=("dockurr",), default="dockurr")
+    parser.add_argument("--re-windows-version", choices=("11",), default="11")
     parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
     parser.add_argument("--with-vm-containers", action="store_true",
         help="check Docker/Podman QEMU support; include KITT Agent CLI")
@@ -243,6 +249,12 @@ def main(argv: list[str] | None = None) -> int:
             component_refs = load_release_refs(source_root, catalog)
 
         platform = PlatformAdapter.detect()
+        if args.with_re_lab and not args.uninstall:
+            if (args.preset or os.environ.get("KITT_PRESET")) != "full":
+                raise InstallerError("--with-re-lab requires --preset full")
+            from .re_lab import check_re_lab
+            check_re_lab(runtime=args.re_runtime, profile=args.re_profile,
+                         windows=args.re_windows, version=args.re_windows_version)
         if args.with_vm_lab and not args.uninstall:
             from .vm_lab import check_vm_lab
             check_vm_lab()
@@ -355,6 +367,21 @@ def main(argv: list[str] | None = None) -> int:
                     "Use 'kitt vm container build' or 'kitt vm container pull' later.",
                     file=sys.stderr,
                 )
+                optional_failed = True
+        if args.with_re_lab and not args.dry_run:
+            from .re_lab import ReLabError, provision_re_lab
+            try:
+                re_report = provision_re_lab(root, runtime=args.re_runtime,
+                    profile=args.re_profile, windows=args.re_windows,
+                    version=args.re_windows_version)
+                print("K.I.T.T. RE lab provisioned:")
+                print("  Linux toolbox: docker exec -it kitt-re-full /bin/sh")
+                print(f"  Windows console: {re_report['windows_url']}")
+                print(f"  Windows username: {re_report['windows_user']}")
+                print(f"  Windows credentials: {re_report['credentials_file']}")
+                print(f"  Note: {re_report['warning']}")
+            except (ReLabError, OSError, subprocess.SubprocessError) as error:
+                print(f"K.I.T.T. installed; RE lab incomplete: {error}", file=sys.stderr)
                 optional_failed = True
         return 1 if optional_failed else 0
     except UserCancelled as exc:
