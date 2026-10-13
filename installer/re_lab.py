@@ -5,7 +5,6 @@ never claim that changing Docker environment variables updates an installed OS.
 """
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -111,6 +110,7 @@ def _toolbox_tag(python: Path) -> str:
 
 def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, version: str) -> dict[str, str]:
     check_re_lab(runtime=runtime, profile=profile, windows=windows, version=version)
+    import fcntl  # Linux-only; do not prevent a helpful platform error on Windows
     root = root.expanduser().resolve()
     python = root / ".venv-agent" / "bin" / "python"
     if python.is_symlink() or not python.is_file():
