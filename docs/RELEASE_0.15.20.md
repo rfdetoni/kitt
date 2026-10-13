@@ -19,7 +19,7 @@ returned to the Agent.
   and remaining durable execution budget. This removes the incorrect
   fixed 240,000-ms cap at the metadata source.
 - Reverse Proxy **5.1.7** (SHA
-  `78ee30cff14326ac7ff34aaa85556b790c095202`):
+  `aec953b1f570bf3f60cd0e14ed5fd644067254db`):
   its existing passive CDP response tap feeds correlated-byte
   progress into the UI monitoring watchdog. KAP/1 envelopes ending
   in `KITT/END` are understood by the strict, trusted raw-stream
