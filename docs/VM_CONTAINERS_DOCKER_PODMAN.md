@@ -148,3 +148,9 @@ rea inspect-managed-artifact /workspace/assembly.dll --json
 O REA via MCP **no host** continua opt-in: instalar o CLI de forma independente no mesmo ambiente do processo KITT e depois executar `kitt plugins enable kitt-rea`. O novo `rea_workflow` fornece sugestões de operações do REA para binários nativos, JavaScript/Electron, .NET, comparação de versões, dumps e PCAP sem executar diretamente. As operações continuam passando por política de ferramentas e aprovação; evidências canônicas do REA e desconhecidos são preservados no Evidence v2 do KITT. Consulte a [documentação técnica do Agent](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/REA.md).
 
 O toolbox é um contêiner com kernel compartilhado, não substitui QEMU para execução de binários suspeitos. Os testes de CI comprovam a construção e execução básica dos CLI; um ensaio com guest Windows/Linux reais continua necessário.
+
+## REA no preset completo do instalador KITT
+
+Além da imagem Docker/Podman `full`, o comando `--preset full` do instalador raiz agora instala `rea-agents@6.4.0` no prefixo privado do próprio KITT, caso um Node compatível e npm estejam disponíveis. Essa instalação não usa `npm install -g` no prefixo global e não habilita o MCP automaticamente. Para ativar no workspace autorizado, execute `kitt plugins enable kitt-rea`.
+
+Para instalar REA com outro preset use `--with-rea`. Para excluir do preset completo use `--skip-rea`. A falta de Node/npm ou a falha de download não cancela a instalação já concluída dos componentes centrais do KITT: uma mensagem específica indica que o REA ficou pendente. Nenhuma instalação implícita modifica o Node ou o prefixo global do npm. Consulte [notas da release](RELEASE_0.15.8.md).
