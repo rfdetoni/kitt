@@ -5,9 +5,9 @@
 The authoritative immutable revision list is in `ecosystem.release.json`. This release updates:
 - kitt-protocol **0.13.1**: KAP/2 strict Python/TypeScript decoders, typed errors, quoted keys, nested object arrays, UTF-8 literal length, schema-guided primitives, shared fixtures and 5,000-case differential fuzzing
 - kitt-reverse-proxy **5.3.0**: canonical KAP/2 parser including typed diagnostic errors, ChatGPT UI/CDP recovery, and normalized Express 5.2.1 npm lock
-- kitt-agent-cli **0.87.4**: Protocol 0.13.1 parser pin
+- kitt-agent-cli **0.87.5**: Protocol 0.13.1 parser pin
 - kitt-ai-workers **0.1.60**: Protocol 0.13.1 dependency pin
-- kitt-assistant **0.1.39**, Runtime **0.3.19**: updated Agent and Protocol locks; fixed Cargo.lock `tracing-core` from an unresolvable 0.1.37 entry to the available 0.1.36
+- kitt-assistant **0.1.40**, Runtime **0.3.20**: updated Agent and Protocol locks; fixed Cargo.lock `tracing-core` from an unresolvable 0.1.37 entry to the available 0.1.36
 
 The trusted host remains responsible for validation, approvals, and tool authority. IPC Envelope v1 remains unchanged.
 
@@ -26,3 +26,4 @@ The captured 2026-10-13 incident used **Proxy 5.2.1**, not this newly pinned 5.3
 ## Deferred scope
 
 Read-only batches, version-negotiated positional arguments, host-scoped references, revision-based patches and differential plans are tracked as proposals in the Protocol roadmap, not silently enabled. The comprehensive cross-repository dead-code/God-class/brain-method architecture audit remains separate work.
+\nThe goal lifecycle now uses KAP/2 for planning, contract review, independent validation, adversarial review and completion, with parser-backed prompt regression checks.\n

@@ -17,11 +17,11 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "985274f87f5252c4757a6ea6365413485da96d19"
+      "sha": "94af7ef008a6316bd6f5079e4175227aff98a1aa"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "16231e0f36e38bc394dc895d3d5b577049648621"
+      "sha": "5693fb3304fb5e0cfba5f1bd90841f43f12e24f3"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
