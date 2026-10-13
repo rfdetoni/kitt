@@ -571,8 +571,7 @@ class RepositoryStateTests(unittest.TestCase):
             self.assertTrue(unrelated.exists())
 
 
-if __name__ == "__main__":
-    unittest.main()
+
 
 
 
@@ -609,8 +608,9 @@ class ReLabProvisioningTests(unittest.TestCase):
             python = root / ".venv-agent" / "bin" / "python"
             python.parent.mkdir(parents=True)
             python.touch()
+            (root / "re-lab").mkdir(mode=0o700)
             storage = root / "re-lab" / "windows"
-            storage.mkdir(parents=True, mode=0o700)
+            storage.mkdir(mode=0o700)
             (storage / "data.img").write_bytes(b"existing guest")
             with (
                 patch("installer.re_lab.check_re_lab"),
@@ -659,3 +659,7 @@ class ReLabProvisioningTests(unittest.TestCase):
             self.assertIn("none", linux)
             self.assertIn("--cap-drop", linux)
             self.assertEqual(result["windows_user"], "Kitt")
+
+
+if __name__ == "__main__":
+    unittest.main()
