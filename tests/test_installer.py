@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from installer.catalog import CatalogError, EcosystemCatalog, Resolution
-from installer.cli import _env_flag, _quiet_install_output, build_parser
+from installer.cli import _env_flag, _quiet_install_output, build_parser, main
 from installer.core import EcosystemInstaller, InstallerError, InstallerOptions
 from installer.platforms import PlatformAdapter
 from installer.release_manifest import load_release_refs
@@ -155,6 +155,38 @@ class InstallerCliTests(unittest.TestCase):
             self.assertIn("hidden stderr", captured)
         finally:
             path.unlink(missing_ok=True)
+
+
+    def test_requested_rea_install_failure_returns_nonzero(self) -> None:
+        from installer.rea_cli import ReaInstallError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            args = ["--preset", "agent", "--minimal", "--with-rea", "--yes", "--verbose",
+                    "--root", str(Path(tmp) / "root"), "--bin-dir", str(Path(tmp) / "bin")]
+            with patch("installer.cli.SourceFreeEcosystemInstaller") as installer, \
+                 patch("installer.cli._record_source_ref"), \
+                 patch("installer.cli._ensure_launcher_priority"), \
+                 patch("installer.rea_cli.install_rea", side_effect=ReaInstallError("Node missing")):
+                status = main(args)
+            self.assertEqual(status, 1)
+            installer.return_value.install.assert_called_once()
+
+    def test_requested_vm_image_failure_returns_nonzero(self) -> None:
+        from installer.vm_containers import VMContainerError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            args = ["--preset", "agent", "--minimal", "--with-vm-containers",
+                    "--vm-pull-images", "--yes", "--verbose",
+                    "--root", str(Path(tmp) / "root"), "--bin-dir", str(Path(tmp) / "bin")]
+            with patch("installer.cli.SourceFreeEcosystemInstaller") as installer, \
+                 patch("installer.cli._record_source_ref"), \
+                 patch("installer.cli._ensure_launcher_priority"), \
+                 patch("installer.vm_containers.check_container_runtime", return_value={}), \
+                 patch("installer.vm_containers.pull_prebuilt",
+                       side_effect=VMContainerError("image unavailable")):
+                status = main(args)
+            self.assertEqual(status, 1)
+            installer.return_value.install.assert_called_once()
 
 
 class InstallerUiTests(unittest.TestCase):
