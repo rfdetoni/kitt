@@ -1,3 +1,5 @@
+**KITT 0.15.9 — REA MCP corrigido:** o toolbox Linux `full` continua com REA 6.4.0/Node 24/Ghidra/Frida, e o instalador `--preset full` continua incluindo REA. Foram corrigidos os nomes sugeridos de ferramentas de análise nativa, comparação e PCAP para corresponder ao REA 6.4.0. Consulte as [notas 0.15.9](docs/RELEASE_0.15.9.md) e o [guia de REA](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/REA.md).
+
 **KITT 0.15.8 — REA no preset do instalador `full` e no toolbox Linux `full`:** o toolbox Docker/Podman inclui `rea-agents@6.4.0`, Node.js 24, Ghidra e Frida, sem alterar o Agent de programação normal. O instalador `--preset full` também instala o REA 6.4.0 em prefixo privado, sem modificar o npm global; após instalar, habilite `kitt-rea` no workspace quando necessário. O Agent 0.86.11 disponibiliza HOME e cache temporários para execução sem root. Consulte o [guia de VMs e REA](docs/VM_CONTAINERS_DOCKER_PODMAN.md) e as [notas da release](docs/RELEASE_0.15.8.md).
 
 **VMs Docker/Podman reforçadas em 0.15.7:** noVNC autenticado, snapshots
