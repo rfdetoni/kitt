@@ -1,4 +1,4 @@
-**KITT 0.15.22 — protocolo compacto KAP/2:** Protocol 0.12.0, Agent 0.87.0, Reverse Proxy 5.2.0 e módulos sincronizados passam a usar envelopes `K2` com objetos hierárquicos, tabelas e blocos literais. A recuperação CDP/DOM reconhece `K2/END`; permissões e validações continuam no host. Consulte [notas 0.15.22](docs/RELEASE_0.15.22.md).
+**KITT 0.15.22 — protocolo compacto KAP/2:** Protocol 0.12.1, Agent 0.87.1, Reverse Proxy 5.2.1 e módulos sincronizados passam a usar envelopes `K2` com objetos hierárquicos, tabelas e blocos literais. A recuperação CDP/DOM reconhece `K2/END`; permissões e validações continuam no host. Consulte [notas 0.15.22](docs/RELEASE_0.15.22.md).
 
 **KITT 0.15.21 — recuperar respostas ChatGPT Web já concluídas:** Reverse Proxy 5.1.8 corrige a correlação de prompts grandes no CDP, amplia seletores do assistente e valida `KITT/END` em mensagens já finalizadas. Se a leitura falhar após o fim da geração, registra um diagnóstico específico em vez de aguardar três minutos. Consulte [release 0.15.21](docs/RELEASE_0.15.21.md).
 
