@@ -1,4 +1,4 @@
-**KITT 0.15.23 — KAP/2 0.13.1 segurança e extensibilidade:** Protocol 0.13.1, Reverse Proxy 5.3.0, Agent CLI 0.87.2, Assistant Runtime 0.3.17 e Workers 0.1.60 compartilham contratos compactos com chaves entre aspas, arrays de objetos, literais UTF-8 com tamanho, erros tipados, validação diferencial e documentação. Consulte [release 0.15.23](docs/RELEASE_0.15.23.md).
+**KITT 0.15.23 — KAP/2 0.13.1 segurança e extensibilidade:** Protocol 0.13.1, Reverse Proxy 5.3.0, Agent CLI 0.87.3, Assistant Runtime 0.3.18 e Workers 0.1.60 compartilham contratos compactos com chaves entre aspas, arrays de objetos, literais UTF-8 com tamanho, erros tipados, validação diferencial e documentação. Consulte [release 0.15.23](docs/RELEASE_0.15.23.md).
 
 **KITT 0.15.22 — protocolo compacto KAP/2:** Protocol 0.12.1, Agent 0.87.1, Reverse Proxy 5.2.1 e módulos sincronizados passam a usar envelopes `K2` com objetos hierárquicos, tabelas e blocos literais. A recuperação CDP/DOM reconhece `K2/END`; permissões e validações continuam no host. Consulte [notas 0.15.22](docs/RELEASE_0.15.22.md).
 
