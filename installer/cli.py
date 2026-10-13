@@ -110,6 +110,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", type=Path, help="installation root")
     parser.add_argument("--bin-dir", type=Path, help="command launcher directory")
     parser.add_argument("--with-ai-workers", action="store_true", help="also install heavy AI/STT worker dependencies")
+    rea = parser.add_mutually_exclusive_group()
+    rea.add_argument("--with-rea", action="store_true", help="install REA 6.4.0 in user prefix (included in --preset full)")
+    rea.add_argument("--skip-rea", action="store_true", help="skip optional REA CLI from full preset")
     parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
     parser.add_argument("--with-vm-containers", action="store_true",
         help="check Docker/Podman QEMU support; include KITT Agent CLI")
@@ -272,6 +275,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         installer = SourceFreeEcosystemInstaller(catalog, platform, options)
         if args.uninstall:
+            from .rea_cli import remove_rea_launcher
+            remove_rea_launcher(root, bin_dir)
             installer.uninstall()
             return 0
 
@@ -284,6 +289,7 @@ def main(argv: list[str] | None = None) -> int:
             requested.extend(
                 module for module in catalog.preset(preset) if module not in requested
             )
+        with_rea = bool(args.with_rea or (preset == "full" and not args.skip_rea))
         if args.with_ai_workers and "ai-workers" not in requested:
             requested.append("ai-workers")
         if args.with_vm_lab and "agent-cli" not in requested:
@@ -324,6 +330,18 @@ def main(argv: list[str] | None = None) -> int:
             if not args.dry_run:
                 _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
+        if with_rea and not args.dry_run:
+            from .rea_cli import ReaInstallError, install_rea
+            try:
+                report = install_rea(root, bin_dir)
+                print(f"REA {report['version']} installed in KITT managed prefix. "
+                      "Run 'kitt plugins enable kitt-rea' inside an authorized workspace to activate MCP.")
+            except (ReaInstallError, OSError, subprocess.SubprocessError) as error:
+                print(
+                    f"K.I.T.T. installed; REA component incomplete: {error}. "
+                    "Install Node 24 LTS and rerun with --with-rea.",
+                    file=sys.stderr,
+                )
         if args.with_vm_containers and args.vm_pull_images and not args.dry_run:
             from .vm_containers import VMContainerError, pull_prebuilt
             try:
