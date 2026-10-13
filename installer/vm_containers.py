@@ -40,7 +40,8 @@ def pull_prebuilt(root: Path, *, runtime: str, profile: str) -> None:
     if profile not in ("base", "wine", "full"):
         raise VMContainerError("Unknown RE image profile")
     python = root / ".venv-agent" / "bin" / "python"
-    if not python.is_file() or python.is_symlink():
+    # The managed venv may expose its interpreter through bin/python symlinks.
+    if not python.is_file():
         raise VMContainerError("Managed KITT Agent interpreter unavailable")
     for image in ("qemu", "toolbox"):
         argv = [str(python), "-m", "kitt.cli.main", "vm", "container", "pull",

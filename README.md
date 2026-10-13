@@ -1,3 +1,5 @@
+**KITT 0.15.13 — Docker/Dockur RE lab com Python do venv:** corrigida a detecção do interpretador `bin/python` quando ele é um link simbólico legítimo, tanto para `--with-re-lab` quanto para `--vm-pull-images`. O KITT Full e o REA já instalados podem ser preservados: reexecute o instalador oficial. Veja [release 0.15.13](docs/RELEASE_0.15.13.md).
+
 **KITT 0.15.12 — Laboratório RE Full com Docker + Dockur Windows:** o instalador oficial agora aceita `--with-re-lab --re-runtime docker --re-profile full --re-windows dockurr --re-windows-version 11` no preset `full`. Cria contêiner Linux RE sem rede e Windows 11 Dockur com disco persistente, console localhost e credenciais configuradas somente na primeira instalação. Veja [guia 0.15.12](docs/RELEASE_0.15.12.md).
 
 **KITT 0.15.11 — Preflight de compilador C no Linux:** o instalador agora detecta `cc` antes do download e da compilação nativa do Assistant/Toolbox, mostra o comando de instalação do toolchain da distribuição e mantém o modo `--portable` sem essa exigência. A ausência de ALSA segue com fallback já implementado. Veja [as notas 0.15.11](docs/RELEASE_0.15.11.md).
