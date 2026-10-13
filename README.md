@@ -1,3 +1,5 @@
+**KITT 0.15.12 — Laboratório RE Full com Docker + Dockur Windows:** o instalador oficial agora aceita `--with-re-lab --re-runtime docker --re-profile full --re-windows dockurr --re-windows-version 11` no preset `full`. Cria contêiner Linux RE sem rede e Windows 11 Dockur com disco persistente, console localhost e credenciais configuradas somente na primeira instalação. Veja [guia 0.15.12](docs/RELEASE_0.15.12.md).
+
 **KITT 0.15.11 — Preflight de compilador C no Linux:** o instalador agora detecta `cc` antes do download e da compilação nativa do Assistant/Toolbox, mostra o comando de instalação do toolchain da distribuição e mantém o modo `--portable` sem essa exigência. A ausência de ALSA segue com fallback já implementado. Veja [as notas 0.15.11](docs/RELEASE_0.15.11.md).
 
 **KITT 0.15.10 — Snapshots de VM protegidos e Proxy 5.1.2:** o Agent 0.86.13 rejeita estado TPM/UEFI inseguro antes de criar ou restaurar snapshots; o manifesto da release passa a fixar também a correção de recuperação Gemini FINAL do Reverse Proxy 5.1.2. O Assistant 0.3.10 permanece compatível. Consulte as [notas 0.15.10](docs/RELEASE_0.15.10.md).
