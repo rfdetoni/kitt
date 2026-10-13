@@ -1,3 +1,5 @@
+**KITT 0.15.11 — Preflight de compilador C no Linux:** o instalador agora detecta `cc` antes do download e da compilação nativa do Assistant/Toolbox, mostra o comando de instalação do toolchain da distribuição e mantém o modo `--portable` sem essa exigência. A ausência de ALSA segue com fallback já implementado. Veja [as notas 0.15.11](docs/RELEASE_0.15.11.md).
+
 **KITT 0.15.10 — Snapshots de VM protegidos e Proxy 5.1.2:** o Agent 0.86.13 rejeita estado TPM/UEFI inseguro antes de criar ou restaurar snapshots; o manifesto da release passa a fixar também a correção de recuperação Gemini FINAL do Reverse Proxy 5.1.2. O Assistant 0.3.10 permanece compatível. Consulte as [notas 0.15.10](docs/RELEASE_0.15.10.md).
 
 **KITT 0.15.9 — REA MCP corrigido:** o toolbox Linux `full` continua com REA 6.4.0/Node 24/Ghidra/Frida, e o instalador `--preset full` continua incluindo REA. Foram corrigidos os nomes sugeridos de ferramentas de análise nativa, comparação e PCAP para corresponder ao REA 6.4.0. Consulte as [notas 0.15.9](docs/RELEASE_0.15.9.md) e o [guia de REA](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/REA.md).
