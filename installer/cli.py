@@ -330,6 +330,7 @@ def main(argv: list[str] | None = None) -> int:
             if not args.dry_run:
                 _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
+        optional_failed = False
         if with_rea and not args.dry_run:
             from .rea_cli import ReaInstallError, install_rea
             try:
@@ -342,6 +343,7 @@ def main(argv: list[str] | None = None) -> int:
                     "Install Node 24 LTS and rerun with --with-rea.",
                     file=sys.stderr,
                 )
+                optional_failed = True
         if args.with_vm_containers and args.vm_pull_images and not args.dry_run:
             from .vm_containers import VMContainerError, pull_prebuilt
             try:
@@ -353,7 +355,8 @@ def main(argv: list[str] | None = None) -> int:
                     "Use 'kitt vm container build' or 'kitt vm container pull' later.",
                     file=sys.stderr,
                 )
-        return 0
+                optional_failed = True
+        return 1 if optional_failed else 0
     except UserCancelled as exc:
         if active_progress is not None:
             active_progress.finish(False)
