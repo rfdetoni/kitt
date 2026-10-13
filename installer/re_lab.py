@@ -113,7 +113,8 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
     import fcntl  # Linux-only; do not prevent a helpful platform error on Windows
     root = root.expanduser().resolve()
     python = root / ".venv-agent" / "bin" / "python"
-    if python.is_symlink() or not python.is_file():
+    # python -m venv normally symlinks bin/python to a usable interpreter.
+    if not python.is_file():
         raise ReLabError("KITT Agent CLI must be installed before provisioning RE lab")
     lab = root / "re-lab"
     _private_dir(lab)
