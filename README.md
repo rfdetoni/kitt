@@ -1,3 +1,11 @@
+## KITT 0.15.35 — DOM freshness capture for KAP/2
+
+This release pins reverse-proxy **5.3.10** with an opt-in,
+bounded post-submit DOM mutation capture fallback for ChatGPT/Gemini
+KAP/2 frames. Prompts containing embedded KAP examples are not
+accepted as fresh replies. No Agent CLI/Protocol grammar change.
+See [release notes](docs/RELEASE_0.15.35.md).
+
 ## KITT 0.15.34 — compact KAP/2 final accepted end to end
 
 The root pins reverse-proxy **5.3.9**, resolving the disagreement between
