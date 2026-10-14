@@ -80,6 +80,11 @@ jobs:
             --base .audit \
             --output .audit-report/inventory.json \
             --markdown .audit-report/report.md
+      - name: Record exact audited HEADs
+        run: |
+          for repo in kitt-agent-cli kitt-reverse-proxy kitt-protocol kitt-memory kitt-toolbox kitt-assistant kitt-ai-workers; do
+            printf '%s %s\n' "$repo" "$(git -C ".audit/$repo" rev-parse HEAD)"
+          done | tee .audit-report/source-commits.txt
       - name: Print bounded review shortlist
         run: sed -n '1,130p' .audit-report/report.md
       - name: Upload immutable report
