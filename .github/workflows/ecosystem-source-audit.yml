@@ -1,0 +1,88 @@
+name: ecosystem-source-audit
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - scripts/audit_ecosystem_sources.py
+      - tests/test_ecosystem_source_audit.py
+      - .github/workflows/ecosystem-source-audit.yml
+  schedule:
+    - cron: "15 6 * * 1"
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout root audit code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Python 3.14
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Unit checks for inventory
+        run: python -m unittest tests.test_ecosystem_source_audit -v
+      - name: Checkout agent
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-agent-cli
+          ref: main
+          path: .audit/kitt-agent-cli
+          persist-credentials: false
+      - name: Checkout proxy
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-reverse-proxy
+          ref: main
+          path: .audit/kitt-reverse-proxy
+          persist-credentials: false
+      - name: Checkout protocol
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-protocol
+          ref: main
+          path: .audit/kitt-protocol
+          persist-credentials: false
+      - name: Checkout memory
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-memory
+          ref: main
+          path: .audit/kitt-memory
+          persist-credentials: false
+      - name: Checkout toolbox
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-toolbox
+          ref: main
+          path: .audit/kitt-toolbox
+          persist-credentials: false
+      - name: Checkout assistant
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-assistant
+          ref: main
+          path: .audit/kitt-assistant
+          persist-credentials: false
+      - name: Checkout ai-workers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: rfdetoni/kitt-ai-workers
+          ref: main
+          path: .audit/kitt-ai-workers
+          persist-credentials: false
+      - name: Generate full inventory and triage report
+        run: |
+          python scripts/audit_ecosystem_sources.py \
+            --base .audit \
+            --output .audit-report/inventory.json \
+            --markdown .audit-report/report.md
+      - name: Upload immutable report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kitt-source-audit
+          path: .audit-report/
+          retention-days: 30
