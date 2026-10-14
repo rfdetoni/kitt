@@ -1,3 +1,11 @@
+## KITT 0.15.36 — T00 ChatGPT Web composer submission fix
+
+The full preset now pins reverse-proxy **5.3.11**, which recovers
+multi-KiB T00 prompts modified by ChatGPT's rich editor before submission.
+The writer verifies exact normalized contents after its single bounded
+recovery and again before pressing Send; it never submits a corrupted draft.
+See [release details](docs/RELEASE_0.15.36.md).
+
 ## KITT 0.15.35 — DOM freshness capture for KAP/2
 
 This release pins reverse-proxy **5.3.10** with an opt-in,
