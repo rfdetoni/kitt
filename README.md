@@ -1,3 +1,11 @@
+## KITT 0.15.41 — targeted review corrections in Goal planning
+
+Pins Agent CLI **0.87.17**. High-risk contract review iterations now preserve
+the host-validated plan as a baseline, correct reviewer findings
+specifically, and revalidate every revised contract before execution.
+Bounded retries, approvals and TUI phase feedback are unchanged.
+See [release notes](docs/RELEASE_0.15.41.md).
+
 ## KITT 0.15.40 — visible Goal planning and execution progress
 
 Pins Agent CLI **0.87.16**, which sends host-owned planning, review,
