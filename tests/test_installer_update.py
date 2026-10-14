@@ -10,12 +10,31 @@ from unittest.mock import patch
 from installer.catalog import EcosystemCatalog
 from installer.cli import _record_source_ref, build_parser
 from installer.platforms import PlatformAdapter
+from installer.core import InstallerError
+from installer.source_free import validate_reverse_proxy_lock
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerUpdateRegressionTests(unittest.TestCase):
+    def test_reverse_proxy_install_rejects_mismatched_lock_versions(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            proxy = Path(temp)
+            (proxy / "package.json").write_text('{"version":"5.3.6"}', encoding="utf-8")
+            (proxy / "package-lock.json").write_text(
+                '{"version":"5.3.5","packages":{"":{"version":"5.3.5"}}}',
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(InstallerError, "version mismatch"):
+                validate_reverse_proxy_lock(proxy)
+
+            (proxy / "package-lock.json").write_text(
+                '{"version":"5.3.6","packages":{"":{"version":"5.3.6"}}}',
+                encoding="utf-8",
+            )
+            self.assertEqual(validate_reverse_proxy_lock(proxy), "5.3.6")
+
     def test_default_install_tracks_main(self) -> None:
         with patch.dict(os.environ, {"KITT_REF": ""}):
             args = build_parser().parse_args([])

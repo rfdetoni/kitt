@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import threading
@@ -14,6 +15,20 @@ from .core import EcosystemInstaller, InstallerError
 
 
 T = TypeVar("T")
+
+
+def validate_reverse_proxy_lock(proxy: Path) -> str:
+    """Prevent publishing a source/runtime pair with conflicting npm version pins."""
+    try:
+        package = json.loads((proxy / "package.json").read_text(encoding="utf-8"))
+        lock = json.loads((proxy / "package-lock.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise InstallerError(f"reverse-proxy package metadata is unavailable or invalid: {exc}") from exc
+    version = package.get("version")
+    if not isinstance(version, str) or not version or lock.get("version") != version \
+            or (lock.get("packages") or {}).get("", {}).get("version") != version:
+        raise InstallerError("reverse-proxy package.json/package-lock.json version mismatch")
+    return version
 
 
 class SourceFreeEcosystemInstaller(EcosystemInstaller):
@@ -367,7 +382,8 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         if "reverse-proxy" not in resolution.ids:
             return
         proxy = self._repo_dir(self.catalog.modules["reverse-proxy"])
-        print("\nBuild KITT Reverse Proxy")
+        version = validate_reverse_proxy_lock(proxy)
+        print(f"\nBuild KITT Reverse Proxy v{version}")
         env = self._npm_env()
         self._run(["npm", "ci", "--no-audit", "--no-fund", "--prefer-offline"], cwd=proxy, env=env)
         self._run(["npm", "run", "build"], cwd=proxy, env=env)
