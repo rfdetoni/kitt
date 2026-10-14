@@ -1,3 +1,7 @@
+## KITT 0.15.42 — opt-in native hybrid memory retrieval
+
+Pins Memory **0.10.0** (SQLite schema 10, indexed multi-probe LSH cosine candidates and FTS5/RRF), Agent CLI **0.87.19** (Ollama local lazy embeddings with bounded indexing/fallback), Assistant Runtime **0.3.27**, and AI Workers **0.1.66**. No new networked vector database or Protocol/KAP/2 change. Enable only with an installed local embedding model via `KITT_MEMORY_EMBED_MODEL`; SQLite remains the authoritative durable store. See [release notes](docs/RELEASE_0.15.42.md).
+
 ## KITT 0.15.41 — indexed search efficiency and consumer lock synchronization
 
 Release pins Agent CLI **0.87.18** (SQLite FTS5 rowid deletions, qualified symbol indexes and reduced unchanged-file reads), Reverse Proxy **5.3.12** (de-duplicated DOM contract samples and efficient CDP event buffering), Assistant Runtime **0.3.26**, and AI Workers **0.1.65**. Unchanged Protocol, Memory and Toolbox commits remain pinned to the previous validated revisions. See [release notes](docs/RELEASE_0.15.41.md).
