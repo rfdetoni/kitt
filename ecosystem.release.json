@@ -17,15 +17,15 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "f5618fca85ac58d2708e97b0219f975ffb08e53b"
+      "sha": "b0092349eda6784938d47b4341f604b092357e08"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "fed07a745c58ad8c286cba1230ebce9afe413170"
+      "sha": "5d6f6b2ac4a10826ab7b551694146928e06f2023"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
-      "sha": "70f48abc58ae8b42133f7bd7d2635629cf7db93a"
+      "sha": "3d50e644a46c6b67cb29357582b90fc7cab6e04a"
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",

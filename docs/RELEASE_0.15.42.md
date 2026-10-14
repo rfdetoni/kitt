@@ -2,9 +2,9 @@
 
 ## Released components
 - Memory 0.10.0 at eee55669ef7400b2c1f31b6e658a28f018b77723: Rust/SQLite derived embeddings, schema 10, indexed model/dimension/LSH buckets, content-hash invalidation and scope/sensitivity/temporal filtering; query reranking combines FTS5 and cosine candidates using RRF.
-- Agent CLI 0.87.19 at fed07a745c58ad8c286cba1230ebce9afe413170: optional loopback-only Ollama embeddings with lazy bounded single-thread indexing and lexical fallback.
-- Assistant Runtime 0.3.27 at f5618fca85ac58d2708e97b0219f975ffb08e53b: compatible Agent SHA and Python lock/CI alignment.
-- AI Workers 0.1.66 at 70f48abc58ae8b42133f7bd7d2635629cf7db93a: eval/evolution compatible Agent SHA and Python locks.
+- Agent CLI 0.87.19 at 5d6f6b2ac4a10826ab7b551694146928e06f2023: optional loopback-only Ollama embeddings with lazy bounded single-thread indexing and lexical fallback.
+- Assistant Runtime 0.3.27 at b0092349eda6784938d47b4341f604b092357e08: compatible Agent SHA and Python lock/CI alignment.
+- AI Workers 0.1.66 at 3d50e644a46c6b67cb29357582b90fc7cab6e04a: eval/evolution compatible Agent SHA and Python locks.
 
 ## Enable
 ```sh
