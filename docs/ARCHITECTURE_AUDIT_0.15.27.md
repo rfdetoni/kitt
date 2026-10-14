@@ -52,8 +52,8 @@ continua longo: a extração **não** encerra sua refatoração.
 
 **P1 — compatibilidade de contratos e proveniência de respostas web.**
 Protocol 0.13.2 centraliza a seleção exata `X-Kitt-KAP`;
-Agent 0.87.8 confirma a seleção; Proxy 5.3.2 valida o frame e a origem da
-resposta antes de concluir logicamente a espera. Não confundir marcador
+Agent 0.87.9 confirma a seleção; Proxy 5.3.3 disputa CDP tap e DOM como observers independentes,
+validando KAP/2 completo e turno atual antes de concluir logicamente a espera. Não confundir marcador
 `K2/END` solto com resposta válida, não executar ações do modelo sem host,
 não abortar o navegador, não permitir downgrade silencioso.
 
@@ -96,10 +96,11 @@ prova suficiente para apagar esses símbolos.
 
 - Um envelope KAP, cabeçalho ou conteúdo de arquivo nunca atribui
   autoridade; validação e aprovação permanecem no host.
-- Early completion requer CDP previamente confiável e correlacionado,
-  frame KAP/2 completo e parseado, UI de geração encerrada, estabilidade
-  temporal do CDP e DOM, e equivalência da resposta em turno novo do assistente.
-  **Não** encerra a geração por token ou interrompe a conexão upstream.
+- Early completion requer um vencedor válido (CDP com requisição
+  correlacionada, payload único, completo e estável; ou DOM com resposta
+  completa, estável e pertencente ao novo turno do assistente).
+  O outro observer não bloqueia a conclusão. **Não** encerra a geração
+  upstream nem autoriza tools por texto do modelo.
 - Gate aceito: Protocol CI, Agent PR Checks + Docker, Proxy CI + Docker,
   root ecosystem-main + ecosystem-integration na mesma composição.
 - A sessão ChatGPT Web autenticada do incidente original continua
