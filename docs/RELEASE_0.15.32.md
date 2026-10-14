@@ -5,7 +5,7 @@
 - Protocol 0.13.3: `cc3b51dd0e868adaab4ed7a0069c4dbf9aa08c42`
 - Agent CLI 0.87.11: `53edf7bd75f7326e0a5d4303c8f0d12b5c8baaf3`
 - Reverse Proxy 5.3.7: `e4b08073380e37fdd0dbd441efe7ec5d8be662b2`
-- Assistant native 0.1.42 / Python runtime 0.3.23: `e5ded96e8ab550358267d2ebe7ff83366e4305cd`
+- Assistant native 0.1.42 / Python runtime 0.3.23: `26ec25cca5d037c4900d8ca196522be311135930`
 - AI Workers 0.1.62 / Evals and Evolution 0.1.59: `d72a50ee4d022b89fc1c70875b32e86d2f2316d3`
 - Memory and Toolbox remain pinned at prior revisions.
 
