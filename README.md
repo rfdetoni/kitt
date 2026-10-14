@@ -1,3 +1,13 @@
+# KITT 0.15.32 — lossless KAP/2 planning replies
+
+The root manifest now pins Protocol 0.13.3, Agent CLI 0.87.11,
+Reverse Proxy 5.3.7, Assistant Runtime 0.3.23 and AI Workers 0.1.62.
+The planner uses explicit single-line `K2 F @json: {...} K2/END`
+structured finals to survive WebChat whitespace flattening while host
+schema validation and permissions remain strict. See
+[release details](docs/RELEASE_0.15.32.md) and
+[KAP/2 hard limits](docs/KAP2_LIMITS_0.15.32.md).
+
 # KITT 0.15.31 — Safe Python via KAP/2
 
 The full release snapshot pins Agent CLI **0.87.10** with the
