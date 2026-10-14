@@ -3,7 +3,7 @@
 ## Pinned modules
 
 - Root 0.15.27; protocol **0.13.2** (SHA \`0b9300e418557b00e371eeb2c70ef91fbf50855d\`).
-- Agent CLI **0.87.9** (SHA \`0aa1b3af2a4bcb49e45e8deabed8df631763823b\`).
+- Agent CLI **0.87.9** (SHA \`f69d2119579bb4d56178de01d7f7763ebdc9bf74\`).
 - Reverse Proxy **5.3.2** (SHA \`1b99b47bd57429579c40091d99f6f0778956254c\`).
 - Assistant, memory, toolbox and AI Workers retain immutable 0.15.26 pins.
 - Full manifest: \`ecosystem.release.json\`.
