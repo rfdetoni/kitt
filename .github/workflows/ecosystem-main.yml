@@ -6,6 +6,7 @@ on:
     paths:
       - ecosystem.json
       - ecosystem.release.json
+      - VERSION
       - installer/catalog.py
       - installer/release_manifest.py
       - installer/cli.py
@@ -21,6 +22,7 @@ on:
     paths:
       - ecosystem.json
       - ecosystem.release.json
+      - VERSION
       - installer/catalog.py
       - installer/release_manifest.py
       - installer/cli.py
