@@ -1,3 +1,10 @@
+## KITT 0.15.38 — KAP/2 K2 T host dispatch
+
+Pins Agent CLI **0.87.13** plus updated Assistant and AI Workers
+runtime locks, completing the tool-first Goals repair. Model K2 T
+operations now reach canonical KAP/2 decoding before host policy and
+execution. See [release notes](docs/RELEASE_0.15.38.md).
+
 ## KITT 0.15.37 — restore host-tool execution in durable Goals
 
 The root pins Agent CLI **0.87.12** with a KAP/2 tool-first completion
