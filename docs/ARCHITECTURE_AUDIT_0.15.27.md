@@ -38,7 +38,7 @@ inventário possuem uma ocorrência lexical, não são rotas nem exports:
 \`kitt/llm/providers/kitt_reverse_proxy.py::_proxy_error_message\`,
 \`kitt/llm/kitt_proxy_capabilities.py::_range\` e
 \`kitt/llm/client.py::_normalize_reasoning_effort\`.
-Foram removidos no PR Agent #96; testes de contrato e Docker
+Foram removidos no PR Agent #96 e correção de lock no PR #97; testes de contrato e Docker
 passaram no SHA do PR. Permissões, schemas e adaptadores mantêm as
 assinaturas públicas. Isso confirma ausência de consumidor *estático
 dentro da árvore analisada*, não prova ausência de import externo.
