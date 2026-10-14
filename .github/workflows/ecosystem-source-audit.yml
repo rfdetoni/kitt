@@ -80,6 +80,8 @@ jobs:
             --base .audit \
             --output .audit-report/inventory.json \
             --markdown .audit-report/report.md
+      - name: Print bounded review shortlist
+        run: sed -n '1,130p' .audit-report/report.md
       - name: Upload immutable report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
