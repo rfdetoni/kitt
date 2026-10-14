@@ -1,3 +1,13 @@
+## KITT 0.15.39 — lazy RE lab lifecycle and in-Agent setup
+
+Release pins Agent CLI **0.87.15**. Windows/Linux reverse-engineering guest
+profiles are created by the existing wizard, enrolled explicitly, and started
+only when the operator uses a lab mission or the `/re` UI. Only
+mission-started guests are stopped after the run; existing guests are
+preserved. RE toolbox can be launched directly from the Agent CLI TUI.
+See [release details](docs/RELEASE_0.15.39.md) and the
+[Agent RE guide](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/RE_LAZY_ENVIRONMENTS.md).
+
 ## KITT 0.15.38 — KAP/2 K2 T host dispatch
 
 Pins Agent CLI **0.87.13** plus updated Assistant and AI Workers
