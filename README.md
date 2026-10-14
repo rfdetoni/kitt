@@ -1,3 +1,13 @@
+## KITT 0.15.34 — compact KAP/2 final accepted end to end
+
+The root pins reverse-proxy **5.3.9**, resolving the disagreement between
+the proxy's generated KAP/2 decoder and canonical Protocol **0.13.3**.
+A captured `K2 F @json: {...}\nK2/END` is now recognized by the proxy
+contract validator and raw transport selector, with no duplicate parser
+heuristics. The host still checks that a durable plan includes the mandatory
+`FINAL` item, so incomplete plans cannot execute. See
+[release 0.15.34](docs/RELEASE_0.15.34.md).
+
 ## KITT 0.15.33 — WebChat KAP/2 DOM recovery
 
 Root pins Reverse Proxy 5.3.8, which detects one-line `K2 F @json`
