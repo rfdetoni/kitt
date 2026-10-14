@@ -1,3 +1,12 @@
+## KITT 0.15.40 — visible Goal planning and execution progress
+
+Pins Agent CLI **0.87.16**, which sends host-owned planning, review,
+revision/retry and execution states through daemon IPC into the Agent TUI.
+Long WebChat planning loops now show their current phase and attempt instead
+of appearing idle; reviewer rejection still blocks execution as designed.
+No Protocol, Reverse Proxy or permission-policy changes.
+See [release notes](docs/RELEASE_0.15.40.md).
+
 ## KITT 0.15.39 — lazy RE lab lifecycle and in-Agent setup
 
 Release pins Agent CLI **0.87.15**. Windows/Linux reverse-engineering guest
