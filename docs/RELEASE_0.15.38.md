@@ -5,7 +5,7 @@
 - Agent CLI **0.87.13**, `d50e3fe6aa4258fa24e2c69645968f6c845c18a0`
 - Assistant Python Runtime **0.3.25**, `11c9fee34db10c87dce8b73a8c2c7cc442456f23` (native unchanged)
 - AI Workers **0.1.64**, Evals/Evolution **0.1.61**, `5a53de290ae861e3bee4a24dea07b603bbafecfa`
-- Reverse Proxy **5.3.11**, Protocol **0.13.3**, Memory and Toolbox: unchanged immutable pins
+- Reverse Proxy **5.3.11** at `44b487262924c4fd4cf240a6421ee53a1b24712f` (dependency lock and CI workflow updates; runtime capture logic unchanged), Protocol **0.13.3**, Memory and Toolbox: unchanged versions
 
 ## Root cause and resolution
 

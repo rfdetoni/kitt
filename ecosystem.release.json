@@ -29,7 +29,7 @@
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
-      "sha": "9dfae74f57b8239c5b9b419967ed5ee8fe037155"
+      "sha": "44b487262924c4fd4cf240a6421ee53a1b24712f"
     }
   }
 }
