@@ -1,3 +1,10 @@
+## KITT 0.15.33 — WebChat KAP/2 DOM recovery
+
+Root pins Reverse Proxy 5.3.8, which detects one-line `K2 F @json`
+replies, bounds the DOM fallback, and handles only deterministic Markdown
+presentation escapes without relaxing canonical host validation.
+See [release notes](docs/RELEASE_0.15.33.md).
+
 # KITT 0.15.32 — lossless KAP/2 planning replies
 
 The root manifest now pins Protocol 0.13.3, Agent CLI 0.87.11,
