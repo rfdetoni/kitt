@@ -1,3 +1,7 @@
+## KITT 0.15.41 — indexed search efficiency and consumer lock synchronization
+
+Release pins Agent CLI **0.87.18** (SQLite FTS5 rowid deletions, qualified symbol indexes and reduced unchanged-file reads), Reverse Proxy **5.3.12** (de-duplicated DOM contract samples and efficient CDP event buffering), Assistant Runtime **0.3.26**, and AI Workers **0.1.65**. Unchanged Protocol, Memory and Toolbox commits remain pinned to the previous validated revisions. See [release notes](docs/RELEASE_0.15.41.md).
+
 ## KITT 0.15.40 — visible Goal planning and execution progress
 
 Pins Agent CLI **0.87.16**, which sends host-owned planning, review,
