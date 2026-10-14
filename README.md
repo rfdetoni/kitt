@@ -1,3 +1,10 @@
+## KITT 0.15.37 — restore host-tool execution in durable Goals
+
+The root pins Agent CLI **0.87.12** with a KAP/2 tool-first completion
+contract, Assistant Runtime **0.3.24** and AI Workers **0.1.63**.
+This fixes T00 loops returning `INCOMPLETE` without a single host tool
+operation. See [release 0.15.37](docs/RELEASE_0.15.37.md).
+
 ## KITT 0.15.36 — T00 ChatGPT Web composer submission fix
 
 The full preset now pins reverse-proxy **5.3.11**, which recovers
