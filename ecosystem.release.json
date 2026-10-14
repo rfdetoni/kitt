@@ -17,7 +17,7 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "94af7ef008a6316bd6f5079e4175227aff98a1aa"
+      "sha": "5b8fdc858dece435f82fe4ff8fe98af4ceed29ae"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
@@ -29,7 +29,7 @@
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
-      "sha": "1b99b47bd57429579c40091d99f6f0778956254c"
+      "sha": "05aa12d3578448142742dbf746fb7c078a488152"
     }
   }
 }
