@@ -1,3 +1,7 @@
+## KITT 0.15.51 — live agent planning/review feedback
+
+Pins Agent CLI **0.87.27**, Assistant Runtime **0.3.34**, and AI Workers **0.1.73**. Planning/review now exposes the current stage, retry number and real elapsed provider-wait time in TUI, without claiming work is complete while the remote LLM is still responding. Retains the FINAL contract-review convergence fix from 0.87.26. Protocol, Memory, Toolbox and Reverse Proxy pins are unchanged. [Release notes](docs/RELEASE_0.15.51.md).
+
 ## KITT 0.15.50 — reviewed planning convergence fix
 
 Pins Agent CLI **0.87.26**, Assistant Runtime **0.3.33** and AI Workers **0.1.72**. The Agent contract planner now preserves authored FINAL criteria, paths and dependencies through high-risk independent review, avoiding systematic REVIEW → REVISE loops caused by implicit union of all task criteria. Each task is still verified independently; global contract limits remain in force. Protocol, Memory, Toolbox and Reverse Proxy pins unchanged. [Release details](docs/RELEASE_0.15.50.md).
