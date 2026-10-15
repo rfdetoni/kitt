@@ -1,3 +1,7 @@
+## KITT 0.15.49 — automatically routed LLMs per specialist
+
+Pins Agent CLI **0.87.25** (each Code/Creative/Investigator/Critic/Tester worker selects its own registered TaskRouter profile: Ollama, direct providers or separate reverse proxies, with fixed/preferred/automatic routing and bounded failover), Assistant Runtime **0.3.32**, and AI Workers **0.1.71**. Memory, Protocol, Toolbox and Reverse Proxy pins remain unchanged. [Release notes](docs/RELEASE_0.15.49.md).
+
 ## KITT 0.15.48 — WebChat KAP/2 tool-action capture fix
 
 Release manifest pins **Reverse Proxy 5.3.15** and **Agent CLI 0.87.24**
