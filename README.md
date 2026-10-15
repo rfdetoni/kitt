@@ -1,3 +1,7 @@
+## KITT 0.15.52 — safe handling of ambiguous WebChat responses
+
+Pins Agent CLI **0.87.28**, Assistant Runtime **0.3.35**, and AI Workers **0.1.74**. When ChatGPT Web accepted the model request but a fresh KAP action could not be captured, the durable goal now enters **BLOCKED / ENVIRONMENT** rather than automatically resending the same prompt. Inspect/repair the authenticated provider session and explicitly resume the affected goal. Protocol, Memory, Toolbox and Reverse Proxy versions remain unchanged. [Release details](docs/RELEASE_0.15.52.md).
+
 ## KITT 0.15.51 — live agent planning/review feedback
 
 Pins Agent CLI **0.87.27**, Assistant Runtime **0.3.34**, and AI Workers **0.1.73**. Planning/review now exposes the current stage, retry number and real elapsed provider-wait time in TUI, without claiming work is complete while the remote LLM is still responding. Retains the FINAL contract-review convergence fix from 0.87.26. Protocol, Memory, Toolbox and Reverse Proxy pins are unchanged. [Release notes](docs/RELEASE_0.15.51.md).
