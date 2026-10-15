@@ -1,3 +1,7 @@
+## KITT 0.15.50 — reviewed planning convergence fix
+
+Pins Agent CLI **0.87.26**, Assistant Runtime **0.3.33** and AI Workers **0.1.72**. The Agent contract planner now preserves authored FINAL criteria, paths and dependencies through high-risk independent review, avoiding systematic REVIEW → REVISE loops caused by implicit union of all task criteria. Each task is still verified independently; global contract limits remain in force. Protocol, Memory, Toolbox and Reverse Proxy pins unchanged. [Release details](docs/RELEASE_0.15.50.md).
+
 ## KITT 0.15.49 — automatically routed LLMs per specialist
 
 Pins Agent CLI **0.87.25** (each Code/Creative/Investigator/Critic/Tester worker selects its own registered TaskRouter profile: Ollama, direct providers or separate reverse proxies, with fixed/preferred/automatic routing and bounded failover), Assistant Runtime **0.3.32**, and AI Workers **0.1.71**. Memory, Protocol, Toolbox and Reverse Proxy pins remain unchanged. [Release notes](docs/RELEASE_0.15.49.md).
