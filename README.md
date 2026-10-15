@@ -1,3 +1,7 @@
+# KITT 0.16.4 — assistant patch decoding and terminal response recovery
+
+Pins Reverse Proxy 5.4.3 for ordered assistant patch batches, complete escape presentation and recovery of a complete response after SSE EOF followed by a connection failure. Thoughts, metadata copies, partial and ambiguous responses remain excluded. [Release details](docs/RELEASE_0.16.4.md).
+
 # KITT 0.16.3 — rendered prompt exclusion and generation sequencing
 
 Pins Reverse Proxy 5.4.2: rejects JSON examples from the prompt despite rendering whitespace changes, waits for DOM generation to finish, and captures the next turn baseline after the previous answer completes. Busy waits preserve drafts and support cancellation. [Release details](docs/RELEASE_0.16.3.md).
