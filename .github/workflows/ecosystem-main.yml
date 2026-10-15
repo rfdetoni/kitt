@@ -60,5 +60,7 @@ jobs:
         run: python scripts/validate_ecosystem_main.py --check-main-heads
       - name: Validate bounded-context architecture
         run: python scripts/validate_architecture.py
+      - name: Smoke synthetic retrieval benchmark harness
+        run: python benchmarks/retrieval_sqlite_lsh.py --rows 200 --dimensions 8 --queries 2
       - name: Run installer/catalog regressions
         run: python -m unittest tests.test_installer tests.test_installer_update tests.test_ecosystem_architecture tests.test_ecosystem_release_pins -v

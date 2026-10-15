@@ -1,3 +1,7 @@
+## KITT 0.15.46 — reproducible FTS5 and LSH retrieval microbenchmark
+
+Adds a dependency-free, deterministic comparison of SQLite FTS5 vs lexical LIKE, and 8-bit multi-probe LSH candidate retrieval vs exact cosine top-10. It reports p50/p95 and Recall@10 and is smoke-tested by ecosystem-main. Measurements are synthetic/Python-only and do not replace Rust, Ollama, or WebChat end-to-end profiling. [Methodology](docs/RELEASE_0.15.46.md).
+
 ## KITT 0.15.45 — authoritative KAP/2 corpus gate
 
 Pins Reverse Proxy **5.3.14** at `12ca00379295c919ce160d5a9c211a99304ac240`, adding an independent golden-corpus CI check against the canonical Protocol 0.13.3 fixtures on top of byte-for-byte parser parity. All other component pins remain aligned with KITT 0.15.44. See [release notes](docs/RELEASE_0.15.45.md).
