@@ -1,6 +1,10 @@
-## KITT 0.15.53 — multilingual local semantic runtime
+## KITT 0.15.54 — explicit local semantic installer guidance
 
-Pins Agent CLI **0.87.29** (`cb530c2e`), Assistant Runtime **0.3.36** (`2cd77205`) and AI Workers **0.1.75** (`5d1dd899`). Adds opt-in local PT-BR/EN/ES task classification, original-prompt fidelity hardening, loopback-only Ollama E5 embeddings and explicit model preparation in Agent direct installers. The central source-free installer keeps model downloading disabled; use `python -m installer --semantic-help` for manual local setup instructions. Protocol, Memory, Toolbox and Reverse Proxy remain pinned to their existing immutable SHAs. [Release notes](docs/RELEASE_0.15.53.md).
+Pins Agent CLI **0.87.29**, Assistant Runtime **0.3.36** and AI Workers **0.1.75** from validated main commits, while preserving Reverse Proxy **5.3.16** and all other pinned components from 0.15.53. The central source-free installer now offers `python -m installer --semantic-help` for safe opt-in Ollama E5 preparation guidance; it performs no download and starts no services. Agent standalone installers support explicit `--prepare-semantic-model` (Linux) / `-PrepareSemanticModel` (Windows). [Release notes](docs/RELEASE_0.15.54.md).
+
+## KITT 0.15.53 — current-turn WebChat capture
+
+Pins Reverse Proxy **5.3.16**, fixing fresh tool actions mistaken for prompt echoes and lost rendered line boundaries. The release manifest refreshes all seven component pins to their current mains, including Agent CLI **0.87.29**. [Release details](docs/RELEASE_0.15.53.md).
 
 ## KITT 0.15.52 — safe handling of ambiguous WebChat responses
 

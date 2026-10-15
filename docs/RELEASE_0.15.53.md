@@ -1,17 +1,23 @@
-# KITT ecosystem v0.15.53 — multilingual semantic Agent
+# KITT 0.15.53 — current-turn WebChat capture
 
-## Immutable component pins
-- Agent CLI v0.87.29: `cb530c2ecddaafa1241e957c3d379ea853f43863`.
-- Assistant Runtime v0.3.36: `2cd77205df6deb7f7b8aa6bec3d390bc0d7e4f6e`.
-- AI Workers v0.1.75: `5d1dd8998d9ca9f8d8b9b4bbecbbf5cd9c4a2bf0`.
-- Protocol, Memory, Toolbox, Reverse Proxy: unchanged release manifest SHAs, because their APIs were not modified.
+The release composition pins Reverse Proxy 5.3.16 at
+`77bbce9137860016a23c5bdbdde03c96d8582320`. The proxy distinguishes a newly
+rendered response from prompt examples before applying content exclusions,
+and retains rendered line boundaries in mutation snapshots. This addresses
+reproduced capture timeouts after a successful plan, including roleless DOM.
 
-## Installer and operations
+Agent CLI remains 0.87.29; no Agent/Protocol wire change or automatic replay is
+needed. Its existing no-action-received handling for an uncaptured provider
+response remains in force.
 
-The root installer in `--channel release` resolves each component to these immutable commits. `python -m installer --semantic-help` provides a no-download setup guide. Agent direct install scripts additionally offer an explicit preparation flag: `install.sh --prepare-semantic-model` / `install.ps1 -PrepareSemanticModel`. In all normal install and startup flows, embeddings are disabled by default, and neither Ollama nor model weights are downloaded.
+All seven release pins are refreshed to the component mains observed during
+this release, including the existing Agent CLI, Assistant and AI Workers
+updates. The installer still installs immutable SHAs in release mode.
+`VERSION` and `ecosystem.release.json` advance together to 0.15.53.
 
-Enable an already prepared model with `KITT_SEMANTIC_MODE=auto` and `KITT_SEMANTIC_LOCAL_MODEL=qllama/multilingual-e5-small:q8_0`. Use `/semantic doctor` to diagnose missing services. The semantic stage is optional; it does not change generative LLM provider selection or global privacy policy. E5 weights are hosted by a third party and verified by full SHA-256 by the Agent preparation script.
-
-## Validation and limitations
-
-Agent CLI v0.87.29 PR/main tests include Python 3.14 complete suite, 467 passed and 4 skipped, Windows, Podman, Docker and real CPU Ollama embeddings. Direct multilingual commands were covered by deterministic rules, not an independently calibrated vector-classification holdout. An opt-in version of the semantic engine is being released, not a claim of overall token reduction. Root release integration checks verify main/release installs and the frozen manifest.
+Validation: 282 proxy tests, 10 Chromium integration tests, 31 authoritative
+KAP/2 cases, generated schema/parser parity, typecheck/build/fast build,
+package dry-run, zero reported dependency audit vulnerabilities, and 80 root
+installer tests. Both new browser regressions fail on the previous proxy main.
+The live authenticated ChatGPT session and a full native ecosystem installation
+were not available in this environment.
