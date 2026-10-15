@@ -238,6 +238,9 @@ def main(argv: list[str] | None = None) -> int:
         print("  2. Explicitly run: ollama pull qllama/multilingual-e5-small:q8_0")
         print("  3. In KITT TUI run /semantic doctor, then /semantic test <request>")
         print("  4. Set KITT_SEMANTIC_MODE=auto and KITT_SEMANTIC_LOCAL_MODEL=qllama/multilingual-e5-small:q8_0")
+        print("  5. Optional offline lexical data (no Ollama): build scripts/build_semantic_lexicon.py from the Agent checkout")
+        print("  6. Export KITT_SEMANTIC_LEXICON_DB=/path/to/lexicon.db to use an operator-built index")
+        print("  See https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/SEMANTIC_LEXICON.md for corpus licenses.")
         print("No model is downloaded, no service is started, and no provider is changed by this helper.")
         return 0
     source_root = _source_root()
