@@ -1,3 +1,7 @@
+## KITT 0.15.56 — offline multilingual lexical resources
+
+Pins Agent CLI **0.87.30**, Assistant Runtime **0.3.37** and AI Workers **0.1.76**, preserving current Reverse Proxy **5.3.17**. Supports explicit operator-prepared UniMorph PT/EN/ES corpora, multilingual WordNet suggestion datasets and optional build-time wordfreq, Snowball or spaCy metadata, with no automatic downloads and no runtime NLP dependency. Run `python -m installer --semantic-help` for opt-in guidance. [Release details](docs/RELEASE_0.15.56.md).
+
 ## KITT 0.15.55 — independent WebChat response capture
 
 Pins Reverse Proxy **5.3.17**, restoring passive CDP and DOM observers together in auto mode. Complete current-request KAP/2 responses can be captured when assistant text is absent from the DOM, without resending the prompt. Preserves the semantic installer integration from 0.15.54. [Release notes](docs/RELEASE_0.15.55.md).
