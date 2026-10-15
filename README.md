@@ -1,3 +1,7 @@
+## KITT 0.15.53 — current-turn WebChat capture
+
+Pins Reverse Proxy **5.3.16**, fixing fresh tool actions mistaken for prompt echoes and lost rendered line boundaries. The release manifest refreshes all seven component pins to their current mains, including Agent CLI **0.87.29**. [Release details](docs/RELEASE_0.15.53.md).
+
 ## KITT 0.15.52 — safe handling of ambiguous WebChat responses
 
 Pins Agent CLI **0.87.28**, Assistant Runtime **0.3.35**, and AI Workers **0.1.74**. When ChatGPT Web accepted the model request but a fresh KAP action could not be captured, the durable goal now enters **BLOCKED / ENVIRONMENT** rather than automatically resending the same prompt. Inspect/repair the authenticated provider session and explicitly resume the affected goal. Protocol, Memory, Toolbox and Reverse Proxy versions remain unchanged. [Release details](docs/RELEASE_0.15.52.md).
