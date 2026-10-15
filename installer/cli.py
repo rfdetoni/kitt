@@ -157,6 +157,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-start-services", action="store_true", help="install services without starting them")
     parser.add_argument("--uninstall", action="store_true", help="remove the complete managed K.I.T.T. installation")
     parser.add_argument("--list", action="store_true", help="list modules and presets, then exit")
+    parser.add_argument("--semantic-help", action="store_true", help="show explicit offline-capable local semantic model setup instructions without making changes")
     return parser
 
 
@@ -231,6 +232,14 @@ def _record_source_ref(
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.semantic_help:
+        print("Local multilingual semantics (opt-in):")
+        print("  1. Install/start your own Ollama daemon bound to http://127.0.0.1:11434")
+        print("  2. Explicitly run: ollama pull qllama/multilingual-e5-small:q8_0")
+        print("  3. In KITT TUI run /semantic doctor, then /semantic test <request>")
+        print("  4. Set KITT_SEMANTIC_MODE=auto and KITT_SEMANTIC_LOCAL_MODEL=qllama/multilingual-e5-small:q8_0")
+        print("No model is downloaded, no service is started, and no provider is changed by this helper.")
+        return 0
     source_root = _source_root()
     quiet_log: Path | None = None
     active_progress: InstallProgress | None = None

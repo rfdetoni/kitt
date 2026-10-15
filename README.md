@@ -1,3 +1,7 @@
+## KITT 0.15.53 — multilingual local semantic runtime
+
+Pins Agent CLI **0.87.29** (`cb530c2e`), Assistant Runtime **0.3.36** (`2cd77205`) and AI Workers **0.1.75** (`5d1dd899`). Adds opt-in local PT-BR/EN/ES task classification, original-prompt fidelity hardening, loopback-only Ollama E5 embeddings and explicit model preparation in Agent direct installers. The central source-free installer keeps model downloading disabled; use `python -m installer --semantic-help` for manual local setup instructions. Protocol, Memory, Toolbox and Reverse Proxy remain pinned to their existing immutable SHAs. [Release notes](docs/RELEASE_0.15.53.md).
+
 ## KITT 0.15.52 — safe handling of ambiguous WebChat responses
 
 Pins Agent CLI **0.87.28**, Assistant Runtime **0.3.35**, and AI Workers **0.1.74**. When ChatGPT Web accepted the model request but a fresh KAP action could not be captured, the durable goal now enters **BLOCKED / ENVIRONMENT** rather than automatically resending the same prompt. Inspect/repair the authenticated provider session and explicitly resume the affected goal. Protocol, Memory, Toolbox and Reverse Proxy versions remain unchanged. [Release details](docs/RELEASE_0.15.52.md).

@@ -726,5 +726,16 @@ class ReLabProvisioningTests(unittest.TestCase):
             self.assertIn("toolbox", calls[1])
 
 
+    def test_semantic_help_never_runs_installer(self):
+        import io
+        from contextlib import redirect_stdout
+        from installer.cli import main
+        output = io.StringIO()
+        with redirect_stdout(output):
+            result = main(["--semantic-help"])
+        self.assertEqual(result, 0)
+        self.assertIn("ollama pull", output.getvalue())
+        self.assertIn("No model is downloaded", output.getvalue())
+
 if __name__ == "__main__":
     unittest.main()
