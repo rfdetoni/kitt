@@ -1,3 +1,7 @@
+# KITT 0.16.3 — rendered prompt exclusion and generation sequencing
+
+Pins Reverse Proxy 5.4.2: rejects JSON examples from the prompt despite rendering whitespace changes, waits for DOM generation to finish, and captures the next turn baseline after the previous answer completes. Busy waits preserve drafts and support cancellation. [Release details](docs/RELEASE_0.16.3.md).
+
 # KITT 0.16.2 — JSON response capture and faithful repair
 
 Pins Reverse Proxy 5.4.1: complete JSON reaches host validation before Agent schema checks, and bounded repair may wrap an unchanged structured result as `final_response`. Tool execution still requires the full contract and host authorization. Includes bounded opt-in capture diagnostics. [Release details](docs/RELEASE_0.16.2.md).
