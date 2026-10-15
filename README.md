@@ -1,3 +1,7 @@
+## KITT 0.15.55 — independent WebChat response capture
+
+Pins Reverse Proxy **5.3.17**, restoring passive CDP and DOM observers together in auto mode. Complete current-request KAP/2 responses can be captured when assistant text is absent from the DOM, without resending the prompt. Preserves the semantic installer integration from 0.15.54. [Release notes](docs/RELEASE_0.15.55.md).
+
 ## KITT 0.15.54 — explicit local semantic installer guidance
 
 Pins Agent CLI **0.87.29**, Assistant Runtime **0.3.36** and AI Workers **0.1.75** from validated main commits, while preserving Reverse Proxy **5.3.16** and all other pinned components from 0.15.53. The central source-free installer now offers `python -m installer --semantic-help` for safe opt-in Ollama E5 preparation guidance; it performs no download and starts no services. Agent standalone installers support explicit `--prepare-semantic-model` (Linux) / `-PrepareSemanticModel` (Windows). [Release notes](docs/RELEASE_0.15.54.md).
