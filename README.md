@@ -1,3 +1,11 @@
+## KITT 0.15.48 — WebChat KAP/2 tool-action capture fix
+
+Release manifest pins **Reverse Proxy 5.3.15** and **Agent CLI 0.87.24**
+to immutable main commits, while Protocol remains at 0.13.3. This addresses
+the incident in which planning frames were captured but operational K2 T
+responses failed DOM extraction. Browser E2E requires an authenticated
+ChatGPT Web session. [Release notes](docs/RELEASE_0.15.48.md).
+
 ## KITT 0.15.47 — extensible multi-agent specialist teams
 
 Pins Agent CLI **0.87.23** (trusted declarative personas, Code/Creative/Investigator/Critic/Tester, CLI/TUI Agent Manager, scoped peer messaging and governed model delegation), Assistant Runtime **0.3.31**, and AI Workers **0.1.70**. Existing Protocol, Memory, Toolbox and Reverse Proxy pins remain unchanged. Specialists share the existing ChildAgentManager, GoalScheduler, PolicyEngine, isolated child sessions and budgets. [Release notes](docs/RELEASE_0.15.47.md).
