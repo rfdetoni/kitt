@@ -1,3 +1,9 @@
+# KITT 0.16.5 — bounded planning and local JSON result normalization
+
+Pins Agent CLI 0.88.1, Reverse Proxy 5.4.4, Assistant 0.1.46 / Runtime 0.4.1 and Workers / Evals / Evolution 0.1.78. Updated runtime and consumer locks resolve the same Agent commit. Protocol 0.14.0 remains JSON Agent v5; Memory and Toolbox pins are unchanged.
+
+[Release details](docs/RELEASE_0.16.5.md).
+
 # KITT 0.16.4 — assistant patch decoding and terminal response recovery
 
 Pins Reverse Proxy 5.4.3 for ordered assistant patch batches, complete escape presentation and recovery of a complete response after SSE EOF followed by a connection failure. Thoughts, metadata copies, partial and ambiguous responses remain excluded. [Release details](docs/RELEASE_0.16.4.md).
