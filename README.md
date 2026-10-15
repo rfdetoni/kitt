@@ -1,3 +1,7 @@
+## KITT 0.15.45 — authoritative KAP/2 corpus gate
+
+Pins Reverse Proxy **5.3.14** at `12ca00379295c919ce160d5a9c211a99304ac240`, adding an independent golden-corpus CI check against the canonical Protocol 0.13.3 fixtures on top of byte-for-byte parser parity. All other component pins remain aligned with KITT 0.15.44. See [release notes](docs/RELEASE_0.15.45.md).
+
 ## KITT 0.15.44 — short index transactions, selective graph/FTS and DOM observer reuse
 
 This release pins Agent CLI 0.87.22, Reverse Proxy 5.3.13, Assistant native 0.1.44 / Python 0.3.30, AI Workers 0.1.69 and Memory 0.10.2. Agent full indexing reads/parses outside the shared SQLite lock, graph updates refresh impacted source adjacencies, and ready FTS5 indexes avoid unnecessary native source scans. The Proxy reuses per-page DOM observers with bounded idle cleanup; KAP/2 source parity is already enforced in Proxy CI. Memory vectors require the original content revision and missing embeddings persist as backfill work. [Release notes](docs/RELEASE_0.15.44.md).
