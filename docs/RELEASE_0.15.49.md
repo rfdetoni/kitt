@@ -1,9 +1,9 @@
 # KITT ecosystem 0.15.49 — multi-model specialist agents
 
 ## Versions
-- Agent CLI 0.87.25: 51c00288f4a63eee66a977ca67a9fd58961828c7
-- Assistant Runtime 0.3.32: 8a3044e1f8c3f100cc25a35873ecbb9e7103da3a
-- AI Workers 0.1.71: 4186f01554f2b564d9207ce01cedac9fae5fbb02
+- Agent CLI 0.87.25: 4138895c84b673c8dfef54ddb8f7276ee4ca1eb4
+- Assistant Runtime 0.3.32: 6ef66e21db7b37375a53e5c6998088edb61586bc
+- AI Workers 0.1.71: d8e7d3fa768368c5c4d91a9592558238541d7e08
 - Unchanged: Protocol, Memory, Toolbox, Reverse Proxy.
 
 ## Configure
