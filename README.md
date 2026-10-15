@@ -1,3 +1,7 @@
+## KITT 0.15.44 — short index transactions, selective graph/FTS and DOM observer reuse
+
+This release pins Agent CLI 0.87.22, Reverse Proxy 5.3.13, Assistant native 0.1.44 / Python 0.3.30, AI Workers 0.1.69 and Memory 0.10.2. Agent full indexing reads/parses outside the shared SQLite lock, graph updates refresh impacted source adjacencies, and ready FTS5 indexes avoid unnecessary native source scans. The Proxy reuses per-page DOM observers with bounded idle cleanup; KAP/2 source parity is already enforced in Proxy CI. Memory vectors require the original content revision and missing embeddings persist as backfill work. [Release notes](docs/RELEASE_0.15.44.md).
+
 ## KITT 0.15.43 — Memory 0.10.2 and revision-safe durable embedding backfill
 
 Pins Agent CLI 0.87.20, Memory 0.10.2, native Assistant 0.1.44 / Runtime 0.3.28 and AI Workers 0.1.67. The Memory vector index now refuses outdated embeddings by exact content hash, and pending workspace embeddings remain discoverable from SQLite across restarts. Assistant Cargo.lock resolves the exact Memory git commit pinned in this release. Existing Protocol, Toolbox and Reverse Proxy commits remain unchanged. [Release notes](docs/RELEASE_0.15.43.md).
