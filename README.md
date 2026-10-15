@@ -1,3 +1,7 @@
+## KITT 0.15.43 — Memory 0.10.2 and revision-safe durable embedding backfill
+
+Pins Agent CLI 0.87.20, Memory 0.10.2, native Assistant 0.1.44 / Runtime 0.3.28 and AI Workers 0.1.67. The Memory vector index now refuses outdated embeddings by exact content hash, and pending workspace embeddings remain discoverable from SQLite across restarts. Assistant Cargo.lock resolves the exact Memory git commit pinned in this release. Existing Protocol, Toolbox and Reverse Proxy commits remain unchanged. [Release notes](docs/RELEASE_0.15.43.md).
+
 ## KITT 0.15.42 — opt-in native hybrid memory retrieval
 
 Pins Memory **0.10.0** (SQLite schema 10, indexed multi-probe LSH cosine candidates and FTS5/RRF), Agent CLI **0.87.19** (Ollama local lazy embeddings with bounded indexing/fallback), Assistant Runtime **0.3.27**, and AI Workers **0.1.66**. No new networked vector database or Protocol/KAP/2 change. Enable only with an installed local embedding model via `KITT_MEMORY_EMBED_MODEL`; SQLite remains the authoritative durable store. See [release notes](docs/RELEASE_0.15.42.md).
