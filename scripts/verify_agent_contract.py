@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify installed Protocol / Proxy / Agent structured-result interoperability."""
+"""Verify installed Protocol / Proxy / Agent JSON interoperability."""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +10,7 @@ import subprocess
 from kitt_protocol import AGENT_CONTRACT_VERSION
 from kitt.llm.agent_contract import parse_structured_result
 from kitt.goals.contract_validation import parse_validation_report
+from kitt.tools.protocol import parse_tool_call
 
 
 def main() -> None:
@@ -24,9 +25,10 @@ def main() -> None:
             'severity': 'P1', 'location': 'src/domain.ts',
             'problem': 'requirement is unproven', 'fix': 'implement and validate it',
         }]},
+        {'tasks': [{'local_id': 'T01', 'check_ids': ['node.typecheck']}],
+         'X-Foo': 'enabled', 'data': 'literal {braces}, Unicode ação 😀 and backslash \\n'},
     ]
-    # Host serialization at the real TypeScript boundary must be decoded by the
-    # installed Python consumer, not by a second implementation in this script.
+    # Real TypeScript transform followed by real installed Python consumers.
     javascript = r'''
 import {pathToFileURL} from 'node:url';
 import {readFileSync} from 'node:fs';
@@ -34,45 +36,20 @@ const root = process.argv[1];
 const {AGENT_CONTRACT_VERSION} = await import(pathToFileURL(root + '/dist/contracts/agent-contract.js'));
 const {prepareAgentContractRequest,transformAgentContractCompletion} = await import(pathToFileURL(root + '/dist/runtime/agent-contract.js'));
 const values = JSON.parse(readFileSync(0, 'utf8'));
-const plan = prepareAgentContractRequest({messages:[{role:'user',content:'Return a structured result'}]}, {sessionId:'composition-check'});
-function encodeKAP(path, value, lines) {
-  if (value === null) lines.push('NULL ' + path);
-  else if (Array.isArray(value)) {
-    lines.push('ARRAY ' + path);
-    value.forEach((item,index)=>encodeKAP(path+'.'+index,item,lines));
-  } else if (typeof value === 'object') {
-    lines.push('OBJECT ' + path);
-    for (const [key,item] of Object.entries(value)) encodeKAP(path+'.'+key,item,lines);
-  } else if (typeof value === 'string' && value.includes('\n')) {
-    lines.push('TEXT ' + path, value, 'KITT/ENDTEXT');
-  } else if (typeof value === 'string') lines.push('STRING ' + path + ' = ' + value);
-  else if (typeof value === 'boolean') lines.push('BOOLEAN ' + path + ' = ' + value);
-  else lines.push((Number.isInteger(value)?'INTEGER ':'DECIMAL ') + path + ' = ' + value);
+const toolInput = {operation:'repo.read',arguments:{path:'README.md'}};
+const plan = prepareAgentContractRequest({messages:[{role:'user',content:'Return a structured result'}],tools:[{type:'function',function:{name:'kitt_runtime',parameters:{type:'object',properties:{operation:{enum:['repo.read']},arguments:{type:'object',properties:{path:{type:'string'}},required:['path'],additionalProperties:false}},required:['operation','arguments'],additionalProperties:false}}}]}, {sessionId:'composition-check'});
+const envelope = (action,content,tool=null,tool_input=null) => ({action,tool,tool_input,content,reasoning_summary:'',loop:null});
+const completion = content => ({id:'check',object:'chat.completion',created:1,model:'check',choices:[{index:0,message:{role:'assistant',content},finish_reason:'stop'}]});
+const transform = value => transformAgentContractCompletion(completion(JSON.stringify(value)),plan).choices[0].message;
+const content = values.map(value => transform(envelope('final_response',value)).content);
+const action = envelope('use_tool',null,'kitt_runtime',toolInput);
+const tool = transform(action).tool_calls[0].function;
+for (const raw of [JSON.stringify(action).replace('"path":"README.md"','"path":"README.md","path":"secret"'),JSON.stringify(action)+'\n'+JSON.stringify(envelope('final_response','done'))]) {
+  let rejected = false;
+  try { transformAgentContractCompletion(completion(raw),plan); } catch { rejected = true; }
+  if (!rejected) throw new Error('Conflicting JSON model output was accepted');
 }
-const content = values.map(value => {
-  const lines = ['KITT/1','ACTION FINAL'];
-  encodeKAP('content',value,lines);
-  const kap = [...lines,'KITT/END'].join('\n');
-  return transformAgentContractCompletion({
-    id:'check',object:'chat.completion',created:1,model:'check',
-    choices:[{index:0,message:{role:'assistant',content:kap},finish_reason:'stop'}]
-  },plan).choices[0].message.content;
-});
-const compactText = ['K2 F','tasks[1]{id,status}:','  T01,done','K2/END'].join('\n');
-const compact = transformAgentContractCompletion({
-  id:'k2',object:'chat.completion',created:1,model:'check',
-  choices:[{index:0,message:{role:'assistant',content:compactText},finish_reason:'stop'}]
-},plan).choices[0].message.content;
-const advancedText = [
-  'K2 F', '@summary: verified', 'tasks[1]:', '  -',
-  '    local_id: T01', '    check_ids[1]:', '      - node.typecheck',
-  '"X-Foo": enabled', 'data<<TXT:10', 'abc', 'K2/END', 'TXT', 'K2/END'
-].join('\n');
-const advanced = transformAgentContractCompletion({
-  id:'k2-extended',object:'chat.completion',created:1,model:'check',
-  choices:[{index:0,message:{role:'assistant',content:advancedText},finish_reason:'stop'}]
-},plan).choices[0].message.content;
-console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content,compact,advanced}));
+console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content,action,tool}));
 '''
     result = subprocess.run(
         ['node', '--input-type=module', '-e', javascript, str(args.proxy_runtime.resolve())],
@@ -82,21 +59,15 @@ console.log(JSON.stringify({version:AGENT_CONTRACT_VERSION,content,compact,advan
     if payload['version'] != AGENT_CONTRACT_VERSION:
         raise SystemExit('installed Agent / Protocol / Proxy contract version mismatch')
     actual = [parse_structured_result(content) for content in payload['content']]
-    compact_expected = {'tasks': [{'id': 'T01', 'status': 'done'}]}
-    if (parse_structured_result(payload['compact']) != compact_expected
-            or parse_structured_result("K2 F\ntasks[1]{id,status}:\n  T01,done\nK2/END") != compact_expected):
-        raise SystemExit('KAP/2 compact result failed installed Agent / Proxy / Protocol contract')
-    advanced_expected = {
-        'tasks': [{'local_id': 'T01', 'check_ids': ['node.typecheck']}],
-        'X-Foo': 'enabled', 'data': 'abc\nK2/END',
-    }
-    if parse_structured_result(payload['advanced']) != advanced_expected:
-        raise SystemExit('KAP/2 advanced result changed through installed TypeScript/Python boundary')
     failed_review = parse_validation_report(payload['content'][3])
+    tool = payload['tool']
     if (actual != expected or not parse_validation_report(payload['content'][2]).ok
-            or failed_review.ok or failed_review.issues[0]['location'] != 'src/domain.ts'):
-        raise SystemExit('structured results changed across the installed runtime boundary')
-    print('installed Agent / Protocol / Proxy structured results: ok')
+            or failed_review.ok or failed_review.issues[0]['location'] != 'src/domain.ts'
+            or tool['name'] != 'kitt_runtime'
+            or json.loads(tool['arguments']) != payload['action']['tool_input']
+            or parse_tool_call(json.dumps(payload['action'])) != ('kitt_runtime',payload['action']['tool_input'])):
+        raise SystemExit('JSON changed across the installed runtime boundary')
+    print('installed Agent / Protocol / Proxy JSON results and tool actions: ok')
 
 
 if __name__ == '__main__':
