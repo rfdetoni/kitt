@@ -1,3 +1,7 @@
+## KITT 0.16.13 — DeepSeek stopped reply footer
+
+Pins Reverse Proxy 5.4.9 and DeepSeek plugin 1.2.1 to recognize the screenshot-observed `Servidor está temporariamente indisponível` / `Parado` / `Continuar` state, supporting deeply nested footer controls without clicking unrelated authorization UI or replaying prompts. [Release notes](docs/RELEASE_0.16.13.md).
+
 ## KITT 0.16.12 — DeepSeek paused generation continuation
 
 Pins Reverse Proxy 5.4.8 (after upstream CI/merge) to resume one confirmed assistant-only DeepSeek `Continue` button without replaying the prompt, and avoids delivering partial JSON. Unrelated login/consent/approval dialogs remain human-only. [Release note](docs/RELEASE_0.16.12.md).
