@@ -7,3 +7,9 @@
 - Tests cover CLI opt-in, delegation, no duplicate Dockur creation, and lock handoff. Agent CI covers forbidden actions, hash pinning, packaging and cross-platform smoke.
 
 The end-to-end Microsoft Windows 11 first-boot OpenSSH capability and differential result remain **UNVERIFIED** until the operator runs the new release in the isolated lab.
+
+## Immutable component pins
+
+- Agent CLI **0.88.6**, main merge `57071e5161ed6c77bcda14aafd46077b84fab0e7`.
+- Assistant **0.1.51** / Python Runtime **0.4.6** pending its own validated immutable merge; other ecosystem pins remain unchanged.
+- Root ecosystem version **0.16.10**; release manifest will switch to the final Assistant commit before the root PR is merged.
