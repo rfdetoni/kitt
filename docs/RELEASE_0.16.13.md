@@ -5,7 +5,9 @@ The operator provided a screenshot of an authenticated DeepSeek reply showing
 **"Continuar"** control at the response footer. A manual click restarted
 generation of the same message.
 
-- Pins Reverse Proxy 5.4.9 / DeepSeek plugin 1.2.1 at an immutable main SHA.
+- Pins Reverse Proxy 5.4.9 / DeepSeek plugin 1.2.1 at immutable main SHA `2b9970856e126efd6a0689f6499d697dfc4422fa`.
+- Contract v5 repair mode is serializer-only: trims task context to a bounded excerpt with SHA-256, preserves the model's original decision and rejects semantic drift.
+- Equivalent unchanged invalid JSON stops wasting retries; safety, shape, tool schemas and ambiguity checks remain mandatory.
 - Scans only the current fresh assistant message card for exact continuation
   controls, including footer siblings nested beyond the answer body.
 - Supports native buttons and `role=button`; never searches outside the
