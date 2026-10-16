@@ -123,7 +123,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--re-oracle-bootstrap", action="store_true",
         help="Prepare Windows OpenSSH and SHA-pinned Win32 probes via Dockur OEM")
     parser.add_argument("--re-oracle-recreate", action="store_true",
-        help="DESTROY and rebuild the KITT-owned Windows lab disk (--yes required)")
+        help="Legacy option (rejected); use kitt re lab recreate with a scoped token")
     parser.add_argument("--accept-windows-license", action="store_true",
         help="Confirm Windows licensing and consent to Microsoft media downloads")
     parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
@@ -270,10 +270,11 @@ def main(argv: list[str] | None = None) -> int:
         platform = PlatformAdapter.detect()
         if args.re_oracle_bootstrap and not args.with_re_lab:
             raise InstallerError("--re-oracle-bootstrap requires --with-re-lab")
-        if args.re_oracle_recreate and not args.re_oracle_bootstrap:
-            raise InstallerError("--re-oracle-recreate requires --re-oracle-bootstrap")
-        if args.re_oracle_bootstrap and (not args.yes or not args.accept_windows_license):
-            raise InstallerError("Oracle bootstrap requires --yes and --accept-windows-license")
+        if args.re_oracle_recreate:
+            raise InstallerError("Use token-gated kitt re lab recreate --dry-run/--confirm instead")
+        if args.with_re_lab and not args.uninstall and not args.dry_run:
+            if not args.yes or not args.accept_windows_license:
+                raise InstallerError("RE lab requires --yes and --accept-windows-license")
         if args.with_re_lab and not args.uninstall:
             if (args.preset or os.environ.get("KITT_PRESET")) != "full":
                 raise InstallerError("--with-re-lab requires --preset full")
@@ -394,26 +395,18 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 optional_failed = True
         if args.with_re_lab and not args.dry_run:
-            from .re_lab import ReLabError, provision_re_lab
+            from .re_lab_delegate import provision_with_agent
+            from .re_lab import ReLabError
             try:
-                re_report = provision_re_lab(root, runtime=args.re_runtime,
-                    profile=args.re_profile, windows=args.re_windows,
-                    version=args.re_windows_version,
-                    oracle=args.re_oracle_bootstrap, oracle_recreate=args.re_oracle_recreate)
-                print("K.I.T.T. RE lab provisioned:")
-                print("  Linux toolbox: docker exec -it kitt-re-full /bin/sh")
-                print(f"  Windows console: {re_report['windows_url']}")
-                print(f"  Windows username: {re_report['windows_user']}")
-                print(f"  Windows credentials: {re_report['credentials_file']}")
-                print(f"  Note: {re_report['warning']}")
-                if re_report.get("oracle_hosts"):
-                    print(f"  Oracle SSH profile: {re_report['oracle_hosts']}")
-                    print(f"  Oracle manifest SHA: {re_report['oracle_manifest_sha256']}")
-                    quoted = shlex.quote(re_report["oracle_hosts"])
-                    digest = re_report["oracle_manifest_sha256"]
-                    print(f"  Verify after Windows setup: kitt re oracle doctor --hosts {quoted} --manifest-sha256 {digest}")
-                    print(f"  Compare Windows/Wine: kitt re oracle pilot --hosts {quoted} --manifest-sha256 {digest} --yes")
-                    print("  Oracle ready: UNVERIFIED until the Windows OEM and SSH doctor pass")
+                re_report = provision_with_agent(
+                    root, runtime=args.re_runtime, profile=args.re_profile,
+                    windows=args.re_windows, version=args.re_windows_version,
+                    accept_license=args.accept_windows_license, yes=args.yes)
+                print("K.I.T.T. RE lab: " + re_report["status"])
+                print("  Windows console: http://127.0.0.1:8006")
+                print("  Inspect: kitt re lab status --json")
+                print("  Verify: kitt re lab verify --full")
+                print("  Oracle ready: UNVERIFIED until authenticated guest verification")
             except (ReLabError, OSError, subprocess.SubprocessError) as error:
                 print(f"K.I.T.T. installed; RE lab incomplete: {error}", file=sys.stderr)
                 optional_failed = True
