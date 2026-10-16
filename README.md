@@ -1,6 +1,6 @@
 # KITT 0.16.8 — durable approvals, scoped parallelism and synchronized dependencies
 
-Pins Agent CLI **0.88.4**, Assistant **0.1.49** / Python Runtime **0.4.4**. Approval requests persist before display and cannot reopen after a decision; pending actions resume the exact host-approved tool and retain mutation preconditions. Goal parallel batches prioritize the scheduler's current task and prevent overlapping path scopes. The Agent, Assistant and release manifest are coordinated by immutable commit SHAs. Protocol 0.14.0, Memory 0.10.2, Toolbox 0.4.3, AI Workers 0.1.78 and Reverse Proxy 5.4.4 remain unchanged.
+Pins Agent CLI **0.88.4**, Assistant **0.1.49** / Python Runtime **0.4.4**. Approval requests persist before display and cannot reopen after a decision; pending actions resume the exact host-approved tool and retain mutation preconditions. Goal parallel batches prioritize the scheduler's current task and prevent overlapping path scopes. The Agent, Assistant and release manifest are coordinated by immutable commit SHAs. Protocol 0.14.0, Memory 0.10.2, Toolbox 0.4.3, AI Workers 0.1.78 remain unchanged. Reverse Proxy **5.4.5** fixes response extraction after uniquely rendered prompts while retaining fail-closed behavior for ambiguous WebChat output.
 
 [Release details](docs/RELEASE_0.16.8.md).
 
