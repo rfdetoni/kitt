@@ -1,3 +1,7 @@
+## KITT 0.16.12 — DeepSeek paused generation continuation
+
+Pins Reverse Proxy 5.4.8 (after upstream CI/merge) to resume one confirmed assistant-only DeepSeek `Continue` button without replaying the prompt, and avoids delivering partial JSON. Unrelated login/consent/approval dialogs remain human-only. [Release note](docs/RELEASE_0.16.12.md).
+
 ## KITT 0.16.11 — DeepSeek 1.1.0 and ChatGPT Web capture recovery
 
 Pins Reverse Proxy 5.4.7: DeepSeek final-answer-only DOM selectors, non-replayable ChatGPT `ui_capture_unverified` recovery via explicit `continue`, and deterministic two-sentence public summary normalization. Preserves the previous Agent CLI 0.88.8 / Assistant 0.1.53 pins. [Release details](docs/RELEASE_0.16.11.md).
