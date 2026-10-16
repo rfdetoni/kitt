@@ -1,3 +1,5 @@
+> **KITT 0.16.10:** O caminho canônico é `./install.sh --preset full --with-re-lab --yes --accept-windows-license`, que chama `kitt re lab setup` no Agent CLI 0.88.7. Para apagar dados, use exclusivamente `kitt re lab recreate --scope windows --destroy-data --dry-run` e execute com `--confirm TOKEN --accept-license`. As opções antigas `--re-oracle-recreate` do instalador são rejeitadas. Verificação Windows/KVM real permanece **UNVERIFIED** até `kitt re lab verify --full` no host autorizado.
+
 ## Atualização 0.15.7 — segurança e coordenação entre VMs
 
 O console noVNC passa a exigir senha aleatória por VM, inclusive para acesso
