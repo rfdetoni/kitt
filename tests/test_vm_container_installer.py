@@ -65,5 +65,25 @@ class InstallerContainerVMTests(unittest.TestCase):
             self.assertNotIn("--privileged", str(calls))
 
 
+    def test_auto_uses_docker_only_when_it_is_healthy(self):
+        parser = build_parser()
+        self.assertEqual(parser.parse_args(["--with-vm-containers"]).vm_container_runtime, "auto")
+        self.assertEqual(parser.parse_args(["--with-vm-containers", "--vm-container-runtime", "docker"]).vm_container_runtime, "docker")
+        with patch("installer.vm_containers.sys.platform", "linux"), \
+             patch("installer.vm_containers.shutil.which", side_effect=lambda name: "/usr/bin/" + name), \
+             patch("installer.vm_containers.subprocess.run", return_value=SimpleNamespace(returncode=0)):
+            self.assertEqual(check_container_runtime("auto")["runtime"], "docker")
+
+    def test_auto_falls_back_to_podman_but_explicit_docker_fails(self):
+        def probe(argv, **kwargs):
+            return SimpleNamespace(returncode=1 if "docker" in argv[0] else 0)
+        with patch("installer.vm_containers.sys.platform", "linux"), \
+             patch("installer.vm_containers.shutil.which", side_effect=lambda name: "/usr/bin/" + name), \
+             patch("installer.vm_containers.subprocess.run", side_effect=probe):
+            self.assertEqual(check_container_runtime("auto")["runtime"], "podman")
+            with self.assertRaisesRegex(VMContainerError, "not ready"):
+                check_container_runtime("docker")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -15,8 +15,18 @@ class VMContainerError(ValueError):
 def check_container_runtime(runtime: str) -> dict:
     if sys.platform != "linux":
         raise VMContainerError("QEMU Docker/Podman backend requires Linux host")
+    if runtime == "auto":
+        for candidate in ("docker", "podman"):
+            try:
+                return check_container_runtime(candidate)
+            except VMContainerError:
+                continue
+        raise VMContainerError(
+            "Neither Docker nor Podman is responding; run docker info or "
+            "podman info, or select --vm-container-runtime explicitly"
+        )
     if runtime not in ("docker", "podman"):
-        raise VMContainerError("Choose Docker or Podman")
+        raise VMContainerError("Choose auto, Docker or Podman")
     binary = shutil.which(runtime)
     if not binary:
         raise VMContainerError(f"Missing {runtime}. Install the container runtime first.")
