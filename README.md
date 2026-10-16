@@ -1,3 +1,7 @@
+## Next KITT release — disposable Windows Oracle bootstrap
+
+The full RE lab installer optionally sets up Windows 11 with constrained SSH, a pinned Win32 event probe and reproducible Dockur OEM configuration; reset requires an explicit destructive flag and Windows license consent. [Guide](docs/VM_CONTAINERS_DOCKER_PODMAN.md).
+
 # KITT 0.16.9 — reuse existing Docker RE Linux and Dockur Windows environments
 
 Pins **Agent CLI 0.88.5**, **Assistant 0.1.50** / **Python Runtime 0.4.5**. Docker is automatically preferred over Podman when both engines are operational; an explicitly requested engine is never silently replaced. The Agent recognizes the installer-owned Linux RE toolbox (`kitt-re-full`) and Dockur Windows (`kitt-re-win11`), checks container ownership and isolation before read-only inventory or operator lifecycle actions, and avoids requiring another ISO for the existing Docker lab. Windows remains non-oracle without authenticated guest probes. Other ecosystem SHA pins remain unchanged.
