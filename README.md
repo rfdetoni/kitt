@@ -1,3 +1,9 @@
+# KITT 0.16.7 — complete autonomous and approved process flow
+
+Pins Agent CLI 0.88.3 and Assistant 0.1.48 / Runtime 0.4.3. User-selected allow-all now applies to inline Python/Node processes. Manual approvals persist the exact effective tool and payload, pass the waiting Goal's approval fence, and resume its contract once after evidence persistence. Plain fallback uses the same contract approval owner.
+
+[Release details](docs/RELEASE_0.16.7.md).
+
 # KITT 0.16.6 — approvals resume without reopening the permission modal
 
 Pins Agent CLI 0.88.2 and Assistant 0.1.47 / Runtime 0.4.2. Saving a remembered allow rule no longer invalidates the explicitly approved waiting action. Revocations and other authority changes still block execution. Terminal execution failures are acknowledged separately from approval decisions, so the TUI closes the request and displays its error instead of asking again.
