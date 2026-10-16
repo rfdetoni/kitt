@@ -737,5 +737,55 @@ class ReLabProvisioningTests(unittest.TestCase):
         self.assertIn("ollama pull", output.getvalue())
         self.assertIn("No model is downloaded", output.getvalue())
 
+
+    def test_oracle_bootstrap_cli_is_opt_in_and_requires_destructive_flag(self):
+        parser = build_parser()
+        default = parser.parse_args(["--preset", "full", "--with-re-lab"])
+        self.assertFalse(default.re_oracle_bootstrap)
+        self.assertFalse(default.re_oracle_recreate)
+        configured = parser.parse_args([
+            "--preset", "full", "--with-re-lab", "--re-oracle-bootstrap",
+            "--re-oracle-recreate", "--accept-windows-license", "--yes",
+        ])
+        self.assertTrue(configured.re_oracle_bootstrap)
+        self.assertTrue(configured.re_oracle_recreate)
+        self.assertTrue(configured.accept_windows_license)
+
+    @unittest.skipUnless(os.name == "posix" and __import__("sys").platform == "linux", "Linux only")
+    def test_installer_delegates_oracle_to_pinned_agent_without_recreating_twice(self):
+        from installer.re_lab import provision_re_lab, _WINDOWS_SETTINGS
+        from subprocess import CompletedProcess
+        calls = []
+        def run(argv, **kwargs):
+            calls.append(argv)
+            if len(argv) > 3 and argv[1:3] == ["-m", "kitt.cli.main"]:
+                return CompletedProcess(argv, 0, json.dumps({
+                    "hosts": "/private/hosts.json", "manifest_sha256": "a" * 64}), "")
+            return CompletedProcess(argv, 0, "", "")
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            python = root / ".venv-agent" / "bin" / "python"
+            python.parent.mkdir(parents=True)
+            python.symlink_to(__import__("sys").executable)
+            lab = root / "re-lab"
+            lab.mkdir(mode=0o700)
+            storage = lab / "windows"
+            storage.mkdir(mode=0o700)
+            credentials = lab / "windows.env"
+            credentials.write_text(_WINDOWS_SETTINGS)
+            credentials.chmod(0o600)
+            with (patch("installer.re_lab.check_re_lab"),
+                  patch("installer.re_lab._existing_container", return_value=True),
+                  patch("installer.re_lab._start_existing"),
+                  patch("installer.re_lab._run", side_effect=run)):
+                report = provision_re_lab(root, runtime="docker", profile="full",
+                    windows="dockurr", version="11", oracle=True, oracle_recreate=True)
+            bootstrap = [arg for arg in calls if "bootstrap" in arg]
+            self.assertEqual(len(bootstrap), 1)
+            self.assertIn("--recreate", bootstrap[0])
+            self.assertIn("--accept-license", bootstrap[0])
+            self.assertFalse(any(arg[:2] == ["docker", "create"] for arg in calls))
+            self.assertEqual(report["oracle_manifest_sha256"], "a" * 64)
+
 if __name__ == "__main__":
     unittest.main()
