@@ -185,7 +185,16 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
                        "--yes", "--accept-license"]
             if oracle_recreate:
                 command.append("--recreate")
-            result = _run(command, timeout=400, check=False)
+            # Installer and Agent use the same RE lab lock; yield it to the
+            # child, whose bootstrap owns locking and checks container identity.
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+            try:
+                result = _run(command, timeout=400, check=False)
+            finally:
+                try:
+                    fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError as exc:
+                    raise ReLabError("Concurrent RE lab change detected after Oracle bootstrap") from exc
             if result.returncode:
                 raise ReLabError("Windows Oracle bootstrap failed; inspect KITT logs")
             try:
@@ -206,7 +215,7 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
 
         return {"workspace": str(workspace), "windows_url": "http://127.0.0.1:8006",
                 "windows_user": "Docker", "credentials_file": str(creds),
-                "warning": "Only an isolated test Windows VM; OAuth/SSH/Oracle readiness is not assumed.",
+                "warning": "Only an isolated test Windows VM; SSH/Oracle readiness is not assumed.",
                 **({"oracle_hosts": oracle_plan["hosts"],
                     "oracle_manifest_sha256": oracle_plan["manifest_sha256"]}
                    if oracle_plan else {})}
