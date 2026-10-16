@@ -11,5 +11,5 @@ The end-to-end Microsoft Windows 11 first-boot OpenSSH capability and differenti
 ## Immutable component pins
 
 - Agent CLI **0.88.6**, main merge `57071e5161ed6c77bcda14aafd46077b84fab0e7`.
-- Assistant **0.1.51** / Python Runtime **0.4.6** pending its own validated immutable merge; other ecosystem pins remain unchanged.
-- Root ecosystem version **0.16.10**; release manifest will switch to the final Assistant commit before the root PR is merged.
+- Assistant **0.1.51** / Python Runtime **0.4.6**, validated main commit `215b13119537001e05d4359973441334f9b0187d`; other ecosystem pins remain unchanged.
+- Root ecosystem version **0.16.10**; the release manifest is pinned to the final Agent and Assistant main commits.
