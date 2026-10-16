@@ -1,6 +1,6 @@
 ## KITT 0.16.10 — Agent-owned Linux RE + Dockur Windows autosetup
 
-With `--preset full --with-re-lab --yes --accept-windows-license`, the root installer delegates to Agent CLI 0.88.7 (`kitt re lab setup`). The official Dockur image is pinned by digest; OEM configures OpenSSH and SHA-pinned probes. Wine runs the fixed differential pilot in a separate restricted container. `kitt re lab recreate` requires a recent scope-bound confirmation token. **Live Windows/KVM E2E is unverified.** [Guide](docs/RELEASE_0.16.10.md).
+With `--preset full --with-re-lab --yes --accept-windows-license`, the root installer delegates to Agent CLI 0.88.8 (`kitt re lab setup`). The official Dockur image is pinned by digest; OEM configures OpenSSH and SHA-pinned probes. Wine runs the fixed differential pilot in a separate restricted container. `kitt re lab recreate` requires a recent scope-bound confirmation token. **Live Windows/KVM E2E is unverified.** [Guide](docs/RELEASE_0.16.10.md).
 
 # KITT 0.16.9 — reuse existing Docker RE Linux and Dockur Windows environments
 
