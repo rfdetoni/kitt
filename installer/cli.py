@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -408,6 +409,10 @@ def main(argv: list[str] | None = None) -> int:
                 if re_report.get("oracle_hosts"):
                     print(f"  Oracle SSH profile: {re_report['oracle_hosts']}")
                     print(f"  Oracle manifest SHA: {re_report['oracle_manifest_sha256']}")
+                    quoted = shlex.quote(re_report["oracle_hosts"])
+                    digest = re_report["oracle_manifest_sha256"]
+                    print(f"  Verify after Windows setup: kitt re oracle doctor --hosts {quoted} --manifest-sha256 {digest}")
+                    print(f"  Compare Windows/Wine: kitt re oracle pilot --hosts {quoted} --manifest-sha256 {digest} --yes")
                     print("  Oracle ready: UNVERIFIED until the Windows OEM and SSH doctor pass")
             except (ReLabError, OSError, subprocess.SubprocessError) as error:
                 print(f"K.I.T.T. installed; RE lab incomplete: {error}", file=sys.stderr)
