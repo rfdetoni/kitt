@@ -122,7 +122,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
     parser.add_argument("--with-vm-containers", action="store_true",
         help="check Docker/Podman QEMU support; include KITT Agent CLI")
-    parser.add_argument("--vm-container-runtime", choices=["docker", "podman"], default="podman")
+    parser.add_argument("--vm-container-runtime", choices=["auto", "docker", "podman"], default="auto")
     parser.add_argument("--vm-container-image-profile", choices=["base", "wine", "full"], default="full")
     parser.add_argument("--vm-pull-images", action="store_true",
         help="explicitly fetch QEMU and RE toolbox prebuilt images after installation")
@@ -274,7 +274,7 @@ def main(argv: list[str] | None = None) -> int:
             raise InstallerError("--vm-pull-images requires --with-vm-containers")
         if args.with_vm_containers and not args.uninstall:
             from .vm_containers import check_container_runtime
-            check_container_runtime(args.vm_container_runtime)
+            args.vm_container_runtime = check_container_runtime(args.vm_container_runtime)["runtime"]
         if args.list:
             _print_catalog(catalog)
             return 0

@@ -181,7 +181,7 @@ class InstallerCliTests(unittest.TestCase):
             with patch("installer.cli.SourceFreeEcosystemInstaller") as installer, \
                  patch("installer.cli._record_source_ref"), \
                  patch("installer.cli._ensure_launcher_priority"), \
-                 patch("installer.vm_containers.check_container_runtime", return_value={}), \
+                 patch("installer.vm_containers.check_container_runtime", return_value={"runtime": "docker"}), \
                  patch("installer.vm_containers.pull_prebuilt",
                        side_effect=VMContainerError("image unavailable")):
                 status = main(args)
