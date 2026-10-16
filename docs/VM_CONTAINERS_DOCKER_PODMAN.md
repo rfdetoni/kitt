@@ -1,3 +1,5 @@
+> **KITT 0.16.10:** O caminho canônico é `./install.sh --preset full --with-re-lab --yes --accept-windows-license`, que chama `kitt re lab setup` no Agent CLI 0.88.8. Para apagar dados, use exclusivamente `kitt re lab recreate --scope windows --destroy-data --dry-run` e execute com `--confirm TOKEN --accept-license`. As opções antigas `--re-oracle-recreate` do instalador são rejeitadas. Verificação Windows/KVM real permanece **UNVERIFIED** até `kitt re lab verify --full` no host autorizado.
+
 ## Atualização 0.15.7 — segurança e coordenação entre VMs
 
 O console noVNC passa a exigir senha aleatória por VM, inclusive para acesso
@@ -154,3 +156,48 @@ O toolbox é um contêiner com kernel compartilhado, não substitui QEMU para ex
 Além da imagem Docker/Podman `full`, o comando `--preset full` do instalador raiz agora instala `rea-agents@6.4.0` no prefixo privado do próprio KITT, caso um Node compatível e npm estejam disponíveis. Essa instalação não usa `npm install -g` no prefixo global e não habilita o MCP automaticamente. Para ativar no workspace autorizado, execute `kitt plugins enable kitt-rea`.
 
 Para instalar REA com outro preset use `--with-rea`. Para excluir do preset completo use `--skip-rea`. A falta de Node/npm ou a falha de download não cancela a instalação já concluída dos componentes centrais do KITT: uma mensagem específica indica que o REA ficou pendente. Nenhuma instalação implícita modifica o Node ou o prefixo global do npm. Consulte [notas da release](RELEASE_0.15.8.md).
+
+## Reproducible Windows 11 Oracle lab (next release)
+
+The full installer can now automate the **initial** Windows OpenSSH
+configuration and a benign SHA-pinned Win32 probe using Dockur /oem, without
+changing the existing, default RE lab provisioning flow.
+
+For a brand-new test lab:
+
+    ./install.sh --preset full --channel release --with-re-lab \
+      --re-runtime docker --re-oracle-bootstrap \
+      --accept-windows-license --yes
+
+For a disposable existing managed Windows lab (DELETES Windows disk/data):
+
+    ./install.sh --preset full --channel release --with-re-lab \
+      --re-runtime docker --re-oracle-bootstrap --re-oracle-recreate \
+      --accept-windows-license --yes
+
+The second command leaves the KITT-managed Linux toolbox intact. Both require
+an explicit Windows license/consent flag. The installer delegates to
+Agent CLI kitt re oracle bootstrap, which verifies the KITT-owned container
+and its private storage, compiles the fixed event synchronization pilot in
+the managed MinGW toolbox, pins generated SSH identities, creates OEM files,
+and boots a new Windows 11 using the local Dockur image.
+
+Only 127.0.0.1:8006 (console) and 127.0.0.1:2222 (probe-only Windows SSH) are
+published. OpenSSH allows a nonadmin local user with public-key authentication
+and ForceCommand bound to a read-only probe inventory or SHA-pinned probe.run.
+The guest does not need a Python installation to serve requests.
+
+Provisioning returns status PROVISIONING, **never oracle_ready=true**. The
+operator checks its generated private hosts.json and manifest SHA using
+kitt re oracle doctor, then invokes the opt-in fixed Windows/Wine pilot only
+after the SSH handshake succeeds. Real first-boot Windows, firewall and
+Features-on-Demand verification is not covered by an installer unit test.
+
+No unknown binaries should be executed in the Linux toolbox, because Docker
+shares its kernel with the host; isolated disposable QEMU VMs are required for
+hostile or untrusted code. Private keys, Windows ISO/disk and credentials must
+never be committed or included in telemetry.
+
+The older --with-re-lab path **without** --re-oracle-bootstrap keeps the
+existing Dockur guest intact and does not expose SSH. The new flags must not
+be used on Windows guests whose data must be preserved.

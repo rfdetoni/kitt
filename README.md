@@ -1,3 +1,7 @@
+## KITT 0.16.10 — Agent-owned Linux RE + Dockur Windows autosetup
+
+With `--preset full --with-re-lab --yes --accept-windows-license`, the root installer delegates to Agent CLI 0.88.8 (`kitt re lab setup`). The official Dockur image is pinned by digest; OEM configures OpenSSH and SHA-pinned probes. Wine runs the fixed differential pilot in a separate restricted container. `kitt re lab recreate` requires a recent scope-bound confirmation token. **Live Windows/KVM E2E is unverified.** [Guide](docs/RELEASE_0.16.10.md).
+
 # KITT 0.16.9 — reuse existing Docker RE Linux and Dockur Windows environments
 
 Pins **Agent CLI 0.88.5**, **Assistant 0.1.50** / **Python Runtime 0.4.5**. Docker is automatically preferred over Podman when both engines are operational; an explicitly requested engine is never silently replaced. The Agent recognizes the installer-owned Linux RE toolbox (`kitt-re-full`) and Dockur Windows (`kitt-re-win11`), checks container ownership and isolation before read-only inventory or operator lifecycle actions, and avoids requiring another ISO for the existing Docker lab. Windows remains non-oracle without authenticated guest probes. Other ecosystem SHA pins remain unchanged.

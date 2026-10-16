@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "channel": "release",
-  "ecosystem_version": "0.16.9",
+  "ecosystem_version": "0.16.10",
   "components": {
     "protocol": {
       "repository": "rfdetoni/kitt-protocol",
@@ -17,11 +17,11 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "d60938253a946714387a421a762b687f1d8ea4a9"
+      "sha": "b112fa3ad52c66ae20410b187e1095ffabf61e23"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "27b21b09af724c0b62efefff07baea15d15087c0"
+      "sha": "fb4f1966125a7bd3eece65989df01632956d2439"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
