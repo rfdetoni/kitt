@@ -119,6 +119,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--re-profile", choices=("full",), default="full")
     parser.add_argument("--re-windows", choices=("dockurr",), default="dockurr")
     parser.add_argument("--re-windows-version", choices=("11",), default="11")
+    parser.add_argument("--re-oracle-bootstrap", action="store_true",
+        help="Prepare Windows OpenSSH and SHA-pinned Win32 probes via Dockur OEM")
+    parser.add_argument("--re-oracle-recreate", action="store_true",
+        help="DESTROY and rebuild the KITT-owned Windows lab disk (--yes required)")
+    parser.add_argument("--accept-windows-license", action="store_true",
+        help="Confirm Windows licensing and consent to Microsoft media downloads")
     parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
     parser.add_argument("--with-vm-containers", action="store_true",
         help="check Docker/Podman QEMU support; include KITT Agent CLI")
@@ -261,6 +267,12 @@ def main(argv: list[str] | None = None) -> int:
             component_refs = load_release_refs(source_root, catalog)
 
         platform = PlatformAdapter.detect()
+        if args.re_oracle_bootstrap and not args.with_re_lab:
+            raise InstallerError("--re-oracle-bootstrap requires --with-re-lab")
+        if args.re_oracle_recreate and not args.re_oracle_bootstrap:
+            raise InstallerError("--re-oracle-recreate requires --re-oracle-bootstrap")
+        if args.re_oracle_bootstrap and (not args.yes or not args.accept_windows_license):
+            raise InstallerError("Oracle bootstrap requires --yes and --accept-windows-license")
         if args.with_re_lab and not args.uninstall:
             if (args.preset or os.environ.get("KITT_PRESET")) != "full":
                 raise InstallerError("--with-re-lab requires --preset full")
@@ -385,13 +397,18 @@ def main(argv: list[str] | None = None) -> int:
             try:
                 re_report = provision_re_lab(root, runtime=args.re_runtime,
                     profile=args.re_profile, windows=args.re_windows,
-                    version=args.re_windows_version)
+                    version=args.re_windows_version,
+                    oracle=args.re_oracle_bootstrap, oracle_recreate=args.re_oracle_recreate)
                 print("K.I.T.T. RE lab provisioned:")
                 print("  Linux toolbox: docker exec -it kitt-re-full /bin/sh")
                 print(f"  Windows console: {re_report['windows_url']}")
                 print(f"  Windows username: {re_report['windows_user']}")
                 print(f"  Windows credentials: {re_report['credentials_file']}")
                 print(f"  Note: {re_report['warning']}")
+                if re_report.get("oracle_hosts"):
+                    print(f"  Oracle SSH profile: {re_report['oracle_hosts']}")
+                    print(f"  Oracle manifest SHA: {re_report['oracle_manifest_sha256']}")
+                    print("  Oracle ready: UNVERIFIED until the Windows OEM and SSH doctor pass")
             except (ReLabError, OSError, subprocess.SubprocessError) as error:
                 print(f"K.I.T.T. installed; RE lab incomplete: {error}", file=sys.stderr)
                 optional_failed = True

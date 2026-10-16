@@ -120,7 +120,8 @@ def _toolbox_tag(python: Path) -> str:
     return tag
 
 
-def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, version: str) -> dict[str, str]:
+def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, version: str,
+                     oracle: bool = False, oracle_recreate: bool = False) -> dict[str, str]:
     check_re_lab(runtime=runtime, profile=profile, windows=windows, version=version)
     import fcntl  # Linux-only; do not prevent a helpful platform error on Windows
     root = root.expanduser().resolve()
@@ -175,7 +176,23 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
                   *_labels(lab, "toolbox"), image, "sleep", "infinity"], timeout=120)
         _start_existing("kitt-re-full")
 
-        if not windows_exists:
+        oracle_plan = None
+        if oracle:
+            # Do not infer guest configuration from container state.
+            _ensure_windows_settings(creds, fresh_guest=not any(storage.iterdir()))
+            _run(["docker", "pull", "dockurr/windows"], timeout=1800)
+            command = [str(python), "-m", "kitt.cli.main", "re", "oracle", "bootstrap",
+                       "--yes", "--accept-license"]
+            if oracle_recreate:
+                command.append("--recreate")
+            result = _run(command, timeout=400, check=False)
+            if result.returncode:
+                raise ReLabError("Windows Oracle bootstrap failed; inspect KITT logs")
+            try:
+                oracle_plan = json.loads(result.stdout)
+            except ValueError as exc:
+                raise ReLabError("Oracle bootstrap did not return expected JSON") from exc
+        elif not windows_exists:
             _ensure_windows_settings(creds, fresh_guest=not any(storage.iterdir()))
             _run(["docker", "pull", "dockurr/windows"], timeout=1800)
             image = _image_id("dockurr/windows")
@@ -189,5 +206,7 @@ def provision_re_lab(root: Path, *, runtime: str, profile: str, windows: str, ve
 
         return {"workspace": str(workspace), "windows_url": "http://127.0.0.1:8006",
                 "windows_user": "Docker", "credentials_file": str(creds),
-                "warning": "Dockur default login: Docker/admin, AUTOLOGIN=Y. "
-                           "Only for an isolated test VM. Changes require a fresh Windows installation."}
+                "warning": "Only an isolated test Windows VM; OAuth/SSH/Oracle readiness is not assumed.",
+                **({"oracle_hosts": oracle_plan["hosts"],
+                    "oracle_manifest_sha256": oracle_plan["manifest_sha256"]}
+                   if oracle_plan else {})}
