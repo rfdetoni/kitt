@@ -1,6 +1,6 @@
-## KITT 0.16.13 — DeepSeek stopped reply footer
+## KITT 0.16.13 — DeepSeek paused response and contract resilience
 
-Pins Reverse Proxy 5.4.9 and DeepSeek plugin 1.2.1 to recognize the screenshot-observed `Servidor está temporariamente indisponível` / `Parado` / `Continuar` state, supporting deeply nested footer controls without clicking unrelated authorization UI or replaying prompts. [Release notes](docs/RELEASE_0.16.13.md).
+Pins Reverse Proxy 5.4.9 and DeepSeek plugin 1.2.1 to recognize the screenshot-observed `Servidor está temporariamente indisponível` / `Parado` / `Continuar` state, supporting deeply nested footer controls without clicking unrelated authorization UI or replaying prompts. Hardens JSON contract repairs with bounded context, serializer-only instructions and early exit on unchanged invalid responses. [Release notes](docs/RELEASE_0.16.13.md).
 
 ## KITT 0.16.12 — DeepSeek paused generation continuation
 
