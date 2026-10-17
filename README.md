@@ -1,3 +1,7 @@
+# KITT 0.16.15 — signed offline Clean-Room RE pipeline
+
+Pins Agent 0.88.10, Protocol 0.14.1, Assistant 0.1.55/Runtime 0.4.10 and Workers 0.1.80. Adds local model image build and gated independent execution, without claiming Windows/Wine new-code conformance. [Release notes](docs/RELEASE_0.16.15.md).
+
 # KITT 0.16.14 — guarded Clean-Room RE
 
 Pins Agent 0.88.9, Protocol 0.14.1, Assistant 0.1.54/Runtime 0.4.9 and Workers 0.1.79. Strict black-box API contracts, private handoff seals, mandatory independent Ed25519 review signature and a SHA-pinned networkless offline implementer path are available; independent Windows/Wine end-to-end certification is still required. [Release notes](docs/RELEASE_0.16.14.md).
