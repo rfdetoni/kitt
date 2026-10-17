@@ -92,7 +92,7 @@ jobs:
               release_impact=()
               for path in "${changed[@]}"; do
                 case "$path" in
-                  .github/*|tests/*|docs/*|README.md|SECURITY.md|LICENSE)
+                  .github/*|tests/*|docs/*|README.md|CHANGELOG.md|SECURITY.md|LICENSE)
                     ;;
                   *)
                     release_impact+=("$path")
