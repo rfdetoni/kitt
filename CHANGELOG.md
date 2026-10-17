@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.16 — Centralized changelogs and synchronized immutable pins
+
+Promotes Protocol 0.14.2, Agent CLI 0.88.11, Assistant 0.1.56 / Runtime 0.4.11, AI Workers 0.1.81, and documentation-only revisions of Reverse Proxy, Memory and Toolbox. Moves README release history to CHANGELOG.md and fixes immutable release hygiene. [Notas completas](docs/RELEASE_0.16.16.md).
+
 Histórico de versões migrado integralmente do README. As notas detalhadas de cada versão permanecem em `docs/RELEASE_*.md`.
 
 # KITT 0.16.15 — signed offline Clean-Room RE pipeline
