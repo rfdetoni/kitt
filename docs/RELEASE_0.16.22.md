@@ -3,7 +3,7 @@
 ## Pins imutáveis do canal release
 
 - **Agent CLI 0.88.18**: `e768fdfd92b8f5b255f38ccd337230e0a3e370a8` ([PR #122](https://github.com/rfdetoni/kitt-agent-cli/pull/122)).
-- **Reverse Proxy 5.4.11**: `0b5cf52e3c5da10e918467739a139956dcc8ae06` ([PR #94](https://github.com/rfdetoni/kitt-reverse-proxy/pull/94)).
+- **Reverse Proxy 5.4.11** (inclui melhoria posterior de contêiner na main): `0d3b986471d569283b904f8cd1cd08ad190cb076` ([PR #94](https://github.com/rfdetoni/kitt-reverse-proxy/pull/94)).
 - Protocol, Memory, Toolbox, Assistant e AI Workers mantêm seus pins da versão 0.16.21; nenhuma alteração de protocolo compartilhado foi necessária.
 
 ## Entregas

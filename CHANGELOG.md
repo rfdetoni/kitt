@@ -2,7 +2,7 @@
 
 ## 0.16.22 — validated agent/proxy contract and tool-loop performance
 
-Pins Agent CLI 0.88.18 (`e768fdf`, PR #122) and Reverse Proxy 5.4.11 (`0b5cf52`, PR #94). The Agent exposes its existing bounded batch-read operation in the exact model schema, extracts host-tool policy from the tool loop and avoids repeating generic guidance on every receipt; the proxy rejects empty final responses and unsafe broad contract repairs while separating validation from session orchestration. Component locks and release docs are synchronized. Protocol, Memory, Toolbox, Assistant and AI Workers retain their previous tested pins; no authenticated Gemini Web speedup is claimed. [Notas](docs/RELEASE_0.16.22.md).
+Pins Agent CLI 0.88.18 (`e768fdf`, PR #122) and Reverse Proxy 5.4.11 (`0d3b986`, inclui PR #94 e ajustes posteriores de contêiner). The Agent exposes its existing bounded batch-read operation in the exact model schema, extracts host-tool policy from the tool loop and avoids repeating generic guidance on every receipt; the proxy rejects empty final responses and unsafe broad contract repairs while separating validation from session orchestration. Component locks and release docs are synchronized. Protocol, Memory, Toolbox, Assistant and AI Workers retain their previous tested pins; no authenticated Gemini Web speedup is claimed. [Notas](docs/RELEASE_0.16.22.md).
 
 
 ## 0.16.21 — agent capability-first discovery and RE source staging
