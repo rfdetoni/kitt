@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.18 — RE Linux guest WineHQ Staging
+
+Pins Agent 0.88.13, signed Wine-Staging guest image 0.86.11, Assistant 0.1.58/Runtime 0.4.13 and Workers 0.1.83. Adds `kitt re lab upgrade-linux --approve` with rollback and /workspace/Windows preservation. [Notas](docs/RELEASE_0.16.18.md).
+
 ## 0.16.17 — UI composer recovery and RE guests MCP
 
 Pins Reverse Proxy 5.4.10, Agent CLI 0.88.12, Assistant 0.1.57 / Runtime 0.4.12 and AI Workers 0.1.82. Repairs a one-character mutation in ChatGPT tool continuations and adds optional read-only guest status/Oracle readiness MCP. [Notas](docs/RELEASE_0.16.17.md).
