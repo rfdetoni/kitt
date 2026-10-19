@@ -4,7 +4,7 @@
 
 | Component | Version / revision | Scope |
 | --- | --- | --- |
-| Agent CLI | 0.88.14 / `9bdde7d1f1724900cbf0767cdc439e171e0b5a66` | SSH error classifications, read-only handshake retry, Windows OEM bootstrap status, tests and runbook |
+| Agent CLI | 0.88.15 / `037635b293bab033a375b8f180bd30072fd3de1f` | SSH error classifications, read-only handshake retry, Windows OEM bootstrap status, tests, runbook and early BrokenPipeError handling |
 | Memory | 0.10.2 / `646a213672833c42f0e4eacf1faf048261e5a4c6` | CI-passing serde_json 1.0.154, sha2 0.11.1 and thiserror 2.0.21 dependency and Cargo.lock updates |
 | Reverse Proxy | 5.4.10 / `9ea46443988fcf7fcb9beadd36d1ce41b2f21820` | CI-passing Playwright 1.64.1 dependency and package lock |
 
@@ -18,4 +18,4 @@ Run `kitt re lab status --json` and `kitt re lab verify --full` only after guest
 
 ## Verification
 
-Agent CLI PR [#117](https://github.com/rfdetoni/kitt-agent-cli/pull/117), Memory PRs [#4](https://github.com/rfdetoni/kitt-memory/pull/4), [#15](https://github.com/rfdetoni/kitt-memory/pull/15) and [#16](https://github.com/rfdetoni/kitt-memory/pull/16), Reverse Proxy PR [#92](https://github.com/rfdetoni/kitt-reverse-proxy/pull/92). Each component merged only after available checks passed. Root integration CI must separately validate this immutable composition.
+Agent CLI PRs [#117](https://github.com/rfdetoni/kitt-agent-cli/pull/117) and [#118](https://github.com/rfdetoni/kitt-agent-cli/pull/118), Memory PRs [#4](https://github.com/rfdetoni/kitt-memory/pull/4), [#15](https://github.com/rfdetoni/kitt-memory/pull/15) and [#16](https://github.com/rfdetoni/kitt-memory/pull/16), Reverse Proxy PR [#92](https://github.com/rfdetoni/kitt-reverse-proxy/pull/92). Each component merged only after available checks passed. Root integration CI must separately validate this immutable composition.
