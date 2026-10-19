@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.22 — validated agent/proxy contract and tool-loop performance
+
+Pins Agent CLI 0.88.18 (`e768fdf`, PR #122) and Reverse Proxy 5.4.11 (`0d3b986`, inclui PR #94 e ajustes posteriores de contêiner). The Agent exposes its existing bounded batch-read operation in the exact model schema, extracts host-tool policy from the tool loop and avoids repeating generic guidance on every receipt; the proxy rejects empty final responses and unsafe broad contract repairs while separating validation from session orchestration. Component locks and release docs are synchronized. Protocol, Memory, Toolbox, Assistant and AI Workers retain their previous tested pins; no authenticated Gemini Web speedup is claimed. [Notas](docs/RELEASE_0.16.22.md).
+
+
 ## 0.16.21 — agent capability-first discovery and RE source staging
 
 Pins Agent CLI 0.88.17 (`c5abeff`): host capability snapshot for agent-loop, consistent JSON tool envelope, context retrieval free from plan scaffolding, deterministic single-file planning, bounded discovery checkpoints and operator-only Wine-Staging source staging in the networkless RE shared workspace. uv.lock, regression tests and runbooks updated in Agent; all other immutable ecosystem pins unchanged. [Notas](docs/RELEASE_0.16.21.md).
