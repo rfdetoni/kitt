@@ -9,7 +9,7 @@
     },
     "memory": {
       "repository": "rfdetoni/kitt-memory",
-      "sha": "477f94edaa47fe370dbc103b5bd0227cc45e1c0d"
+      "sha": "646a213672833c42f0e4eacf1faf048261e5a4c6"
     },
     "toolbox": {
       "repository": "rfdetoni/kitt-toolbox",
@@ -17,7 +17,7 @@
     },
     "assistant": {
       "repository": "rfdetoni/kitt-assistant",
-      "sha": "9960bf81d80ae3c28e82e485997a92ef04a6c331"
+      "sha": "6ef2201946ad3e0ca35218b01427f43a63cd16f7"
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
