@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.20 — fixed isolated Wine pilot HOME
+
+Promotes Agent CLI 0.88.16 (`38b0bf4`) to fix the isolated Windows-versus-Wine pilot failing because non-root Wine refused root-owned `HOME=/tmp`. The ephemeral container now initializes a private Wine HOME inside tmpfs, validates Windows receipts first and reports bounded nonzero Wine exit codes without exposing stderr. Preserves the existing Protocol, Memory, Assistant, Reverse Proxy, Toolbox and Workers immutable pins. [Notas](docs/RELEASE_0.16.20.md).
+
+
 ## 0.16.19 — Windows Oracle SSH diagnostics and dependency lock pins
 
 Pins Agent CLI 0.88.15 (`037635b`): actionable SSH error classification, bounded read-only probe.info transport retry and OEM provisioning evidence; still no automatic probe.run replay or guest disk reset. Promotes CI-validated Memory serde_json/sha2/thiserror updates (`646a213`), compatible Assistant Cargo.lock (`6ef2201`), and Reverse Proxy Playwright patch (`9ea4644`). Protocol, Toolbox and AI Workers retain existing immutable pins. [Notas](docs/RELEASE_0.16.19.md).
