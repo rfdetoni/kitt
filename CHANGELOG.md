@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.21 — agent capability-first discovery and RE source staging
+
+Pins Agent CLI 0.88.17 (`c5abeff`): host capability snapshot for agent-loop, consistent JSON tool envelope, context retrieval free from plan scaffolding, deterministic single-file planning, bounded discovery checkpoints and operator-only Wine-Staging source staging in the networkless RE shared workspace. uv.lock, regression tests and runbooks updated in Agent; all other immutable ecosystem pins unchanged. [Notas](docs/RELEASE_0.16.21.md).
+
+
 ## 0.16.20 — fixed isolated Wine pilot HOME
 
 Promotes Agent CLI 0.88.16 (`38b0bf4`) to fix the isolated Windows-versus-Wine pilot failing because non-root Wine refused root-owned `HOME=/tmp`. The ephemeral container now initializes a private Wine HOME inside tmpfs, validates Windows receipts first and reports bounded nonzero Wine exit codes without exposing stderr. Preserves the existing Protocol, Memory, Assistant, Reverse Proxy, Toolbox and Workers immutable pins. [Notas](docs/RELEASE_0.16.20.md).
