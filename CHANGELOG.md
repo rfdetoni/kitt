@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.19 — Windows Oracle SSH diagnostics and dependency lock pins
+
+Pins Agent CLI 0.88.15 (`037635b`): actionable SSH error classification, bounded read-only probe.info transport retry and OEM provisioning evidence; still no automatic probe.run replay or guest disk reset. Promotes CI-validated Memory serde_json/sha2/thiserror updates (`646a213`), compatible Assistant Cargo.lock (`6ef2201`), and Reverse Proxy Playwright patch (`9ea4644`). Protocol, Toolbox and AI Workers retain existing immutable pins. [Notas](docs/RELEASE_0.16.19.md).
+
+
 ## 0.16.18 — RE Linux guest WineHQ Staging
 
 Pins Agent 0.88.13, signed Wine-Staging guest image 0.86.11, Assistant 0.1.58/Runtime 0.4.13 and Workers 0.1.83. Adds `kitt re lab upgrade-linux --approve` with rollback and /workspace/Windows preservation. [Notas](docs/RELEASE_0.16.18.md).
