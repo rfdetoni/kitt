@@ -2,7 +2,7 @@
 
 ## 0.16.19 — Windows Oracle SSH diagnostics and dependency lock pins
 
-Pins Agent CLI 0.88.14 (`9bdde7d`): actionable SSH error classification, bounded read-only probe.info transport retry and OEM provisioning evidence; still no automatic probe.run replay or guest disk reset. Promotes the CI-validated Memory serde_json and sha2 dependency updates (`eebecff`) and Reverse Proxy Playwright patch (`9ea4644`), preserving immutable SHA pins of all other components. [Notas](docs/RELEASE_0.16.19.md).
+Pins Agent CLI 0.88.14 (`9bdde7d`): actionable SSH error classification, bounded read-only probe.info transport retry and OEM provisioning evidence; still no automatic probe.run replay or guest disk reset. Promotes the CI-validated Memory serde_json, sha2 and thiserror dependency updates (`646a213`) and Reverse Proxy Playwright patch (`9ea4644`), preserving immutable SHA pins of all other components. [Notas](docs/RELEASE_0.16.19.md).
 
 
 ## 0.16.18 — RE Linux guest WineHQ Staging
