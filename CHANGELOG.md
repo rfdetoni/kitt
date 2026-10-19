@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.17 — UI composer recovery and RE guests MCP
+
+Pins Reverse Proxy 5.4.10, Agent CLI 0.88.12, Assistant 0.1.57 / Runtime 0.4.12 and AI Workers 0.1.82. Repairs a one-character mutation in ChatGPT tool continuations and adds optional read-only guest status/Oracle readiness MCP. [Notas](docs/RELEASE_0.16.17.md).
+
 ## 0.16.16 — Centralized changelogs and synchronized immutable pins
 
 Promotes Protocol 0.14.2, Agent CLI 0.88.11, Assistant 0.1.56 / Runtime 0.4.11, AI Workers 0.1.81, and documentation-only revisions of Reverse Proxy, Memory and Toolbox. Moves README release history to CHANGELOG.md and fixes immutable release hygiene. [Notas completas](docs/RELEASE_0.16.16.md).
