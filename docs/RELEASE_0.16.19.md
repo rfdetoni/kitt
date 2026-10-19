@@ -5,10 +5,10 @@
 | Component | Version / revision | Scope |
 | --- | --- | --- |
 | Agent CLI | 0.88.15 / `037635b293bab033a375b8f180bd30072fd3de1f` | SSH error classifications, read-only handshake retry, Windows OEM bootstrap status, tests, runbook and early BrokenPipeError handling |
-| Memory | 0.10.2 / `646a213672833c42f0e4eacf1faf048261e5a4c6` | CI-passing serde_json 1.0.154, sha2 0.11.1 and thiserror 2.0.21 dependency and Cargo.lock updates |
+| Memory | 0.10.2 / `477f94edaa47fe370dbc103b5bd0227cc45e1c0d` | Unchanged pinned baseline; new Memory dependency commits await Assistant Cargo.lock synchronization |
 | Reverse Proxy | 5.4.10 / `9ea46443988fcf7fcb9beadd36d1ce41b2f21820` | CI-passing Playwright 1.64.1 dependency and package lock |
 
-Protocol, Toolbox, Assistant and AI Workers retain the exact earlier immutable pins. This release changes the root VERSION/manifest only; it does **not** generate new installable Windows or Wine images.
+Protocol, Memory, Toolbox, Assistant and AI Workers retain the exact earlier immutable pins. Memory PRs #4, #15 and #16 were merged into Memory's main separately, but are deliberately **not promoted by this root manifest**, because the integrated Assistant release-channel Cargo.lock smoke rejected that new Memory SHA. Never bypass --locked or the release pin check; regenerate Assistant Cargo.lock and validate it in a separate coordinated promotion. This release changes the root VERSION/manifest only; it does **not** generate new installable Windows or Wine images.
 
 ## Windows laboratory operator acceptance
 
