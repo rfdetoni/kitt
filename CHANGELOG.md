@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.29 — Agent host-loop recovery and safe Reverse Proxy timeout handling
+
+Pins Agent CLI 0.88.27 (`401bf42`) and Assistant Runtime 0.4.19 (`483e05c`). Repeated host commands are blocked after an unavailable Bubblewrap sandbox; alternating failed commands and unchanged read results are recognized as stalled progress; ambiguous reverse-proxy WebChat request timeouts are not automatically replayed. Python runtime lock and both Assistant CI Agent source pins are aligned. Protocol, Memory, Toolbox, AI Workers and Reverse Proxy remain at their previous exact main SHAs; there is no new Wire/API protocol or Rust daemon behavior. [Notes](docs/RELEASE_0.16.29.md).
+
+
 ## 0.16.28 — contract-aware planning diagnostics
 
 Pins Agent CLI 0.88.24 (`58ffe92`, PR #130) and Assistant Runtime 0.4.18 (PR #57). Agent planning now provides the exact plan.submit wire format; invalid proposals and premature verification receive actionable errors. Host sandbox failures state the Bubblewrap/user-namespace requirement instead of suggesting repeated approvals. Scope, capabilities, VM identity and mandatory host isolation remain unchanged. Existing Protocol, Memory, Toolbox, AI Workers and Reverse Proxy pins are preserved. [Notes](docs/RELEASE_0.16.28.md).
