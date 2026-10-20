@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.31 — verify Agent model identity before WebChat dispatch
+
+Pins Reverse Proxy 5.4.16 (`d992cbe`) which rejects mismatched Agent Contract model IDs before browser submission, preventing a configured Gemini model from silently executing on a ChatGPT instance. Keeps Agent CLI 0.88.30 and Assistant Runtime 0.4.21 at their verified source pins. Protocol, Memory, Toolbox and AI Workers are unchanged. [Notes](docs/RELEASE_0.16.31.md).
+
+
 ## 0.16.30 — host reliability, context budgets, typed decision shadow and proxy sessions
 
 Pins Agent CLI 0.88.30 (`dd63d72`), Reverse Proxy 5.4.15 (`23d86ef`) and Assistant Runtime 0.4.21 (`1901398`). Aligns Python/npm manifests, locks and Assistant CI source pins; the release manifest preserves exact current-main SHAs for Protocol, Memory, Toolbox and AI Workers. Improves resumable host checkpoints, scoped read batches, polyglot AGENTS.md inclusion, autonomous policy consistency, immutable child-model egress constraints and double-invalidation of browser session generations. Adds an opt-in System One decision benchmark; production routing and safety authorization remain unchanged until measured. [Notes](docs/RELEASE_0.16.30.md).
