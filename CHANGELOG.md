@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.33 — Agent 0.88.32 no-progress loop and host-blocker fixes
+
+Pins Agent CLI 0.88.32 (`f399bf6`), Assistant Runtime 0.4.23 (`fa6fad5`) and Reverse Proxy 5.4.16 (`d992cbe`). Repeated successful read-only batches now trigger bounded stagnation detection; repeated host denials and unavailable sandbox errors propagate as POLICY and ENVIRONMENT blockers respectively, never successful completion. Python uv.lock, Assistant source pins, release manifesto and notes are synchronized. Unchanged modules retain their existing immutable SHAs. [Notes](docs/RELEASE_0.16.33.md).
+
+
 ## 0.16.32 — explicit host sandbox preflight
 
 Pins Agent CLI 0.88.31 (`fbb6029`) and Assistant Runtime 0.4.22 (`a1f7f68`), retaining Reverse Proxy 5.4.16 (`d992cbe`). Hosts without functional Bubblewrap >=0.12 now expose the blocker before the Agent attempts process.run; authorized repo mutations remain available, while unsafe unsandboxed fallback remains forbidden. The Python lock, Assistant CI immutable pins and root release manifest are aligned. [Notes](docs/RELEASE_0.16.32.md).
