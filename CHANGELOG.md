@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.23 — native tools, sequential execution and explicit host actions
+
+Pins Agent CLI 0.88.19 (`dc625e5`, PR #124) and Reverse Proxy 5.4.13 (`82c4c59`, PRs #96/#97). Restores native provider tool forwarding when the client sets `parallel_tool_calls=false`, keeps a single host action per loop, rejects prose-inferred tools, and uses existing bounded `repo.batch_read` for independent reads. Validated component CI/Docker; no authenticated WebChat speedup is claimed. Other ecosystem pins unchanged. [Notes](docs/RELEASE_0.16.23.md).
+
+
 ## 0.16.22 — validated agent/proxy contract and tool-loop performance
 
 Pins Agent CLI 0.88.18 (`e768fdf`, PR #122) and Reverse Proxy 5.4.11 (`0d3b986`, inclui PR #94 e ajustes posteriores de contêiner). The Agent exposes its existing bounded batch-read operation in the exact model schema, extracts host-tool policy from the tool loop and avoids repeating generic guidance on every receipt; the proxy rejects empty final responses and unsafe broad contract repairs while separating validation from session orchestration. Component locks and release docs are synchronized. Protocol, Memory, Toolbox, Assistant and AI Workers retain their previous tested pins; no authenticated Gemini Web speedup is claimed. [Notas](docs/RELEASE_0.16.22.md).
