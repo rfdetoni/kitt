@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.25 — daemon autonomy reconciliation and durable approvals
+
+Pins Agent CLI 0.88.21 (`306f312`, PR #126) and Assistant 0.1.59 / runtime 0.4.14 (`c2157a8`, PR #53). The TUI no longer resets daemon autonomy to a stale local preset at attach; it reads the daemon-authoritative effective profile. Persisted approval lists retain the authenticated principal identity required by workspace/session remembered approval rules. The Assistant build and Python lock pin Agent CLI 0.88.21. Reverse Proxy 5.4.14 and unrelated pins unchanged. [Notes](docs/RELEASE_0.16.25.md).
+
+
 ## 0.16.24 — approval hotkeys, bounded artifact and tool-catalog recovery
 
 Pins Agent CLI 0.88.20 (`4a45488`, PR #125) and Reverse Proxy 5.4.14 (`9dc9e78`, PR #98). Fixes A/S/D keyboard navigation for autonomy and eager approval shortcuts, prevents recursive artifact retention, avoids replaying identical policy-denied actions, and bounds `request_tools` recovery to one attempt without inventing host tools. Component CI/Docker passed; pins and installer integration are verified by the ecosystem CI. Other components retain their 0.16.23 SHAs. [Notes](docs/RELEASE_0.16.24.md).
