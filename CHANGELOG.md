@@ -2,7 +2,7 @@
 
 ## 0.16.29 — Agent host-loop recovery and safe Reverse Proxy timeout handling
 
-Pins Agent CLI 0.88.27 (`401bf42`) and Assistant Runtime 0.4.19 (`483e05c`). Repeated host commands are blocked after an unavailable Bubblewrap sandbox; alternating failed commands and unchanged read results are recognized as stalled progress; ambiguous reverse-proxy WebChat request timeouts are not automatically replayed. Python runtime lock and both Assistant CI Agent source pins are aligned. Protocol, Memory, Toolbox, AI Workers and Reverse Proxy remain at their previous exact main SHAs; there is no new Wire/API protocol or Rust daemon behavior. [Notes](docs/RELEASE_0.16.29.md).
+Pins Agent CLI 0.88.27 (`67bc827`) and Assistant Runtime 0.4.19 (`e1f5694`). Repeated host commands are blocked after an unavailable Bubblewrap sandbox; alternating failed commands and unchanged read results are recognized as stalled progress; ambiguous reverse-proxy WebChat request timeouts are not automatically replayed. Python runtime lock and both Assistant CI Agent source pins are aligned. Protocol, Memory, Toolbox, AI Workers and Reverse Proxy remain at their previous exact main SHAs; there is no new Wire/API protocol or Rust daemon behavior. [Notes](docs/RELEASE_0.16.29.md).
 
 
 ## 0.16.28 — contract-aware planning diagnostics

@@ -2,8 +2,8 @@
 
 ## Immutable component pins
 
-- Agent CLI 0.88.27: 401bf42d41660b54d6e3cd7d37a5027def0d55c3
-- Assistant Runtime 0.4.19 / Rust workspace 0.1.61: 483e05c8fefe8d677e42e2cb99ddb7cbd9eb3c14
+- Agent CLI 0.88.27: 67bc827ab29eabd998522d6d7efe39c41fadc399
+- Assistant Runtime 0.4.19 / Rust workspace 0.1.61: e1f56948c759fff36153343aa72121faa1507bca
 - Reverse Proxy 5.4.14: 9dc9e788d77827eb5df04775a1c1b58a231764b5
 - Protocol: ac9baf8b4b8f03e839471c7bbb7d5e52e970a9ec
 - Memory: 646a213672833c42f0e4eacf1faf048261e5a4c6
