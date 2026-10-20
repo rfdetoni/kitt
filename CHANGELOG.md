@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.37 — Bubblewrap resolver symlink mount fix
+
+Pins Agent CLI 0.88.36 (`d76ef6a`) and Assistant Runtime 0.4.27 (`297a5bf`), retaining Reverse Proxy 5.4.16. The Agent runtime now avoids bind-mounting onto the systemd-resolved `/etc/resolv.conf` symlink while the Bubblewrap namespace masks `/run`; it selectively restores only canonical resolver targets for network-enabled profiles. Python locks and CI source pins are synchronized. Protocol, Memory, Toolbox, AI Workers and Reverse Proxy remain on their exact previous revisions. [Notes](docs/RELEASE_0.16.37.md).
+
+
 ## 0.16.36 — automatic secure Bubblewrap selection
 
 Pins Agent CLI 0.88.35 (`89d30ef`) and Assistant Runtime 0.4.26 (`99e0611`) with Reverse Proxy 5.4.16 unchanged. The host enumerates all system and PATH Bubblewrap candidates, skips outdated or nonfunctional versions, reports AppArmor uid_map denials accurately and refreshes status after environment repairs. The Python runtime lock and Assistant CI pins are aligned. No AppArmor configuration or host capability is modified automatically; Protocol, Memory, Toolbox and AI Workers retain their prior immutable source revisions. [Notes](docs/RELEASE_0.16.36.md).
