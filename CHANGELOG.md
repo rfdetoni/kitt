@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.28 — contract-aware planning diagnostics
+
+Pins Agent CLI 0.88.24 (`58ffe92`, PR #130) and Assistant Runtime 0.4.18 (PR #57). Agent planning now provides the exact plan.submit wire format; invalid proposals and premature verification receive actionable errors. Host sandbox failures state the Bubblewrap/user-namespace requirement instead of suggesting repeated approvals. Scope, capabilities, VM identity and mandatory host isolation remain unchanged. Existing Protocol, Memory, Toolbox, AI Workers and Reverse Proxy pins are preserved. [Notes](docs/RELEASE_0.16.28.md).
+
 ## 0.16.27 — Agent CLI allow-all e Assistant Runtime sincronizados
 
 Promove Agent CLI 0.88.23 (`fa1ab23`, PR #129) e KITT Assistant Runtime 0.4.17 (`f332320`, PR #56), com atalho `A` que persiste autonomia para todo o workspace, `w` para permissão restrita a uma ferramenta e tratamento explícito de erro na mudança de perfil. Manifesto release utiliza SHAs imutáveis de ambas as branches `main`; Protocol, Memory, Toolbox, AI Workers e Reverse Proxy permanecem nos pins anteriores. Permissões de workspace, capacidades e requisitos de isolamento do host continuam aplicáveis. [Notas](docs/RELEASE_0.16.27.md).
