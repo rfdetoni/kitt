@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.36 — automatic secure Bubblewrap selection
+
+Pins Agent CLI 0.88.35 (`89d30ef`) and Assistant Runtime 0.4.26 (`99e0611`) with Reverse Proxy 5.4.16 unchanged. The host enumerates all system and PATH Bubblewrap candidates, skips outdated or nonfunctional versions, reports AppArmor uid_map denials accurately and refreshes status after environment repairs. The Python runtime lock and Assistant CI pins are aligned. No AppArmor configuration or host capability is modified automatically; Protocol, Memory, Toolbox and AI Workers retain their prior immutable source revisions. [Notes](docs/RELEASE_0.16.36.md).
+
+
 ## 0.16.35 — preserve Goal read evidence and validate written paths
 
 Pins Agent CLI 0.88.34 (`66e8b49`) and Assistant Runtime 0.4.25 (`399ac70`), retaining Reverse Proxy 5.4.16. The Goal loop persists bounded previous host read receipts and now captures canonical `repo.write_file` paths (including Markdown reports) for post-turn verification. Python locks and CI pins updated; unrelated Protocol, Memory, Toolbox and AI Workers stay at their existing exact main SHAs. [Notes](docs/RELEASE_0.16.35.md).
