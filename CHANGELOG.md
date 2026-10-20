@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.32 — explicit host sandbox preflight
+
+Pins Agent CLI 0.88.31 (`fbb6029`) and Assistant Runtime 0.4.22 (`a1f7f68`), retaining Reverse Proxy 5.4.16 (`d992cbe`). Hosts without functional Bubblewrap >=0.12 now expose the blocker before the Agent attempts process.run; authorized repo mutations remain available, while unsafe unsandboxed fallback remains forbidden. The Python lock, Assistant CI immutable pins and root release manifest are aligned. [Notes](docs/RELEASE_0.16.32.md).
+
+
 ## 0.16.31 — verify Agent model identity before WebChat dispatch
 
 Pins Reverse Proxy 5.4.16 (`d992cbe`) which rejects mismatched Agent Contract model IDs before browser submission, preventing a configured Gemini model from silently executing on a ChatGPT instance. Keeps Agent CLI 0.88.30 and Assistant Runtime 0.4.21 at their verified source pins. Protocol, Memory, Toolbox and AI Workers are unchanged. [Notes](docs/RELEASE_0.16.31.md).
