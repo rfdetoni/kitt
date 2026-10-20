@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.27 — Agent CLI allow-all e Assistant Runtime sincronizados
+
+Promove Agent CLI 0.88.23 (`fa1ab23`, PR #129) e KITT Assistant Runtime 0.4.17 (`f332320`, PR #56), com atalho `A` que persiste autonomia para todo o workspace, `w` para permissão restrita a uma ferramenta e tratamento explícito de erro na mudança de perfil. Manifesto release utiliza SHAs imutáveis de ambas as branches `main`; Protocol, Memory, Toolbox, AI Workers e Reverse Proxy permanecem nos pins anteriores. Permissões de workspace, capacidades e requisitos de isolamento do host continuam aplicáveis. [Notas](docs/RELEASE_0.16.27.md).
+
 ## 0.16.26 — release metadata and immutable CLI / Assistant pins
 
 Pins the validated Agent CLI 0.88.21 release source (`0484f2e`, PR #127) and Assistant 0.1.60 / Runtime 0.4.15 (`6b019b3`, PR #54). Aligns source fallback with Python package metadata, fixes the automatic release gate, and reconciles Assistant uv.lock/CI pin with the exact CLI source revision. Behavior of the autonomy and remembered approval fixes from 0.16.25 remains unchanged. All unrelated component pins are preserved. [Notes](docs/RELEASE_0.16.26.md).
