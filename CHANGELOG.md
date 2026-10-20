@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.30 — host reliability, context budgets, typed decision shadow and proxy sessions
+
+Pins Agent CLI 0.88.30 (`dd63d72`), Reverse Proxy 5.4.15 (`23d86ef`) and Assistant Runtime 0.4.21 (`1901398`). Aligns Python/npm manifests, locks and Assistant CI source pins; the release manifest preserves exact current-main SHAs for Protocol, Memory, Toolbox and AI Workers. Improves resumable host checkpoints, scoped read batches, polyglot AGENTS.md inclusion, autonomous policy consistency, immutable child-model egress constraints and double-invalidation of browser session generations. Adds an opt-in System One decision benchmark; production routing and safety authorization remain unchanged until measured. [Notes](docs/RELEASE_0.16.30.md).
+
+
 ## 0.16.29 — Agent host-loop recovery and safe Reverse Proxy timeout handling
 
 Pins Agent CLI 0.88.27 (`67bc827`) and Assistant Runtime 0.4.19 (`e1f5694`). Repeated host commands are blocked after an unavailable Bubblewrap sandbox; alternating failed commands and unchanged read results are recognized as stalled progress; ambiguous reverse-proxy WebChat request timeouts are not automatically replayed. Python runtime lock and both Assistant CI Agent source pins are aligned. Protocol, Memory, Toolbox, AI Workers and Reverse Proxy remain at their previous exact main SHAs; there is no new Wire/API protocol or Rust daemon behavior. [Notes](docs/RELEASE_0.16.29.md).
