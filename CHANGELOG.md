@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.26 — release metadata and immutable CLI / Assistant pins
+
+Pins the validated Agent CLI 0.88.21 release source (`0484f2e`, PR #127) and Assistant 0.1.60 / Runtime 0.4.15 (`6b019b3`, PR #54). Aligns source fallback with Python package metadata, fixes the automatic release gate, and reconciles Assistant uv.lock/CI pin with the exact CLI source revision. Behavior of the autonomy and remembered approval fixes from 0.16.25 remains unchanged. All unrelated component pins are preserved. [Notes](docs/RELEASE_0.16.26.md).
+
+
 ## 0.16.25 — daemon autonomy reconciliation and durable approvals
 
 Pins Agent CLI 0.88.21 (`306f312`, PR #126) and Assistant 0.1.59 / runtime 0.4.14 (`c2157a8`, PR #53). The TUI no longer resets daemon autonomy to a stale local preset at attach; it reads the daemon-authoritative effective profile. Persisted approval lists retain the authenticated principal identity required by workspace/session remembered approval rules. The Assistant build and Python lock pin Agent CLI 0.88.21. Reverse Proxy 5.4.14 and unrelated pins unchanged. [Notes](docs/RELEASE_0.16.25.md).
