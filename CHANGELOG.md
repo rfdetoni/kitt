@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.34 — durable Goal host evidence across retries
+
+Pins Agent CLI 0.88.33 (`dc1333b`) and Assistant Runtime 0.4.24 (`a90b554`), with Reverse Proxy 5.4.16 unchanged (`d992cbe`). The Goal executor persists bounded read/list/search evidence into its existing session state; subsequent turns reuse prior receipts instead of starting discovery from scratch. Successful file mutations invalidate stale entries; successful members of partially failed batches are preserved. Agent/Assistant Python locks and immutable CI checkout pins align with this release. Protocol, Memory, Toolbox and AI Workers remain pinned to the same versions. [Notes](docs/RELEASE_0.16.34.md).
+
+
 ## 0.16.33 — Agent 0.88.32 no-progress loop and host-blocker fixes
 
 Pins Agent CLI 0.88.32 (`f399bf6`), Assistant Runtime 0.4.23 (`fa6fad5`) and Reverse Proxy 5.4.16 (`d992cbe`). Repeated successful read-only batches now trigger bounded stagnation detection; repeated host denials and unavailable sandbox errors propagate as POLICY and ENVIRONMENT blockers respectively, never successful completion. Python uv.lock, Assistant source pins, release manifesto and notes are synchronized. Unchanged modules retain their existing immutable SHAs. [Notes](docs/RELEASE_0.16.33.md).
