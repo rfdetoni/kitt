@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.26**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.27**.
 
 ## Instalação
 
@@ -15,7 +15,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.26](docs/RELEASE_0.16.26.md)
+- [Notas técnicas da versão 0.16.27](docs/RELEASE_0.16.27.md)
 
 ## Histórico
 
