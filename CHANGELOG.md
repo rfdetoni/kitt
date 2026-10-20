@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.35 — preserve Goal read evidence and validate written paths
+
+Pins Agent CLI 0.88.34 (`66e8b49`) and Assistant Runtime 0.4.25 (`399ac70`), retaining Reverse Proxy 5.4.16. The Goal loop persists bounded previous host read receipts and now captures canonical `repo.write_file` paths (including Markdown reports) for post-turn verification. Python locks and CI pins updated; unrelated Protocol, Memory, Toolbox and AI Workers stay at their existing exact main SHAs. [Notes](docs/RELEASE_0.16.35.md).
+
+
 ## 0.16.34 — durable Goal host evidence across retries
 
 Pins Agent CLI 0.88.33 (`dc1333b`) and Assistant Runtime 0.4.24 (`a90b554`), with Reverse Proxy 5.4.16 unchanged (`d992cbe`). The Goal executor persists bounded read/list/search evidence into its existing session state; subsequent turns reuse prior receipts instead of starting discovery from scratch. Successful file mutations invalidate stale entries; successful members of partially failed batches are preserved. Agent/Assistant Python locks and immutable CI checkout pins align with this release. Protocol, Memory, Toolbox and AI Workers remain pinned to the same versions. [Notes](docs/RELEASE_0.16.34.md).
