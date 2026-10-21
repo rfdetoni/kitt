@@ -2,7 +2,7 @@
 
 ## 0.16.45 — safe agent-session continuity under Chromium memory pressure
 
-Pins Reverse Proxy 5.4.19 to preserve recently active named sessions across host-tool execution gaps and to recheck RSS pressure after recycling stale sessions. The 5-minute resource-pressure grace does not extend the configured session timeout or permit new sessions above resource limits; normal count-bound LRU replacement remains unchanged. Retains Agent CLI 0.88.43, Assistant Runtime 0.4.33 and other immutable pins. CI and end-to-end release-channel installation remain required. [Notes](docs/RELEASE_0.16.45.md).
+Pins Reverse Proxy 5.4.20 to preserve recently active named sessions across host-tool execution gaps and to recheck RSS pressure after recycling stale sessions. The five-minute grace applies to background pressure sweeps; on-demand admission can still recycle idle isolated planning sessions before the executor's conversation. The configured session timeout, busy-session protection and resource admission limits remain intact. Retains Agent CLI 0.88.43, Assistant Runtime 0.4.33 and other immutable pins. CI and end-to-end release-channel installation remain required. [Notes](docs/RELEASE_0.16.45.md).
 
 ## 0.16.44 — guarded Begin Patch compatibility for Wine-MBS agents
 
