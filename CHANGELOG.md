@@ -2,7 +2,7 @@
 
 ## 0.16.43 — bounded auto-continuation for durable Goals
 
-Pins Agent CLI 0.88.42 and Assistant Runtime 0.4.32 (Python lock and CI checkout aligned to that Agent revision). A host-owned tool-budget checkpoint now requeues the same contract item without consuming a failed attempt; overall Goal turn, time, token and cost caps still apply, and unsupported CHECKPOINT reasons fail closed. Preserves Reverse Proxy 5.4.18 and all other immutable component SHAs from 0.16.42. See [release notes](docs/RELEASE_0.16.43.md).
+Pins Agent CLI 0.88.42 and Assistant Runtime 0.4.32 (Python lock and CI checkout aligned to that Agent revision). A host-owned tool-budget checkpoint now requeues the same contract item without consuming a failed attempt; overall Goal turn, time, token and cost caps still apply, and unsupported CHECKPOINT reasons fail closed. Preserves Reverse Proxy 5.4.18 and all remaining immutable component SHAs from 0.16.42. See [release notes](docs/RELEASE_0.16.43.md).
 
 ## 0.16.42 — safer Agent CLI patches and Reverse Proxy memory admission
 
