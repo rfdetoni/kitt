@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.40 — complete host-verification diagnostic handoff
+
+Pins Agent CLI 0.88.39 (`f915302`) and Assistant Runtime 0.4.30 (`6c18d0d`) with Reverse Proxy 5.4.17 unchanged. Native C/C++ source builds that have no configured Makefile now explicitly report a bounded `UNAVAILABLE` diagnostic through the outer Goal, instead of generic failure messages. The release retains read-only tool graph guidance, persistent evidence, empty-memory status, parallel planning independence and explicit manual continuation for WebChat captures without verified provenance. Python/npm locks, immutable CI pins and root manifest are synchronized. Protocol, Memory, Toolbox and AI Workers remain unchanged. [Notes](docs/RELEASE_0.16.40.md).
+
+
 ## 0.16.39 — safe continuation across Agent/Proxy v5
 
 Pins Agent CLI 0.88.38 (`0d28f07`), Assistant Runtime 0.4.29 (`b6d5347`) and Reverse Proxy 5.4.17 (`e3fd97e`). Completed WebChat UI turns that cannot be attributed to their request are recoverable by explicit operator continuation only and are never replayed automatically by the Goal scheduler. Includes read-only flow/program and code navigation guidance, preserved Goal receipts, empty-memory diagnostics, non-artificial parallel task dependencies and fail-closed Makefile-backed native C/C++ compilation checks. Locks and CI checkout pins match component SHAs; Protocol, Memory, Toolbox and AI Workers are unchanged. [Notes](docs/RELEASE_0.16.39.md).
