@@ -2,7 +2,7 @@
 
 ## 0.16.46 — integrações opcionais e pins reproduzíveis
 
-Fixa o Agent CLI 0.88.44 no manifesto imutável do ecossistema, preservando os commits dos demais componentes. O Agent CLI passa a oferecer recomendações de automação por projeto, registro opcional do gateway FreeLLMAPI, invocação explícita do Strix externo e diagnóstico do kitt-memoryd. FreeLLMAPI e Strix não entram no pacote padrão nem em um segundo lock. Os exemplos de instalação externa referenciam FreeLLMAPI v0.16.7 e Strix 1.7.0; as referências Git e a configuração de segurança estão descritas na documentação do Agent. Esta release exige validação do CI e instalação real do canal release; um resultado verde não comprova pentest nem disponibilidade dos terceiros. [Notas](docs/RELEASE_0.16.46.md).
+Fixa o Agent CLI 0.88.45 no manifesto imutável do ecossistema, preservando os commits dos demais componentes. Preserva o ajuste posterior do parser Begin Patch sem remover as integrações de 0.88.44. O Agent CLI passa a oferecer recomendações de automação por projeto, registro opcional do gateway FreeLLMAPI, invocação explícita do Strix externo e diagnóstico do kitt-memoryd. FreeLLMAPI e Strix não entram no pacote padrão nem em um segundo lock. Os exemplos de instalação externa referenciam FreeLLMAPI v0.16.7 e Strix 1.7.0; as referências Git e a configuração de segurança estão descritas na documentação do Agent. Esta release exige validação do CI e instalação real do canal release; um resultado verde não comprova pentest nem disponibilidade dos terceiros. [Notas](docs/RELEASE_0.16.46.md).
 
 
 ## 0.16.45 — safe agent-session continuity under Chromium memory pressure
