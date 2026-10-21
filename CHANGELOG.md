@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.39 — safe continuation across Agent/Proxy v5
+
+Pins Agent CLI 0.88.38 (`0d28f07`), Assistant Runtime 0.4.29 (`b6d5347`) and Reverse Proxy 5.4.17 (`e3fd97e`). Completed WebChat UI turns that cannot be attributed to their request are recoverable by explicit operator continuation only and are never replayed automatically by the Goal scheduler. Includes read-only flow/program and code navigation guidance, preserved Goal receipts, empty-memory diagnostics, non-artificial parallel task dependencies and fail-closed Makefile-backed native C/C++ compilation checks. Locks and CI checkout pins match component SHAs; Protocol, Memory, Toolbox and AI Workers are unchanged. [Notes](docs/RELEASE_0.16.39.md).
+
+
 ## 0.16.38 — read-only tool orchestration, native verification and WebChat continuation
 
 Pins Agent CLI 0.88.37 (`2a8aaad`), Assistant Runtime 0.4.28 (`9110d6e`) and Reverse Proxy 5.4.17 (`e3fd97e`). Agent prompts can leverage existing read-only flow/program operations, context handles, memory and structured symbol tools; Goal evidence survives read-only graph calls and planning favors independent scopes for existing parallel specialists. C/C++ source edits require a configured Makefile-backed build, otherwise validation blocks rather than asserting unsupported success. Reverse-Proxy returns safe explicit-continue signals and correlated capture diagnostics for completed unattributed WebChat replies, without implicit prompt replay. Python/npm locks and Agent/Assistant CI pins align with component main SHAs. Protocol, Memory, Toolbox and AI Workers remain unchanged. [Notes](docs/RELEASE_0.16.38.md).
