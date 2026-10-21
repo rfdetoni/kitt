@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.47 — correct autonomous public Git clone approvals
+
+Pins Agent CLI 0.88.47 and Assistant Python Runtime 0.4.36. In a root workspace autonomous turn with strong network sandbox, public Git source checkout via GitHub or GitLab can execute without the redundant `network.access` approval loop. General egress, other network commands, guest/path-scoped principals, and absent strong sandbox continue to require explicit authority. Reverse Proxy 5.4.20 remains unchanged. Regression covers the 2026-10-21 Wine/Wine-Staging submodule flow and blocked variants. Missing Ollama local models and slow downloads remain environment conditions. [Release notes](docs/RELEASE_0.16.47.md).
+
 ## 0.16.46 — recovery from SQLite repository index lock during KITT startup
 
 Pins Agent CLI 0.88.46 with a bounded SQLite busy wait and safe per-process, non-persistent repository-index fallback when the daemon holds a writer transaction on the same workspace. Disk index/WAL are preserved, searches continue in-memory for the secondary instance, and permanent DB errors still propagate. Pins Assistant Python runtime 0.4.35 for the same immutable Agent revision; Reverse Proxy 5.4.20 is unchanged. Includes regression with a real concurrent SQLite writer. [Release notes](docs/RELEASE_0.16.46.md).
