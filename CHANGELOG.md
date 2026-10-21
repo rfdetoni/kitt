@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.42 — safer Agent CLI patches and Reverse Proxy memory admission
+
+Pins Agent CLI 0.88.41 and Reverse Proxy 5.4.18. Agent patch parsing no longer treats version strings in later SEARCH/REPLACE blocks as new file targets; batch reads surface failed IDs without hiding successful siblings, and bounded default tool budgets accommodate larger implementation turns. Reverse Proxy only admits a first named Chromium session under bounded memory-growth headroom instead of unlimited baseline-pressure exceptions. Regression suites and component CI remain authoritative; this does not certify Windows guest Oracle behavior or eliminate Chromium's resident baseline.
+
 ## 0.16.41 — stable Goal tool-graph context and aligned release gates
 
 Pins Agent CLI 0.88.40 (`78d7eaa`) and Assistant Runtime 0.4.31 (`2f39401`), retaining Reverse Proxy 5.4.17 (`e3fd97e`). Source code and locks now agree on the same Agent version, restoring the critical package metadata test. Read-only tool graphs and program receipts persist across Goals attempts, repository-wide evidence is invalidated after writes and semantic memory queries focus on the original objective. Existing C/Wine verification diagnostics, bounded parallel specialists and safe WebChat continuation remain intact. Protocol, Memory, Toolbox and AI Workers preserve their previous immutable SHAs. [Notes](docs/RELEASE_0.16.41.md).
