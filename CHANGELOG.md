@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.43 — bounded auto-continuation for durable Goals
+
+Pins Agent CLI 0.88.42. A host-owned tool-budget checkpoint now requeues the same contract item without consuming a failed attempt; overall Goal turn, time, token and cost caps still apply, and unsupported CHECKPOINT reasons fail closed. Preserves Reverse Proxy 5.4.18 and all other immutable component SHAs from 0.16.42. See [release notes](docs/RELEASE_0.16.43.md).
+
 ## 0.16.42 — safer Agent CLI patches and Reverse Proxy memory admission
 
 Pins Agent CLI 0.88.41 and Reverse Proxy 5.4.18. Agent patch parsing no longer treats version strings in later SEARCH/REPLACE blocks as new file targets; batch reads surface failed IDs without hiding successful siblings, and bounded default tool budgets accommodate larger implementation turns. Reverse Proxy only admits a first named Chromium session under bounded memory-growth headroom instead of unlimited baseline-pressure exceptions. Regression suites and component CI remain authoritative; this does not certify Windows guest Oracle behavior or eliminate Chromium's resident baseline.
