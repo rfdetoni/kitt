@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.48 — nested, read-only Git inspection in autonomous MBS workflow
+
+Agent CLI 0.88.48 fixes `git -C mbs-wine status --short --branch` being hard-denied despite autonomy, preserving the existing read-only subcommand and workspace path checks. Assistant Python Runtime 0.4.37 pins the merged Agent revision; Reverse Proxy stays 5.4.20. The earlier public Git HTTPS checkout change from 0.16.47 remains intact. The 2026-10-21 MBS logs also show an independent memory-pressure refusal of a child Reverse Proxy session: this release does not increase the RSS limit or claim to eliminate model latency. [Release notes](docs/RELEASE_0.16.48.md).
+
 ## 0.16.47 — correct autonomous public Git clone approvals
 
 Pins Agent CLI 0.88.47 and Assistant Python Runtime 0.4.36. In a root workspace autonomous turn with strong network sandbox, public Git source checkout via GitHub or GitLab can execute without the redundant `network.access` approval loop. General egress, other network commands, guest/path-scoped principals, and absent strong sandbox continue to require explicit authority. Reverse Proxy 5.4.20 remains unchanged. Regression covers the 2026-10-21 Wine/Wine-Staging submodule flow and blocked variants. Missing Ollama local models and slow downloads remain environment conditions. [Release notes](docs/RELEASE_0.16.47.md).
