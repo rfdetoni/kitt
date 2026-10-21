@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.49 — allow bounded child sessions under high Chromium startup RSS
+
+The Wine-MBS logs of 2026-10-21 exposed `session_limit_exceeded` when the primary ChatGPT Web conversation was busy and its diagnostic child could not open a named session. Chromium already exceeded the configured 768 MiB memory cap at startup, while session/page-count quotas were otherwise available. This release pins Reverse Proxy 5.4.21: where the fixed startup RSS itself is over budget, one additional named child may be admitted within the original 512 MiB startup headroom. The third named session, excessive growth, hard page/count limits and busy-session eviction remain blocked. Agent CLI 0.88.48 and Assistant 0.4.37 retain the already-merged Git -C inspection fix; no changes to Agent or Assistant pins. [Release notes](docs/RELEASE_0.16.49.md).
+
 ## 0.16.48 — nested, read-only Git inspection in autonomous MBS workflow
 
 Agent CLI 0.88.48 fixes `git -C mbs-wine status --short --branch` being hard-denied despite autonomy, preserving the existing read-only subcommand and workspace path checks. Assistant Python Runtime 0.4.37 pins the merged Agent revision; Reverse Proxy stays 5.4.20. The earlier public Git HTTPS checkout change from 0.16.47 remains intact. The 2026-10-21 MBS logs also show an independent memory-pressure refusal of a child Reverse Proxy session: this release does not increase the RSS limit or claim to eliminate model latency. [Release notes](docs/RELEASE_0.16.48.md).
