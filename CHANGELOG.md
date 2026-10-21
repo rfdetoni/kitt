@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.46 — recovery from SQLite repository index lock during KITT startup
+
+Pins Agent CLI 0.88.46 with a bounded SQLite busy wait and safe per-process, non-persistent repository-index fallback when the daemon holds a writer transaction on the same workspace. Disk index/WAL are preserved, searches continue in-memory for the secondary instance, and permanent DB errors still propagate. Pins Assistant Python runtime 0.4.35 for the same immutable Agent revision; Reverse Proxy 5.4.20 is unchanged. Includes regression with a real concurrent SQLite writer. [Release notes](docs/RELEASE_0.16.46.md).
+
 ## 0.16.45 — safe agent-session continuity under Chromium memory pressure
 
 Pins Reverse Proxy 5.4.20 to preserve recently active named sessions across host-tool execution gaps and to recheck RSS pressure after recycling stale sessions. The five-minute grace applies to background pressure sweeps; on-demand admission can still recycle idle isolated planning sessions before the executor's conversation. The configured session timeout, busy-session protection and resource admission limits remain intact. Retains Agent CLI 0.88.43, Assistant Runtime 0.4.33 and other immutable pins. CI and end-to-end release-channel installation remain required. [Notes](docs/RELEASE_0.16.45.md).
