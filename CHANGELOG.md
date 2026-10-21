@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.44 — guarded Begin Patch compatibility for Wine-MBS agents
+
+Pins Agent CLI 0.88.43 and Assistant Runtime 0.4.33, keeping their immutable Python dependency and CI checkouts aligned. The Agent now accepts bounded `*** Begin Patch` updates through its existing content-anchored, path-constrained patch engine rather than rejecting the model's `*** Update File` hunk as a parse failure. Invalid, ambiguous, unanchored or out-of-workspace edits remain rejected. Preserves Reverse Proxy 5.4.18 and all other immutable component pins. The distinct `ui_capture_unverified` transport fault requires explicit safe continuation. [Notes](docs/RELEASE_0.16.44.md).
+
 ## 0.16.43 — bounded auto-continuation for durable Goals
 
 Pins Agent CLI 0.88.42 and Assistant Runtime 0.4.32 (Python lock and CI checkout aligned to that Agent revision). A host-owned tool-budget checkpoint now requeues the same contract item without consuming a failed attempt; overall Goal turn, time, token and cost caps still apply, and unsupported CHECKPOINT reasons fail closed. Preserves Reverse Proxy 5.4.18 and all remaining immutable component SHAs from 0.16.42. See [release notes](docs/RELEASE_0.16.43.md).
