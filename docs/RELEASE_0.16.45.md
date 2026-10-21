@@ -6,14 +6,14 @@ O Agent CLI concluiu o planejamento, criou `mbs-wine` e pediu aprovação de ace
 
 ## Atualização
 
-- **Reverse Proxy 5.4.19:** reciclagem por pressão de RSS/páginas somente após uma tolerância de ociosidade de até cinco minutos para sessões nomeadas, respeitando o timeout de sessão configurado. Chamadas com o mesmo ID preservado reutilizam a sessão sem criar navegador novo.
-- Novas sessões continuam sujeitas a limite de memória, páginas e quantidade. A substituição ao atingir apenas o limite de quantidade continua usando a reciclagem LRU.
-- Depois de reciclar por pressão de recursos, o proxy verifica novamente RSS/páginas; fechar uma aba não prova liberação imediata de memória.
+- **Reverse Proxy 5.4.20:** reciclagem por pressão de RSS/páginas somente após uma tolerância de ociosidade de até cinco minutos para sessões nomeadas, respeitando o timeout de sessão configurado. Chamadas com o mesmo ID preservado reutilizam a sessão sem criar navegador novo.
+- Na admissão de novas sessões, o LRU ainda pode reciclar imediatamente uma sessão nomeada ociosa, permitindo duas rodadas de planejamento isoladas seguidas da execução. Sessões ocupadas/reservadas não são recicladas; a tolerância de cinco minutos vale para a varredura automática por pressão de memória.
+- A substituição LRU de uma sessão ociosa mantém o limite de quantidade de sessões. O proxy não admite novos navegadores se não existe candidato reciclável e o RSS/páginas já excede as restrições; fechar uma aba não prova liberação imediata de memória.
 - Evento `session.capacity.resource_pressure_rejection` mostra a capacidade e a tolerância aplicada para facilitar o diagnóstico.
 
 ## Validação
 
-Regressões para pausa de ferramenta, reutilização do ID, negativa a outra sessão e reciclagem após janela de ociosidade. CI, Docker e instalação ponta a ponta da release exigidos antes de merge.
+Regressões para pausa de ferramenta, reutilização do ID, sequência de sessões isoladas de planejamento, reciclagem LRU na admissão e reciclagem automática somente após a janela de ociosidade. CI, Docker e instalação ponta a ponta da release exigidos antes de merge.
 
 ## Limites
 
