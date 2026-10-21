@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.38 — read-only tool orchestration, native verification and WebChat continuation
+
+Pins Agent CLI 0.88.37 (`2a8aaad`), Assistant Runtime 0.4.28 (`9110d6e`) and Reverse Proxy 5.4.17 (`e3fd97e`). Agent prompts can leverage existing read-only flow/program operations, context handles, memory and structured symbol tools; Goal evidence survives read-only graph calls and planning favors independent scopes for existing parallel specialists. C/C++ source edits require a configured Makefile-backed build, otherwise validation blocks rather than asserting unsupported success. Reverse-Proxy returns safe explicit-continue signals and correlated capture diagnostics for completed unattributed WebChat replies, without implicit prompt replay. Python/npm locks and Agent/Assistant CI pins align with component main SHAs. Protocol, Memory, Toolbox and AI Workers remain unchanged. [Notes](docs/RELEASE_0.16.38.md).
+
+
 ## 0.16.37 — Bubblewrap resolver symlink mount fix
 
 Pins Agent CLI 0.88.36 (`d76ef6a`) and Assistant Runtime 0.4.27 (`297a5bf`), retaining Reverse Proxy 5.4.16. The Agent runtime now avoids bind-mounting onto the systemd-resolved `/etc/resolv.conf` symlink while the Bubblewrap namespace masks `/run`; it selectively restores only canonical resolver targets for network-enabled profiles. Python locks and CI source pins are synchronized. Protocol, Memory, Toolbox, AI Workers and Reverse Proxy remain on their exact previous revisions. [Notes](docs/RELEASE_0.16.37.md).
