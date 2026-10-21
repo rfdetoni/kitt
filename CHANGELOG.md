@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.45 — safe agent-session continuity under Chromium memory pressure
+
+Pins Reverse Proxy 5.4.20 to preserve recently active named sessions across host-tool execution gaps and to recheck RSS pressure after recycling stale sessions. The five-minute grace applies to background pressure sweeps; on-demand admission can still recycle idle isolated planning sessions before the executor's conversation. The configured session timeout, busy-session protection and resource admission limits remain intact. Retains Agent CLI 0.88.43, Assistant Runtime 0.4.33 and other immutable pins. CI and end-to-end release-channel installation remain required. [Notes](docs/RELEASE_0.16.45.md).
+
 ## 0.16.44 — guarded Begin Patch compatibility for Wine-MBS agents
 
 Pins Agent CLI 0.88.43 and Assistant Runtime 0.4.33, keeping their immutable Python dependency and CI checkouts aligned. The Agent now accepts bounded `*** Begin Patch` updates through its existing content-anchored, path-constrained patch engine rather than rejecting the model's `*** Update File` hunk as a parse failure. Invalid, ambiguous, unanchored or out-of-workspace edits remain rejected. Preserves Reverse Proxy 5.4.18 and all other immutable component pins. The distinct `ui_capture_unverified` transport fault requires explicit safe continuation. [Notes](docs/RELEASE_0.16.44.md).

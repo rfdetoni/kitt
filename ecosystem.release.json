@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "channel": "release",
-  "ecosystem_version": "0.16.44",
+  "ecosystem_version": "0.16.45",
   "components": {
     "protocol": {
       "repository": "rfdetoni/kitt-protocol",
@@ -29,7 +29,7 @@
     },
     "reverse-proxy": {
       "repository": "rfdetoni/kitt-reverse-proxy",
-      "sha": "ecefe1667251e49f9697a5b314d6513aeaaf2cdf"
+      "sha": "84820288793af3e63905c308bf196172d8ee025f"
     }
   }
 }
