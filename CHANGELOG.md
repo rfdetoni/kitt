@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.41 — stable Goal tool-graph context and aligned release gates
+
+Pins Agent CLI 0.88.40 (`78d7eaa`) and Assistant Runtime 0.4.31 (`2f39401`), retaining Reverse Proxy 5.4.17 (`e3fd97e`). Source code and locks now agree on the same Agent version, restoring the critical package metadata test. Read-only tool graphs and program receipts persist across Goals attempts, repository-wide evidence is invalidated after writes and semantic memory queries focus on the original objective. Existing C/Wine verification diagnostics, bounded parallel specialists and safe WebChat continuation remain intact. Protocol, Memory, Toolbox and AI Workers preserve their previous immutable SHAs. [Notes](docs/RELEASE_0.16.41.md).
+
+
 ## 0.16.40 — complete host-verification diagnostic handoff
 
 Pins Agent CLI 0.88.39 (`f915302`) and Assistant Runtime 0.4.30 (`6c18d0d`) with Reverse Proxy 5.4.17 unchanged. Native C/C++ source builds that have no configured Makefile now explicitly report a bounded `UNAVAILABLE` diagnostic through the outer Goal, instead of generic failure messages. The release retains read-only tool graph guidance, persistent evidence, empty-memory status, parallel planning independence and explicit manual continuation for WebChat captures without verified provenance. Python/npm locks, immutable CI pins and root manifest are synchronized. Protocol, Memory, Toolbox and AI Workers remain unchanged. [Notes](docs/RELEASE_0.16.40.md).
