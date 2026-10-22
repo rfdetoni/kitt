@@ -2,7 +2,7 @@
 
 ## 0.16.50 — protected Git planning recovery and empty Gemini action guard
 
-Pins merged Agent CLI 0.88.49 and Reverse Proxy 5.4.22 to correct two distinct failure modes reported on 2026-10-22. An automatic contract containing model-generated `.git` validation paths now requests a corrected plan instead of aborting with `Protected workspace path component: .git`; Git metadata remains inaccessible to workspace file tools. An empty Gemini action `{}` now fails immediately as a recoverable no-action response, avoiding a speculative browser repair that previously stalled for minutes. Assistant Python Runtime 0.4.38 updates its minimum Agent CLI dependency, lock and immutable CI checkout pins. No new dependency or sandbox permissions were introduced. [Release notes](docs/RELEASE_0.16.50.md).
+Pins merged Agent CLI 0.88.50 and Reverse Proxy 5.4.22 to correct three distinct failure modes reported on 2026-10-22. An automatic contract containing model-generated `.git` validation paths now requests a corrected plan instead of aborting with `Protected workspace path component: .git`; Git metadata remains inaccessible to workspace file tools. An empty Gemini action `{}` now fails immediately as a recoverable no-action response, avoiding a speculative browser repair that previously stalled for minutes. Assistant Python Runtime 0.4.39 updates its minimum Agent CLI dependency, lock and immutable CI checkout pins. An additional fix stops shell-wrapped public Git clone requests from triggering generic network approval modals and provides instructions for separate direct Git calls. No new dependency or sandbox permissions were introduced. [Release notes](docs/RELEASE_0.16.50.md).
 
 ## 0.16.49 — allow bounded child sessions under high Chromium startup RSS
 
