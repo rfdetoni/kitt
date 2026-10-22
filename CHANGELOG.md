@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.50 — protected Git planning recovery and empty Gemini action guard
+
+Pins merged Agent CLI 0.88.50 and Reverse Proxy 5.4.22 to correct three distinct failure modes reported on 2026-10-22. An automatic contract containing model-generated `.git` validation paths now requests a corrected plan instead of aborting with `Protected workspace path component: .git`; Git metadata remains inaccessible to workspace file tools. An empty Gemini action `{}` now fails immediately as a recoverable no-action response, avoiding a speculative browser repair that previously stalled for minutes. Assistant Python Runtime 0.4.39 updates its minimum Agent CLI dependency, lock and immutable CI checkout pins. An additional fix stops shell-wrapped public Git clone requests from triggering generic network approval modals and provides instructions for separate direct Git calls. No new dependency or sandbox permissions were introduced. [Release notes](docs/RELEASE_0.16.50.md).
+
 ## 0.16.49 — allow bounded child sessions under high Chromium startup RSS
 
 The Wine-MBS logs of 2026-10-21 exposed `session_limit_exceeded` when the primary ChatGPT Web conversation was busy and its diagnostic child could not open a named session. Chromium already exceeded the configured 768 MiB memory cap at startup, while session/page-count quotas were otherwise available. This release pins Reverse Proxy 5.4.21: where the fixed startup RSS itself is over budget, one additional named child may be admitted within the original 512 MiB startup headroom. The third named session, excessive growth, hard page/count limits and busy-session eviction remain blocked. Agent CLI 0.88.48 and Assistant 0.4.37 retain the already-merged Git -C inspection fix; no changes to Agent or Assistant pins. [Release notes](docs/RELEASE_0.16.49.md).
