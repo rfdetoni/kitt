@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.52 — FreeLLMAPI autonomous CLI execution
+
+Pins Agent CLI 0.88.52 and Assistant Runtime 0.4.41 to immutable main commits. Fixes read-only plan JSON being inferred as a file write, adds native OpenAI-compatible tool round trips and visible CLI planning progress, preserves outer contract verification for native API goals, and bounds gateway retries. Saved authentication and supported output limits are reused without adding execution privileges. Assistant dependency, uv lock and CI pins are synchronized. Free provider capacity and actual Wine/Windows Oracle validation remain runtime requirements. See [release notes](docs/RELEASE_0.16.52.md).
+
 ## 0.16.51 — prevent repeated Gemini empty-action retries
 
 Agent CLI 0.88.51 now confines `agent_contract_empty_action` recovery to another **configured, trusted** provider if one exists and no partial output was emitted. Otherwise the goal item is marked BLOCKED_ENV instead of rapidly resubmitting the identical task, preventing needless WebChat calls. It also clarifies root-relative file paths after inspecting nested project folders. Assistant Python Runtime 0.4.40 synchronizes its min Agent dependency, `uv.lock`, and both CI SHA pins. Reverse Proxy 5.4.22 retains the fail-closed empty-action validator; UI/Gemini generation quality and tap fallback latency are independent and not claimed fixed. All release components remain pinned to immutable merged-main SHAs; no new execution privileges or dependencies were introduced. [Release notes](docs/RELEASE_0.16.51.md).
