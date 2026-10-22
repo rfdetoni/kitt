@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.53 — authenticated FreeLLMAPI model discovery
+
+Pins Agent CLI 0.88.53 and Assistant Runtime 0.4.42 to immutable main commits. FreeLLMAPI now appears in the shared catalog and model picker; discovery sends the gateway credential and the models CLI respects the workspace endpoint. Locks and CI pins are synchronized. See [release notes](docs/RELEASE_0.16.53.md).
+
 ## 0.16.52 — FreeLLMAPI autonomous CLI execution
 
 Pins Agent CLI 0.88.52 and Assistant Runtime 0.4.41 to immutable main commits. Fixes read-only plan JSON being inferred as a file write, adds native OpenAI-compatible tool round trips and visible CLI planning progress, preserves outer contract verification for native API goals, and bounds gateway retries. Saved authentication and supported output limits are reused without adding execution privileges. Assistant dependency, uv lock and CI pins are synchronized. Free provider capacity and actual Wine/Windows Oracle validation remain runtime requirements. See [release notes](docs/RELEASE_0.16.52.md).
