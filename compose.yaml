@@ -50,7 +50,8 @@ services:
     read_only: true
     cap_drop: ["ALL"]
     security_opt: ["no-new-privileges:true"]
-    command: ["python", "-m", "kitt.security.autopilot_broker", "serve"]
+    entrypoint: ["python", "-m", "kitt.security.autopilot_broker"]
+    command: ["serve"]
     environment:
       KITT_SANDBOX_BROKER_SOCKET: /run/kitt-broker/exec.sock
       KITT_BROKER_DEFAULT_IMAGE: "${KITT_AGENT_IMAGE:-ghcr.io/rfdetoni/kitt-agent-cli}:${KITT_AGENT_VERSION:-latest}"

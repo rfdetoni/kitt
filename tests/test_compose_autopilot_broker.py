@@ -12,3 +12,10 @@ def test_compose_agent_does_not_mount_docker_socket():
     assert "kitt-sandbox-socket:/run/kitt-broker" in agent
     assert 'network_mode: "none"' in broker
     assert "condition: service_healthy" in agent
+
+
+def test_broker_overrides_agent_dockerfile_entrypoint():
+    compose = (Path(__file__).resolve().parents[1] / "compose.yaml").read_text()
+    broker = compose.split("  sandbox-broker:", 1)[1].split("\n  agent:", 1)[0]
+    assert 'entrypoint: ["python", "-m", "kitt.security.autopilot_broker"]' in broker
+    assert 'command: ["serve"]' in broker
