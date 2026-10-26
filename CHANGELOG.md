@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.61 — autonomous Git commands and strict network flags
+
+- Pin Agent CLI v0.88.94 (`f07ca85a`) after green CI, adding Git metadata write support for autonomous Bubblewrap shell execution within an owned workspace.
+- Fix network authority input validation to require exact booleans, denying numeric coercion before sandbox selection.
+- Keep the other ecosystem SHA pins, installer source resolution, Docker fallback image policy and dependency locks unchanged.
+
+
 ## 0.16.60 — Autonomy sandbox worker preparation
 
 - Pin Agent CLI 0.88.93 (`1f627845`), adding strongly isolated `sandbox.run` and Docker fallback when Bubblewrap is unavailable.
