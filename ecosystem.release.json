@@ -21,7 +21,7 @@
     },
     "agent-cli": {
       "repository": "rfdetoni/kitt-agent-cli",
-      "sha": "dcc75df5d15f716772bc63bb539328c68bea41de"
+      "sha": "164ad9aca3a41f9e3580f7fcf7ec187651df34e8"
     },
     "ai-workers": {
       "repository": "rfdetoni/kitt-ai-workers",
