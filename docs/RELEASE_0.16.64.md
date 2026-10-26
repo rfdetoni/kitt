@@ -1,5 +1,6 @@
 # KITT 0.16.64 — Unattended sandbox execution
 
+- Assistant runtime 0.4.43 pinned at `296206af8aa28214dbc6bd7a9af220b4072ec3a4` with `kitt-agent-cli>=0.89.1,<0.90`, synchronized lock and passing CI.
 - Agent CLI 0.89.1 pinned at `0ddae4475cdd05d1c0c14059759ac0fd8d3ade88`.
 - A Docker Compose `--profile agent` includes a trusted `sandbox-broker` sidecar.
   The sidecar alone mounts the Docker socket; the Agent uses a private

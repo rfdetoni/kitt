@@ -2,7 +2,7 @@
 
 ## 0.16.64 — persistent Compose Autopilot and recoverable validation
 
-- Pin Agent CLI 0.89.1 (`0ddae447`) with trusted persistent broker, automatic mount discovery, task checkpoints/CAS rollback, strong verification gates and root-only network predelegation.
+- Pin Agent CLI 0.89.1 (`0ddae447`) and Assistant 0.4.43 (`296206af`) with trusted persistent broker, automatic mount discovery, task checkpoints/CAS rollback, strong verification gates and root-only network predelegation.
 - Start `sandbox-broker` only with the Compose Agent profile, keeping Docker socket out of the Agent and worker containers; add readiness checks and dev overlay.
 - Keep all other immutable component SHA pins/locks unchanged.
 - Reconcile historical PRs by audit: superseded release branches are not blindly merged, nor are incompatible dependency PRs with red CI.
