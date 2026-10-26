@@ -3,6 +3,7 @@
 ## 0.16.57 — ACP v1 session replay and permission isolation
 
 - Pin Agent CLI 0.88.91 to merged main. `session/load` replays ordered conversation text through session/update before its empty response, and `session/cancel` affects only the addressed session's permission requests.
+- Fix redundant pip Git cloning of already checked-out internal KITT dependencies during main installation; resolve third-party requirements once and install internal packages locally with --no-deps. Add offline installer regression.
 - Preserve all other component SHAs; run release installer, gateway and Assistant lock gates.
 
 

@@ -445,39 +445,35 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
                 ])
 
         if local_packages:
-            if self.options.component_refs:
-                # Release composition installs external dependencies only.
-                # Selected KITT packages are applied from root-selected checkouts.
-                external_dependencies: list[str] = []
-                for package in local_packages:
-                    pyproject = package / "pyproject.toml"
-                    if not pyproject.is_file():
+            # Resolve third-party requirements once, then install every KITT
+            # component from the already checked-out workspace sources.
+            # In main mode pip previously re-cloned kitt-protocol from GitHub
+            # despite having just installed it locally. A transient Git fetch
+            # error could fail an otherwise valid full installation.
+            external_dependencies: list[str] = []
+            for package in local_packages:
+                pyproject = package / "pyproject.toml"
+                if not pyproject.is_file():
+                    continue
+                payload = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                project = payload.get("project")
+                dependencies = (
+                    project.get("dependencies", [])
+                    if isinstance(project, dict)
+                    else []
+                )
+                for dependency in dependencies if isinstance(dependencies, list) else []:
+                    value = str(dependency).strip()
+                    lowered = value.lower()
+                    if lowered.startswith("kitt-") or "github.com/rfdetoni/kitt-" in lowered:
                         continue
-                    payload = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                    project = payload.get("project")
-                    dependencies = (
-                        project.get("dependencies", [])
-                        if isinstance(project, dict)
-                        else []
-                    )
-                    for dependency in dependencies if isinstance(dependencies, list) else []:
-                        value = str(dependency).strip()
-                        lowered = value.lower()
-                        if lowered.startswith("kitt-") or "github.com/rfdetoni/kitt-" in lowered:
-                            continue
-                        if value and value not in external_dependencies:
-                            external_dependencies.append(value)
-                if external_dependencies:
-                    self._run([
-                        str(python), "-m", "pip", "install", "--disable-pip-version-check",
-                        "--prefer-binary", *external_dependencies,
-                    ])
-            else:
-                for package in local_packages:
-                    self._run([
-                        str(python), "-m", "pip", "install", "--disable-pip-version-check",
-                        "--prefer-binary", "--no-build-isolation", str(package),
-                    ])
+                    if value and value not in external_dependencies:
+                        external_dependencies.append(value)
+            if external_dependencies:
+                self._run([
+                    str(python), "-m", "pip", "install", "--disable-pip-version-check",
+                    "--prefer-binary", *external_dependencies,
+                ])
 
             # Install the Agent on its own and last. Multiple KITT distributions
             # intentionally share the kitt namespace, so a single multi-wheel
