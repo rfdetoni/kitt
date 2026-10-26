@@ -1,5 +1,11 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.57 — ACP v1 session replay and permission isolation
+
+- Pin Agent CLI 0.88.91 to merged main. `session/load` replays ordered conversation text through session/update before its empty response, and `session/cancel` affects only the addressed session's permission requests.
+- Preserve all other component SHAs; run release installer, gateway and Assistant lock gates.
+
+
 ## 0.16.56 — ACP permissions, concurrency-safe reviews and live browser diagnostics
 
 - Agent CLI 0.88.90: workspace-scoped ACP session load and consent flow, durable CAS review changes with per-path authorization, CLI review tools, parameterized recipes with checks/hooks, and reproducible review latency/memory measurement.
