@@ -1,5 +1,13 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## Next — Unix broker in Compose agent profile
+
+- Add sandbox-broker sidecar for the Agent Compose profile with a private Unix socket and persistent isolated Docker workers.
+- Keep the Docker daemon socket exclusively in the broker, not the Agent or guest workers; disable bridge egress unless operator opts in.
+- Reuse the existing workspace mount; guard broker readiness via healthcheck before starting Agent.
+- Final Agent CLI version/immutable pin will be updated after verified merge.
+
+
 ## 0.16.63 — autonomous Docker toolchain selection hardening
 
 - Pin merged Agent CLI 0.88.97 (`2a21ca81`), preferring trusted Docker toolchains over missing host binaries for autonomous development even where Bubblewrap works.

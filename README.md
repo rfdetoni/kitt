@@ -8,6 +8,20 @@ O entrypoint do instalador é [`install.sh`](install.sh). Consulte as opções e
 
 **Dica (Ubuntu/Linux):** se o KITT indicar `Strong sandbox profile ... requires functional bubblewrap >= 0.12` ou `bwrap: setting up uid map: Permission denied`, consulte [Diagnóstico do Bubblewrap e AppArmor](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/BUBBLEWRAP_APPARMOR.md). A configuração do perfil AppArmor deve corresponder ao executável realmente utilizado; não desative a restrição de namespaces globalmente.
 
+## Broker isolado no Docker Compose
+
+A opção `--profile agent` inicia um sidecar `sandbox-broker` com socket Unix
+compartilhado com o Agent, sem exposição de porta TCP. Somente o sidecar monta
+`/var/run/docker.sock`. Ele descobre o bind mount do workspace a partir de
+metadados do próprio container e cria workers persistentes por linguagem e
+escopo de rede. Os workers não recebem o socket nem o estado de controle do
+KITT. O broker é uma peça privilegiada: só execute este perfil em hosts
+confiáveis.
+
+Por padrão `KITT_BROKER_ALLOW_NETWORK=false`; habilitar exige consentimento do
+operador e o runtime continua exigindo `network.access` no principal. O perfil
+sem Docker saudável falha fechado e nunca recorre ao shell irrestrito do host.
+
 ## Sandbox autônomo
 
 O Agent CLI 0.88.97 aceita comandos de desenvolvimento via `sandbox.run` e
