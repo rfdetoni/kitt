@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.63 — autonomous Docker toolchain selection hardening
+
+- Pin merged Agent CLI 0.88.97 (`2a21ca81`), preferring trusted Docker toolchains over missing host binaries for autonomous development even where Bubblewrap works.
+- Incorporate prior Agent CLI 0.88.96 Docker smoke validation, Gradle/JDK25 selection and avoidance of misrouting Git/inspection commands.
+- Keep all other component SHA pins, platform installers and dependency locks unchanged; validate release installer contracts.
+
+
 ## 0.16.62 — Autonomous Docker Java/Node/Rust toolchain support
 
 - Pin merged Agent CLI 0.88.95 (`46a37db1`) after passing Python regression, build, Docker, Podman and Windows CI checks.
