@@ -1,5 +1,11 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.59 — Explicit Python verification check resolution
+
+- Pin Agent CLI v0.88.92 (`3a45f25f`), fixing full-mode verification for explicitly required `python.targeted-tests` without bypassing host contracts or approvals.
+- Keep Reverse Proxy v5.4.27 and all other component pins unchanged. Adds regression coverage for available and missing targeted Python tests.
+
+
 ## 0.16.58 — UI click timeout confirmation and duplicate-send protection
 
 - Update immutable Reverse Proxy pin to v5.4.27 (6d3a1910). A timed-out Playwright send click now checks UI evidence before failure and never automatically retries an ambiguous submission.
