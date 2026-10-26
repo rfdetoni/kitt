@@ -80,6 +80,8 @@ services:
     working_dir: /workspace
     environment:
       KITT_SANDBOX_BROKER_SOCKET: /run/kitt-broker/exec.sock
+      KITT_AUTOPILOT_DELEGATE_NETWORK: "${KITT_AUTOPILOT_DELEGATE_NETWORK:-false}"
+      KITT_AUTOPILOT_VALIDATION: "${KITT_AUTOPILOT_VALIDATION:-}"
     volumes:
       - "${KITT_WORKSPACE:-.}:/workspace"
       - kitt-agent-state:/home/kitt/.kitt

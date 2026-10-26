@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.63**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.64**.
 
 ## Instalação
 
@@ -18,13 +18,15 @@ escopo de rede. Os workers não recebem o socket nem o estado de controle do
 KITT. O broker é uma peça privilegiada: só execute este perfil em hosts
 confiáveis.
 
-Por padrão `KITT_BROKER_ALLOW_NETWORK=false`; habilitar exige consentimento do
-operador e o runtime continua exigindo `network.access` no principal. O perfil
+Por padrão, `KITT_BROKER_ALLOW_NETWORK=false`. Para autorizar downloads de
+dependências sem novas perguntas, defina também
+`KITT_AUTOPILOT_DELEGATE_NETWORK=true` para o Agent. O broker mantém a segunda
+barreira de rede independente; sem ambas as condições, não há egress. O perfil
 sem Docker saudável falha fechado e nunca recorre ao shell irrestrito do host.
 
 ## Sandbox autônomo
 
-O Agent CLI 0.88.97 aceita comandos de desenvolvimento via `sandbox.run` e
+O Agent CLI 0.89.1 aceita comandos de desenvolvimento via `sandbox.run` e
 roteia `process.run` automaticamente para um executor isolado quando o workspace
 está no modo `autonomous` e dispõe das capacidades `process.run` e `repo.write`.
 O instalador Linux prepara a imagem Docker do Agent CLI se houver Docker funcional;
@@ -52,7 +54,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.63](docs/RELEASE_0.16.63.md)
+- [Notas técnicas da versão 0.16.64](docs/RELEASE_0.16.64.md)
 
 ## Histórico
 

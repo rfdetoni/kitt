@@ -1,5 +1,13 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.64 — persistent Compose Autopilot and recoverable validation
+
+- Pin Agent CLI 0.89.1 (`0ddae447`) with trusted persistent broker, automatic mount discovery, task checkpoints/CAS rollback, strong verification gates and root-only network predelegation.
+- Start `sandbox-broker` only with the Compose Agent profile, keeping Docker socket out of the Agent and worker containers; add readiness checks and dev overlay.
+- Keep all other immutable component SHA pins/locks unchanged.
+- Reconcile historical PRs by audit: superseded release branches are not blindly merged, nor are incompatible dependency PRs with red CI.
+
+
 ## Next — Unix broker in Compose agent profile
 
 - Add sandbox-broker sidecar for the Agent Compose profile with a private Unix socket and persistent isolated Docker workers.

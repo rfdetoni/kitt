@@ -19,3 +19,10 @@ def test_broker_overrides_agent_dockerfile_entrypoint():
     broker = compose.split("  sandbox-broker:", 1)[1].split("\n  agent:", 1)[0]
     assert 'entrypoint: ["python", "-m", "kitt.security.autopilot_broker"]' in broker
     assert 'command: ["serve"]' in broker
+
+
+def test_agent_requires_explicit_network_predelegation():
+    compose = (Path(__file__).resolve().parents[1] / "compose.yaml").read_text()
+    assert 'KITT_AUTOPILOT_DELEGATE_NETWORK:' in compose
+    assert 'KITT_BROKER_ALLOW_NETWORK:' in compose
+    assert 'KITT_AUTOPILOT_VALIDATION:' in compose
