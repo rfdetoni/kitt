@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.56 — ACP permissions, concurrency-safe reviews and live browser diagnostics
+
+- Agent CLI 0.88.90: workspace-scoped ACP session load and consent flow, durable CAS review changes with per-path authorization, CLI review tools, parameterized recipes with checks/hooks, and reproducible review latency/memory measurement.
+- Reverse Proxy 5.4.26: live origin-scoped Playwright console/network failure observations, bounded redaction, patched transitive body-parser/fast-uri and verified npm audit.
+- Pin immutable merged-main revisions; leave all other ecosystem components unchanged. Verify end-to-end release installation, contracts and locks in CI.
+
+
 ## 0.16.55 — ACP IDE bridge and reviewable KITT workflows
 
 - Pin Agent CLI 0.88.89 to merged main commit c513114cfbb1f24e4738b10c7ce915f13c0762fb, including an ACP v1 stdio endpoint, guarded review/apply/rewind and editable TOML recipes controlled by existing write permissions.
