@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -235,6 +236,44 @@ def _record_source_ref(
         raise InstallerError(f"could not persist install source ref at {state_path}") from exc
 
 
+def prepare_autopilot_image() -> dict[str, str]:
+    """Prepare a sandbox image using only trusted installer-side Docker commands.
+
+    Never expose Docker's host socket or authentication to an agent process.
+    """
+    image = "ghcr.io/rfdetoni/kitt-agent-cli:latest"
+    docker = shutil.which("docker")
+    if not docker:
+        return {"status": "unavailable", "reason": "Docker CLI not installed"}
+    try:
+        info = subprocess.run(
+            [docker, "info", "--format", "{{.Server.Version}}"],
+            capture_output=True, text=True, check=False, timeout=12,
+        )
+        if info.returncode != 0:
+            return {"status": "unavailable", "reason": "Docker daemon not accessible"}
+        inspect = [docker, "image", "inspect", image, "--format", "{{.Id}}"]
+        cached = subprocess.run(
+            inspect, capture_output=True, text=True, check=False, timeout=12,
+        )
+        if cached.returncode == 0:
+            return {"status": "ready", "image": image, "source": "cache"}
+        pulled = subprocess.run(
+            [docker, "pull", image], capture_output=True, text=True,
+            check=False, timeout=900,
+        )
+        if pulled.returncode != 0:
+            return {"status": "failed", "reason": (pulled.stderr or "image pull failed")[-700:]}
+        verified = subprocess.run(
+            inspect, capture_output=True, text=True, check=False, timeout=12,
+        )
+        if verified.returncode != 0:
+            return {"status": "failed", "reason": "image was not visible after pull"}
+        return {"status": "ready", "image": image, "source": "pull"}
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {"status": "failed", "reason": str(exc)[:700]}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -368,6 +407,23 @@ def main(argv: list[str] | None = None) -> int:
                 _record_source_ref(root, args.ref, channel, component_refs)
                 _ensure_launcher_priority(platform, bin_dir)
         optional_failed = False
+        if "agent-cli" in resolution.ids and platform.name == "linux" and not args.dry_run:
+            status = prepare_autopilot_image()
+            if status["status"] == "ready":
+                print(f"KITT autonomous Docker sandbox: {status['image']} ready ({status['source']}).")
+            elif status["status"] == "failed":
+                print(
+                    "KITT autonomous sandbox Docker image is unavailable: "
+                    + status["reason"] + ". Bubblewrap can still be used.",
+                    file=sys.stderr,
+                )
+                optional_failed = True
+            else:
+                print(
+                    "KITT autonomous Docker fallback unavailable: " + status["reason"]
+                    + ". Bubblewrap may be used when functional.",
+                    file=sys.stderr,
+                )
         if with_rea and not args.dry_run:
             from .rea_cli import ReaInstallError, install_rea
             try:

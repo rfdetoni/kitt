@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.60 — Autonomy sandbox worker preparation
+
+- Pin Agent CLI 0.88.93 (`1f627845`), adding strongly isolated `sandbox.run` and Docker fallback when Bubblewrap is unavailable.
+- On native Linux installs, verify or pull the sandbox Docker image without exposing the Docker socket to agent commands; report preparation failures explicitly.
+- Document capability requirements, immutable Agent commit pin and the current Compose limitation; other component versions remain unchanged.
+
+
 ## 0.16.59 — Explicit Python verification check resolution
 
 - Pin Agent CLI v0.88.92 (`3a45f25f`), fixing full-mode verification for explicitly required `python.targeted-tests` without bypassing host contracts or approvals.
