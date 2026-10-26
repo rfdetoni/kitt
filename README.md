@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.60**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.61**.
 
 ## Instalação
 
@@ -10,7 +10,7 @@ O entrypoint do instalador é [`install.sh`](install.sh). Consulte as opções e
 
 ## Sandbox autônomo
 
-O Agent CLI 0.88.93 aceita comandos de desenvolvimento via `sandbox.run` e
+O Agent CLI 0.88.94 aceita comandos de desenvolvimento via `sandbox.run` e
 roteia `process.run` automaticamente para um executor isolado quando o workspace
 está no modo `autonomous` e dispõe das capacidades `process.run` e `repo.write`.
 O instalador Linux prepara a imagem Docker do Agent CLI se houver Docker funcional;
@@ -31,7 +31,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.60](docs/RELEASE_0.16.60.md)
+- [Notas técnicas da versão 0.16.61](docs/RELEASE_0.16.61.md)
 
 ## Histórico
 
