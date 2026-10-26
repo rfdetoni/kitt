@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.55 — ACP IDE bridge and reviewable KITT workflows
+
+- Pin Agent CLI 0.88.89 to merged main commit c513114cfbb1f24e4738b10c7ce915f13c0762fb, including an ACP v1 stdio endpoint, guarded review/apply/rewind and editable TOML recipes controlled by existing write permissions.
+- Add bounded browser diagnostic summaries. Keep unchanged Protocol, Memory, Toolbox, Assistant, AI Workers and Reverse Proxy SHA pins, avoiding unnecessary companion rebuilds.
+- Validate immutable release resolution, installer portability, end-to-end installation and assistant lock smoke in root CI. No third-party dependency additions.
+
+
 ## 0.16.54 — synchronized Agent MCP/recipe runtime and Reverse Proxy release pins
 
 - Update immutable release pins to the verified Agent CLI and latest Reverse Proxy main revisions; keep all unchanged component SHAs pinned exactly.
