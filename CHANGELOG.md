@@ -1,5 +1,13 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.65 — Preauthorized verified GitHub Autopilot delivery
+
+- Pin Agent CLI 0.89.2 (`105ebd7e`) with trusted `autopilot.publish` and Assistant runtime 0.4.44 (`30b21334`) with synchronized Python dependency and uv lock.
+- Operator-controlled fixed repository/branch publication requires successful workspace validation, unchanged fingerprint and non-force GitHub branch update.
+- Compose exposes only disabled-by-default publication parameters; credentials must be injected as Agent-only secrets outside the workspace.
+- Retain other component pins and dependency locks; perform complete installer/lifecycle CI before merge.
+
+
 ## 0.16.64 — persistent Compose Autopilot and recoverable validation
 
 - Pin Agent CLI 0.89.1 (`0ddae447`) and Assistant 0.4.43 (`296206af`) with trusted persistent broker, automatic mount discovery, task checkpoints/CAS rollback, strong verification gates and root-only network predelegation.
