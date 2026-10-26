@@ -1,5 +1,11 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.58 — UI click timeout confirmation and duplicate-send protection
+
+- Update immutable Reverse Proxy pin to v5.4.27 (6d3a1910). A timed-out Playwright send click now checks UI evidence before failure and never automatically retries an ambiguous submission.
+- Keep Agent CLI v0.88.91 and every other component revision unchanged; validate release installation in CI.
+
+
 ## 0.16.57 — ACP v1 session replay and permission isolation
 
 - Pin Agent CLI 0.88.91 to merged main. `session/load` replays ordered conversation text through session/update before its empty response, and `session/cancel` affects only the addressed session's permission requests.
