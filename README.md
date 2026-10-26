@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.61**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.62**.
 
 ## Instalação
 
@@ -10,7 +10,7 @@ O entrypoint do instalador é [`install.sh`](install.sh). Consulte as opções e
 
 ## Sandbox autônomo
 
-O Agent CLI 0.88.94 aceita comandos de desenvolvimento via `sandbox.run` e
+O Agent CLI 0.88.95 aceita comandos de desenvolvimento via `sandbox.run` e
 roteia `process.run` automaticamente para um executor isolado quando o workspace
 está no modo `autonomous` e dispõe das capacidades `process.run` e `repo.write`.
 O instalador Linux prepara a imagem Docker do Agent CLI se houver Docker funcional;
@@ -22,6 +22,12 @@ serviço Agent no Compose não monta o socket Docker e não possui um broker rem
 nesta versão; não se deve prometer execução autônoma de shell nesse modo até
 haver um executor isolado dedicado. Rede requer `network.access` delegado.
 
+O executor Docker pode escolher automaticamente imagens oficiais Java 25/Maven,
+Node 24 ou Rust quando necessário. O broker confiável baixa as imagens
+pré-definidas no primeiro uso; elas não podem ser selecionadas arbitrariamente
+pelo modelo. O cache inicial de pacotes e a imagem base continuam dependentes
+do ambiente e de disponibilidade da rede.
+
 ## Componentes e versões
 
 O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do Agent CLI, Reverse Proxy, Protocol, Memory, Toolbox, Assistant e AI Workers para instalações reproduzíveis.
@@ -31,7 +37,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.61](docs/RELEASE_0.16.61.md)
+- [Notas técnicas da versão 0.16.62](docs/RELEASE_0.16.62.md)
 
 ## Histórico
 

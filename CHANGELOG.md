@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.62 — Autonomous Docker Java/Node/Rust toolchain support
+
+- Pin merged Agent CLI 0.88.95 (`46a37db1`) after passing Python regression, build, Docker, Podman and Windows CI checks.
+- Autonomous Docker sandbox now selects fixed official Java 25/Maven, Node 24 and Rust worker images and provisions them on demand through trusted host Docker commands.
+- Keep other component pins and dependency locks unchanged. Containerized Compose Agent still requires a host-authorized executor for arbitrary project commands.
+
+
 ## 0.16.61 — autonomous Git commands and strict network flags
 
 - Pin Agent CLI v0.88.94 (`f07ca85a`) after green CI, adding Git metadata write support for autonomous Bubblewrap shell execution within an owned workspace.
