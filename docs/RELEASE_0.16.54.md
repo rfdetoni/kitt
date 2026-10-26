@@ -3,9 +3,10 @@
 ## Scope
 
 The root ecosystem manifest retains immutable pins for all seven components.
-Agent CLI 0.88.87 adds:
+Agent CLI 0.88.88 adds:
 
 - Schema introspection via the existing policy-gated MCP runtime.
+- Path-scoped recipe visibility: child agents can only inspect and execute files within their explicit scope.
 - Bounded, read-only TOML recipes backed by the existing program interpreter.
 - Regression coverage for capability gating, scoped tool visibility, forbidden
   mutations, path containment and bounded workspace enumeration.
