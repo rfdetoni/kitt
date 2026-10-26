@@ -40,6 +40,36 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  sandbox-broker:
+    profiles: ["agent"]
+    image: "${KITT_AGENT_IMAGE:-ghcr.io/rfdetoni/kitt-agent-cli}:${KITT_AGENT_VERSION:-latest}"
+    build:
+      context: "https://github.com/rfdetoni/kitt-agent-cli.git#${KITT_AGENT_REF:-main}"
+    user: "0:0"
+    network_mode: "none"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    entrypoint: ["python", "-m", "kitt.security.autopilot_broker"]
+    command: ["serve"]
+    environment:
+      KITT_SANDBOX_BROKER_SOCKET: /run/kitt-broker/exec.sock
+      KITT_BROKER_DEFAULT_IMAGE: "${KITT_AGENT_IMAGE:-ghcr.io/rfdetoni/kitt-agent-cli}:${KITT_AGENT_VERSION:-latest}"
+      KITT_BROKER_ALLOW_NETWORK: "${KITT_BROKER_ALLOW_NETWORK:-false}"
+    volumes:
+      - "${KITT_WORKSPACE:-.}:/workspace"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - kitt-sandbox-socket:/run/kitt-broker
+    tmpfs:
+      - /tmp:size=64m
+    healthcheck:
+      test: ["CMD", "python", "-m", "kitt.security.autopilot_broker", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
+    restart: unless-stopped
+
   agent:
     profiles: ["agent"]
     image: "${KITT_AGENT_IMAGE:-ghcr.io/rfdetoni/kitt-agent-cli}:${KITT_AGENT_VERSION:-latest}"
@@ -48,15 +78,23 @@ services:
     stdin_open: true
     tty: true
     working_dir: /workspace
+    environment:
+      KITT_SANDBOX_BROKER_SOCKET: /run/kitt-broker/exec.sock
+      KITT_AUTOPILOT_DELEGATE_NETWORK: "${KITT_AUTOPILOT_DELEGATE_NETWORK:-false}"
+      KITT_AUTOPILOT_VALIDATION: "${KITT_AUTOPILOT_VALIDATION:-}"
     volumes:
       - "${KITT_WORKSPACE:-.}:/workspace"
       - kitt-agent-state:/home/kitt/.kitt
+      - kitt-sandbox-socket:/run/kitt-broker
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
       reverse-proxy:
         condition: service_started
+      sandbox-broker:
+        condition: service_healthy
 
 volumes:
+  kitt-sandbox-socket:
   kitt-agent-state:
   kitt-browser-profile:

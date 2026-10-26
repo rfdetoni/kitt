@@ -7,3 +7,8 @@ services:
 
   agent:
     image: kitt/agent-cli:dev
+
+  sandbox-broker:
+    image: kitt/agent-cli:dev
+    environment:
+      KITT_BROKER_DEFAULT_IMAGE: kitt/agent-cli:dev

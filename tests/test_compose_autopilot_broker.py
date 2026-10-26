@@ -1,0 +1,28 @@
+"""Inspect Compose privilege boundaries for the autonomous Agent profile."""
+from pathlib import Path
+
+
+def test_compose_agent_does_not_mount_docker_socket():
+    compose = (Path(__file__).resolve().parents[1] / "compose.yaml").read_text()
+    broker = compose.split("  sandbox-broker:", 1)[1].split("\n  agent:", 1)[0]
+    agent = compose.split("  agent:", 1)[1].split("\nvolumes:", 1)[0]
+    assert "/var/run/docker.sock:/var/run/docker.sock" in broker
+    assert "/var/run/docker.sock" not in agent
+    assert "kitt-sandbox-socket:/run/kitt-broker" in broker
+    assert "kitt-sandbox-socket:/run/kitt-broker" in agent
+    assert 'network_mode: "none"' in broker
+    assert "condition: service_healthy" in agent
+
+
+def test_broker_overrides_agent_dockerfile_entrypoint():
+    compose = (Path(__file__).resolve().parents[1] / "compose.yaml").read_text()
+    broker = compose.split("  sandbox-broker:", 1)[1].split("\n  agent:", 1)[0]
+    assert 'entrypoint: ["python", "-m", "kitt.security.autopilot_broker"]' in broker
+    assert 'command: ["serve"]' in broker
+
+
+def test_agent_requires_explicit_network_predelegation():
+    compose = (Path(__file__).resolve().parents[1] / "compose.yaml").read_text()
+    assert 'KITT_AUTOPILOT_DELEGATE_NETWORK:' in compose
+    assert 'KITT_BROKER_ALLOW_NETWORK:' in compose
+    assert 'KITT_AUTOPILOT_VALIDATION:' in compose
