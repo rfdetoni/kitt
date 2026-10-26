@@ -33,10 +33,11 @@ O instalador Linux prepara a imagem Docker do Agent CLI se houver Docker funcion
 caso contrário, o runtime usa Bubblewrap funcional (>=0.12). Nenhuma execução
 não isolada é autorizada como fallback.
 
-A preparação Docker cobre o **Agent nativo** que acessa o daemon do host. O
-serviço Agent no Compose não monta o socket Docker e não possui um broker remoto
-nesta versão; não se deve prometer execução autônoma de shell nesse modo até
-haver um executor isolado dedicado. Rede requer `network.access` delegado.
+No **Agent nativo**, o executor usa Bubblewrap ou Docker conforme a ferramenta
+e o ambiente. No **Agent do Compose**, o sidecar `sandbox-broker` executa comandos
+em workers Docker persistentes sem montar o socket Docker no próprio Agent.
+Acesso à rede exige autorização explícita do operador e capacidade
+`network.access` no principal.
 
 O executor Docker pode escolher automaticamente imagens oficiais Java 25/Maven,
 Gradle/JDK 25, Node 24 ou Rust quando necessário. O broker confiável baixa as imagens
