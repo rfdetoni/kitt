@@ -790,3 +790,45 @@ class ReLabProvisioningTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class OfflineLocalPythonInstallTests(unittest.TestCase):
+    def test_main_install_uses_local_kitt_packages_without_git_reclone(self) -> None:
+        from types import SimpleNamespace
+        from installer.source_free import SourceFreeEcosystemInstaller
+
+        catalog = EcosystemCatalog.load(ROOT)
+        resolution = catalog.resolve(("agent-cli", "reverse-proxy"), include_companions=False)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            protocol = root / "staged-protocol"
+            (protocol / "sdk" / "python").mkdir(parents=True)
+            (protocol / "sdk" / "python" / "pyproject.toml").write_text(
+                '[project]\nname="kitt-protocol"\nversion="0.0.1"\ndependencies=[]\n',
+                encoding="utf-8",
+            )
+            agent = root / "staged-agent"
+            agent.mkdir()
+            (agent / "pyproject.toml").write_text(
+                '[project]\nname="kitt-agent-cli"\nversion="0.0.1"\n'
+                'dependencies=["kitt-protocol @ git+https://github.com/rfdetoni/'
+                'kitt-protocol.git@0123456789abcdef", "prompt-toolkit>=3.0.52,<4", '
+                '"defusedxml>=0.7.1,<1"]\n',
+                encoding="utf-8",
+            )
+            installer = SourceFreeEcosystemInstaller(
+                catalog,
+                PlatformAdapter("linux", posix=True),
+                InstallerOptions(root=root, bin_dir=root / "bin"),
+            )
+            installer._python = SimpleNamespace(argv=("python3",))
+            source_map = {"protocol": protocol, "agent-cli": agent}
+            with patch.object(installer, "_repo_dir", side_effect=lambda module: source_map[module.id]):
+                with patch.object(installer, "_run") as runner:
+                    installer._install_python_stack(resolution)
+            argv = [tuple(call.args[0]) for call in runner.call_args_list]
+            assert all("github.com/rfdetoni" not in " ".join(cmd) for cmd in argv)
+            assert any("prompt-toolkit>=3.0.52,<4" in cmd for cmd in argv)
+            local = [cmd for cmd in argv if str(agent) in cmd or str(protocol / "sdk" / "python") in cmd]
+            assert len(local) == 2
+            assert all("--no-deps" in cmd for cmd in local)
+            assert str(agent) in local[-1]
