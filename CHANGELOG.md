@@ -1,5 +1,11 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.54 — synchronized Agent MCP/recipe runtime and Reverse Proxy release pins
+
+- Update immutable release pins to the verified Agent CLI and latest Reverse Proxy main revisions; keep all unchanged component SHAs pinned exactly.
+- Release installers continue to resolve the full manifest atomically. No new protocol, native engine, or dependency changes.
+
+
 ## 0.16.53 — authenticated FreeLLMAPI model discovery
 
 Pins Agent CLI 0.88.53 and Assistant Runtime 0.4.42 to immutable main commits. FreeLLMAPI now appears in the shared catalog and model picker; discovery sends the gateway credential and the models CLI respects the workspace endpoint. Locks and CI pins are synchronized. See [release notes](docs/RELEASE_0.16.53.md).
