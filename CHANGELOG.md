@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.71 — release pin sync
+
+- Update the release manifest for the latest Reverse Proxy commit.
+
 ## 0.16.70 — browser memory owned by Chrome
 
 - Pin merged Reverse Proxy 5.4.28 (`b3caa28a1997a624e88db7422c69e94b02f3997b`) in the immutable release manifest.
