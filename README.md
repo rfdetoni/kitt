@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.69**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.70**.
 
 ## Instalação
 
@@ -59,6 +59,17 @@ os limites de memória e as verificações de integridade do editor não foram
 desabilitados. Para diagnóstico, `KITT_LOG_CONTENT=metadata` evita gravar
 o corpo completo dos prompts em instâncias do proxy iniciadas pelo Agent;
 `full` exige configuração explícita.
+
+## Memória do navegador gerenciada pelo próprio Chrome
+
+O Reverse Proxy `5.4.28` não mede RSS/PSS do Chromium e não interrompe
+conversas por consumo elevado de RAM. O Chrome e o sistema operacional
+decidem como usar a memória, inclusive em sessões ChatGPT Web extensas.
+As opções antigas `--max-rss-mb` e `PROXY_MAX_RSS_MB` foram removidas.
+Permanecem os limites operacionais de sessões/abas, o encerramento por
+inatividade e a proteção de sessões com operações ou ferramentas pendentes.
+Em hosts com pouca RAM, o próprio navegador ou sistema pode ficar lento
+ou encerrar processos; o proxy não substitui os controles do sistema.
 
 ## Broker isolado no Docker Compose
 
@@ -136,7 +147,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.69](docs/RELEASE_0.16.69.md)
+- [Notas técnicas da versão 0.16.70](docs/RELEASE_0.16.70.md)
 
 ## Histórico
 
