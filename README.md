@@ -1,12 +1,48 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.67**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.68**.
 
 ## Instalação
 
 O entrypoint do instalador é [`install.sh`](install.sh). Consulte as opções e os pré-requisitos no script e na documentação correspondente antes de instalar ou reinstalar componentes.
 
 **Dica (Ubuntu/Linux):** se o KITT indicar `Strong sandbox profile ... requires functional bubblewrap >= 0.12` ou `bwrap: setting up uid map: Permission denied`, consulte [Diagnóstico do Bubblewrap e AppArmor](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/BUBBLEWRAP_APPARMOR.md). A configuração do perfil AppArmor deve corresponder ao executável realmente utilizado; não desative a restrição de namespaces globalmente.
+
+## Instalação completa com laboratório RE (Linux)
+
+O exemplo instala o canal `release` com todos os módulos, REA e dependências
+dos AI Workers, provisiona o RE lab com Linux Docker/Ghidra/Frida e Windows 11
+Dockur, e baixa as imagens opcionais de VM em containers:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/rfdetoni/kitt/main/install.sh | sh -s -- \
+  --preset full --channel release --yes --with-rea --with-ai-workers \
+  --with-re-lab --re-runtime docker --re-profile full \
+  --re-windows dockurr --re-windows-version 11 --re-oracle-bootstrap \
+  --accept-windows-license --with-vm-containers \
+  --vm-container-runtime docker --vm-container-image-profile full --vm-pull-images
+```
+
+**Pré-requisitos:** Linux com Docker Engine operacional, `/dev/kvm`,
+`/dev/net/tun`, Git e rede para baixar imagens; o instalador também verifica
+e prepara outros pré-requisitos suportados. A flag
+`--accept-windows-license` só deve ser usada por quem possui uma licença válida
+do Windows 11 e autoriza os downloads. O laboratório não substitui nem apaga
+um Windows já instalado sem autorização separada. O provisionamento não equivale
+a verificar o Oracle: execute `kitt re lab status --json` e
+`kitt re lab verify --full` após a instalação. `--channel edge` acompanha
+as `main` mais recentes; `release` instala os commits imutáveis deste manifesto.
+
+## Recuperação do Reverse Proxy
+
+O Agent CLI 0.89.5 espera até 30 segundos por um Reverse Proxy local que ainda
+não aceita conexões, com cancelamento e verificação `GET /healthz`.
+A solicitação de chat não é reenviada depois de ser submetida. Após o proxy
+ficar disponível, a negociação de capacidades é atualizada. Instâncias do proxy
+iniciadas e gerenciadas pelo Agent utilizam `KITT_LOG_CONTENT=metadata` por
+padrão, inclusive no nível TRACE; a captura de conteúdo completo é uma opção
+explícita do operador. `flow.execute` permanece somente leitura: validação
+por comandos utiliza `process.run` separadamente e mediante as políticas do host.
 
 ## Broker isolado no Docker Compose
 
@@ -26,7 +62,7 @@ sem Docker saudável falha fechado e nunca recorre ao shell irrestrito do host.
 
 ## Tarefas isoladas por worktree
 
-O Agent CLI 0.89.4 permite iniciar `autopilot.transaction.start` em um
+O Agent CLI 0.89.5 mantém a capacidade de iniciar `autopilot.transaction.start` em um
 checkout Git limpo. A execução e os testes são direcionados a um worktree
 isolado. Comandos nessa modalidade exigem Docker ou o broker confiável do
 Compose, que monta apenas o diretório da tarefa; a execução não recai no
@@ -55,7 +91,7 @@ com atualização não forçada; não dispara `git push` no host.
 
 ## Sandbox autônomo
 
-O Agent CLI 0.89.4 aceita comandos de desenvolvimento via `sandbox.run` e
+O Agent CLI 0.89.5 aceita comandos de desenvolvimento via `sandbox.run` e
 roteia `process.run` automaticamente para um executor isolado quando o workspace
 está no modo `autonomous` e dispõe das capacidades `process.run` e `repo.write`.
 O instalador Linux prepara a imagem Docker do Agent CLI se houver Docker funcional;
@@ -84,7 +120,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.67](docs/RELEASE_0.16.67.md)
+- [Notas técnicas da versão 0.16.68](docs/RELEASE_0.16.68.md)
 
 ## Histórico
 

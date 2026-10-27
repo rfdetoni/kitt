@@ -1,5 +1,14 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.68 — Agent CLI 0.89.5: startup confiável e diagnósticos seguros
+
+- Pin Agent CLI `0.89.5` (`7ab87087f321f2f13ef4207d6573ed12a303ae3b`) após merge e CI verde, com `pyproject.toml`, `uv.lock` e versão em código sincronizados.
+- Antes da primeira requisição Chat, esperar de forma limitada e cancelável pelo Reverse Proxy local; invalidar descoberta de capacidades offline; não reproduzir solicitações já submetidas.
+- O agente documenta que `flow.execute` é somente leitura e recomenda `process.run` governado em separado; logs das instâncias gerenciadas do proxy usam `metadata` como padrão.
+- Documentar instalação completa com REA, AI Workers, Linux Docker RE, Ghidra/Frida, Dockur Windows 11 e imagens de VM.
+- Preservar pins de Protocol, Memory, Toolbox, Assistant, AI Workers e Reverse Proxy; nenhuma alteração de dependência de terceiros foi necessária nesta atualização.
+
+
 ## 0.16.67 — verified task-root Autopilot isolation
 
 - Pin Agent CLI 0.89.4 (`eaa4f198`) and Assistant runtime 0.4.46 (`727517fb`) at immutable main SHAs.
