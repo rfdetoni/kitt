@@ -1,5 +1,14 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.70 — browser memory owned by Chrome
+
+- Pin merged Reverse Proxy 5.4.28 (`b3caa28a1997a624e88db7422c69e94b02f3997b`) in the immutable release manifest.
+- Remove browser RSS/PSS budgeting and memory-pressure session eviction: browser RAM is no longer sampled or managed by the proxy, allowing naturally growing ChatGPT Web conversations.
+- Preserve page/session count limits, idle cleanup, in-flight and pending-tool protection, and consent-based browser setup.
+- Reverse Proxy package and npm lock are synchronized; patched transitively resolved `qs@6.16.1` satisfies the newly published production dependency advisory without disabling the audit.
+- All other ecosystem pins remain unchanged. The release still requires installer integration and immutable-pin CI before merge.
+
+
 ## 0.16.69 — model-budget checkpoint in Agent CLI 0.89.6
 
 - Pin merged Agent CLI 0.89.6 (`69df41adee0c41354b0fd2768d658ff097c76bc8`) after green Docker, Podman, Windows package and regression CI.
