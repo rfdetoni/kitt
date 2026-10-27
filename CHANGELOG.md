@@ -1,5 +1,10 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.72 — synchronize component pins
+
+- Pin the current Agent CLI and Reverse Proxy main commits in the immutable release manifest.
+- Keep the release metadata aligned with the component heads after CI validation.
+
 ## 0.16.71 — release pin sync
 
 - Update the release manifest for the latest Reverse Proxy commit.
