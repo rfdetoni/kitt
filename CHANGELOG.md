@@ -1,13 +1,9 @@
 # Changelog — K.I.T.T. Ecosystem
 
-## 0.16.72 — synchronize component pins
+## 0.16.71 — synchronize component pins
 
-- Pin the current Agent CLI and Reverse Proxy main commits in the immutable release manifest.
-- Keep the release metadata aligned with the component heads after CI validation.
-
-## 0.16.71 — release pin sync
-
-- Update the release manifest for the latest Reverse Proxy commit.
+- Pin Agent CLI 0.89.7 and Reverse Proxy 5.4.29 at their current validated main commits.
+- Keep the immutable release manifest aligned with the component heads after CI validation.
 
 ## 0.16.70 — browser memory owned by Chrome
 
