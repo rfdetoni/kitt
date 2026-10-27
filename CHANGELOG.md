@@ -1,5 +1,13 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.66 — Persistent Docker broker verified in real container integration
+
+- Pin Agent CLI 0.89.3 (`1b17a65f`) and Assistant Runtime 0.4.45 (`44970484`), maintaining synchronized immutable SHA pins and Python dependency locks.
+- Verify Docker broker worker reuse, cached HOME, readonly workspace, absent socket/control-plane files and worker reprovisioning through real Docker CI.
+- Reject stale worker image/network/security config before reuse, and serialize commands per worker to avoid provisioning races.
+- Keep GitHub publication operator opt-in and all other component SHA pins unchanged.
+
+
 ## 0.16.65 — Preauthorized verified GitHub Autopilot delivery
 
 - Pin Agent CLI 0.89.2 (`105ebd7e`) with trusted `autopilot.publish` and Assistant runtime 0.4.44 (`30b21334`) with synchronized Python dependency and uv lock.
