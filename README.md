@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.66**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.67**.
 
 ## Instalação
 
@@ -24,6 +24,20 @@ dependências sem novas perguntas, defina também
 barreira de rede independente; sem ambas as condições, não há egress. O perfil
 sem Docker saudável falha fechado e nunca recorre ao shell irrestrito do host.
 
+## Tarefas isoladas por worktree
+
+O Agent CLI 0.89.4 permite iniciar `autopilot.transaction.start` em um
+checkout Git limpo. A execução e os testes são direcionados a um worktree
+isolado. Comandos nessa modalidade exigem Docker ou o broker confiável do
+Compose, que monta apenas o diretório da tarefa; a execução não recai no
+Bubblewrap que expõe partes do checkout principal.
+
+`autopilot.transaction.status` acompanha a tarefa e
+`autopilot.transaction.abandon` preserva uma cópia para auditoria sem alterar
+o checkout original. A publicação remota continua opcional, requer aprovação
+antecipada do operador, `autopilot.verify` aprovado e fingerprint inalterado.
+Não existe promoção local automática nesta versão.
+
 ## Publicação remota verificada (opcional)
 
 O Agent CLI 0.89.2 adiciona `autopilot.publish` para uma única branch e
@@ -41,7 +55,7 @@ com atualização não forçada; não dispara `git push` no host.
 
 ## Sandbox autônomo
 
-O Agent CLI 0.89.3 aceita comandos de desenvolvimento via `sandbox.run` e
+O Agent CLI 0.89.4 aceita comandos de desenvolvimento via `sandbox.run` e
 roteia `process.run` automaticamente para um executor isolado quando o workspace
 está no modo `autonomous` e dispõe das capacidades `process.run` e `repo.write`.
 O instalador Linux prepara a imagem Docker do Agent CLI se houver Docker funcional;
@@ -70,7 +84,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.66](docs/RELEASE_0.16.66.md)
+- [Notas técnicas da versão 0.16.67](docs/RELEASE_0.16.67.md)
 
 ## Histórico
 

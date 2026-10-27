@@ -1,5 +1,14 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.67 — verified task-root Autopilot isolation
+
+- Pin Agent CLI 0.89.4 (`eaa4f198`) and Assistant runtime 0.4.46 (`727517fb`) at immutable main SHAs.
+- Introduce isolated Git task worktrees for autonomous sandbox commands, verification and opt-in GitHub publication.
+- Reject parent workspace mounts, tampered Git worktree metadata, absent durable state, and alternate host-write operations during active tasks; Docker and broker live tests included.
+- Do not claim automatic local promotion: abandon retains task artifacts for audit, original checkout remains unchanged.
+- Other protocol, proxy, toolbox and memory lock pins remain unchanged.
+
+
 ## 0.16.66 — Persistent Docker broker verified in real container integration
 
 - Pin Agent CLI 0.89.3 (`1b17a65f`) and Assistant Runtime 0.4.45 (`44970484`), maintaining synchronized immutable SHA pins and Python dependency locks.
