@@ -1,5 +1,13 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.69 — model-budget checkpoint in Agent CLI 0.89.6
+
+- Pin merged Agent CLI 0.89.6 (`69df41adee0c41354b0fd2768d658ff097c76bc8`) after green Docker, Podman, Windows package and regression CI.
+- Preserve completed host tool receipts when a model-call/token/cost/duration budget is exhausted; return a recoverable `TurnBlocked` checkpoint without exceeding budgets or automatically replaying provider requests.
+- Synchronize Agent CLI package/runtime/uv lock in its repository; update ecosystem immutable pin, version, installation docs and release notes.
+- Preserve Reverse Proxy 5.4.27 and all other component pins. Chromium resource pressure and very large composer failures remain independently diagnosed, not disabled.
+
+
 ## 0.16.68 — Agent CLI 0.89.5: startup confiável e diagnósticos seguros
 
 - Pin Agent CLI `0.89.5` (`7ab87087f321f2f13ef4207d6573ed12a303ae3b`) após merge e CI verde, com `pyproject.toml`, `uv.lock` e versão em código sincronizados.

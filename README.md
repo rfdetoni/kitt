@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.68**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.69**.
 
 ## Instalação
 
@@ -35,7 +35,7 @@ as `main` mais recentes; `release` instala os commits imutáveis deste manifesto
 
 ## Recuperação do Reverse Proxy
 
-O Agent CLI 0.89.5 espera até 30 segundos por um Reverse Proxy local que ainda
+O Agent CLI 0.89.6 espera até 30 segundos por um Reverse Proxy local que ainda
 não aceita conexões, com cancelamento e verificação `GET /healthz`.
 A solicitação de chat não é reenviada depois de ser submetida. Após o proxy
 ficar disponível, a negociação de capacidades é atualizada. Instâncias do proxy
@@ -43,6 +43,22 @@ iniciadas e gerenciadas pelo Agent utilizam `KITT_LOG_CONTENT=metadata` por
 padrão, inclusive no nível TRACE; a captura de conteúdo completo é uma opção
 explícita do operador. `flow.execute` permanece somente leitura: validação
 por comandos utiliza `process.run` separadamente e mediante as políticas do host.
+
+## Checkpoint por orçamento de modelo
+
+O Agent CLI 0.89.6 trata esgotamento dos limites de chamadas ao modelo,
+tokens, custo ou duração durante o loop como `TurnBlocked` com checkpoint.
+O orçamento não é aumentado, resultados de ferramentas já concluídas não
+são repetidos e o usuário pode continuar o item pendente em outro turno.
+Essa alteração evita o traceback genérico após uma sequência longa de ações
+de host verificadas.
+
+Erros de preenchimento do Chromium com prompts muito extensos e
+recusas por pressão de memória do Reverse Proxy têm causas diferentes;
+os limites de memória e as verificações de integridade do editor não foram
+desabilitados. Para diagnóstico, `KITT_LOG_CONTENT=metadata` evita gravar
+o corpo completo dos prompts em instâncias do proxy iniciadas pelo Agent;
+`full` exige configuração explícita.
 
 ## Broker isolado no Docker Compose
 
@@ -62,7 +78,7 @@ sem Docker saudável falha fechado e nunca recorre ao shell irrestrito do host.
 
 ## Tarefas isoladas por worktree
 
-O Agent CLI 0.89.5 mantém a capacidade de iniciar `autopilot.transaction.start` em um
+O Agent CLI 0.89.6 mantém a capacidade de iniciar `autopilot.transaction.start` em um
 checkout Git limpo. A execução e os testes são direcionados a um worktree
 isolado. Comandos nessa modalidade exigem Docker ou o broker confiável do
 Compose, que monta apenas o diretório da tarefa; a execução não recai no
@@ -91,7 +107,7 @@ com atualização não forçada; não dispara `git push` no host.
 
 ## Sandbox autônomo
 
-O Agent CLI 0.89.5 aceita comandos de desenvolvimento via `sandbox.run` e
+O Agent CLI 0.89.6 aceita comandos de desenvolvimento via `sandbox.run` e
 roteia `process.run` automaticamente para um executor isolado quando o workspace
 está no modo `autonomous` e dispõe das capacidades `process.run` e `repo.write`.
 O instalador Linux prepara a imagem Docker do Agent CLI se houver Docker funcional;
@@ -120,7 +136,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.68](docs/RELEASE_0.16.68.md)
+- [Notas técnicas da versão 0.16.69](docs/RELEASE_0.16.69.md)
 
 ## Histórico
 
