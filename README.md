@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.70**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.72**.
 
 ## Instalação
 
@@ -32,6 +32,19 @@ um Windows já instalado sem autorização separada. O provisionamento não equi
 a verificar o Oracle: execute `kitt re lab status --json` e
 `kitt re lab verify --full` após a instalação. `--channel edge` acompanha
 as `main` mais recentes; `release` instala os commits imutáveis deste manifesto.
+
+## Verificação Python sem acesso à rede no agente
+
+O instalador prepara Ruff `0.14.3` dentro do mesmo ambiente virtual do
+Agent CLI e valida seu executável. O verificador encontra a ferramenta mesmo
+sem o ambiente virtual no `PATH` e executa os checks `python.lint` exigidos
+pelo contrato, inclusive quando a tarefa modificou apenas documentação mas o
+workspace contém scripts Python. A ausência real do linter continua sendo uma
+falha de verificação; o agente não tenta instalá-lo via `process.run` com rede.
+
+Os sockets Docker do host permanecem isolados dos comandos arbitrários
+executados pelo agente. Para imagens e análise RE, use operações governadas
+`re.lab.images` e `re.lab.analyze`, não `docker` ou `podman` dentro do Bubblewrap.
 
 ## Recuperação do Reverse Proxy
 
@@ -147,7 +160,7 @@ O arquivo [`ecosystem.release.json`](ecosystem.release.json) fixa os commits do 
 A release inclui validação de contratos de caixa-preta, revisão assinada e pipeline offline em ambiente OCI isolado. **O código gerado ainda exige validação diferencial real com o Windows Oracle; CI verde não significa certificação Clean-Room.**
 
 - [Fluxo e controles do RE Clean-Room](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/CLEANROOM_RE.md)
-- [Notas técnicas da versão 0.16.70](docs/RELEASE_0.16.70.md)
+- [Notas técnicas da versão 0.16.72](docs/RELEASE_0.16.72.md)
 
 ## Histórico
 

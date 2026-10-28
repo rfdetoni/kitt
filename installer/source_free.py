@@ -412,6 +412,10 @@ class SourceFreeEcosystemInstaller(EcosystemInstaller):
         selected = set(resolution.ids)
 
         bootstrap = ["setuptools>=68", "wheel"]
+        # Host-owned python.lint checks must work offline during agent turns.
+        # Provision Ruff during the trusted installer phase, never from an agent tool.
+        if "agent-cli" in selected:
+            bootstrap.append("ruff==0.14.3")
         if "toolbox" in selected and not self.options.portable:
             bootstrap.append("maturin>=1.8,<2")
         if "ai-workers" in selected and self.options.with_ai_workers:
