@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.74 — policy-governed directory discovery in read-only flows
+
+- Pin merged Agent CLI 0.89.10 (`3b9cde3505cda1b452b76c89d528b3d1dac75bd4`) after successful CI for critical contracts, Docker, Podman, Windows and container builds.
+- `repo.list` is now available in bounded `flow.execute` and `program.execute` under the existing `repo.read` authority, consistent with the already supported `repo.batch_read`; no process or mutation permissions are granted.
+- Keep Reverse Proxy 5.4.30 and all other component pins unchanged. Agent Python package, runtime version, README, changelog, tests and uv.lock were synchronized in its repository.
+
+
 ## 0.16.73 — browser composer recovery and safe agent checkpoints
 
 - Pin Reverse Proxy 5.4.30 (`05d8527c54551caf1e7f525a14a78ee4e7a86acf`): bypass expensive Playwright fill for rich-editor prompts >=8 KiB, verifying the draft before submission.
