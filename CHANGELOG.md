@@ -1,5 +1,12 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.72 — deterministic Python lint verification
+
+- Install pinned Ruff 0.14.3 inside the trusted Agent CLI virtual environment during KITT installation; verify its executable before accepting the staged runtime.
+- Pin Agent CLI 0.89.8 (31cf1420317daf858d4b745a921eaff1e8903834), which finds Ruff independent of PATH and runs required Python lint even for documentation-only targets when Python code exists.
+- Maintain fail-closed verification when Ruff is truly absent, and give actionable sandbox diagnostics for blocked Docker, Podman and global host searches.
+- Keep Reverse Proxy and other component pins unchanged.
+
 ## 0.16.71 — synchronize component pins
 
 - Pin Agent CLI 0.89.7 and Reverse Proxy 5.4.29 at their current validated main commits.
