@@ -1,6 +1,6 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.72**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.73**.
 
 ## Instalação
 
