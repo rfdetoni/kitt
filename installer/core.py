@@ -335,6 +335,11 @@ class EcosystemInstaller:
                 raise InstallerError("Agent CLI runtime missing")
             python = self._venv_python(venv)
             self._run([str(python), "-m", "kitt.cli.main", "--help"], quiet=True)
+            # The Agent verification gate must find Ruff in this isolated venv,
+            # including installations where the venv bin directory is not in PATH.
+            scripts = venv / ("Scripts" if self.platform.name == "windows" else "bin")
+            ruff = scripts / ("ruff.exe" if self.platform.name == "windows" else "ruff")
+            self._run([str(ruff), "--version"], quiet=True)
             guard_contract = (
                 "from pathlib import Path\n"
                 "from types import SimpleNamespace\n"
