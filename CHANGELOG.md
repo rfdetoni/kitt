@@ -1,5 +1,11 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.73 — browser composer recovery and safe agent checkpoints
+
+- Pin Reverse Proxy 5.4.30 (`05d8527c54551caf1e7f525a14a78ee4e7a86acf`): bypass expensive Playwright fill for rich-editor prompts >=8 KiB, verifying the draft before submission.
+- Pin Agent CLI 0.89.9 (`74f8bf6c534bdffc16ef4ab73c6cca596c981982`): convert proxy protocol errors into non-replaying checkpoints and execute required Python tests from docs-only changes when actual tests exist.
+- Preserve Chrome memory ownership, existing session limits, and the security boundary around host Docker/Podman sockets.
+
 ## 0.16.72 — deterministic Python lint verification
 
 - Install pinned Ruff 0.14.3 inside the trusted Agent CLI virtual environment during KITT installation; verify its executable before accepting the staged runtime.
