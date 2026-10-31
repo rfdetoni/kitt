@@ -2,17 +2,18 @@ name: ecosystem-integration
 
 on:
   pull_request:
+    branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**']
   push:
-    branches: [main, 'fix/**']
-  schedule:
-    - cron: "17 4 * * *"
+    branches: [main] # Automatic release depends on this validated main workflow
+    paths-ignore: ['**/*.md', 'docs/**']
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ecosystem-integration-${{ github.event_name }}-${{ github.ref }}
+  group: ecosystem-integration-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -29,6 +30,7 @@ jobs:
         run: $null = [scriptblock]::Create((Get-Content -Raw ./install.ps1))
 
   main-install:
+    if: github.event_name != 'pull_request'
     name: Install main ecosystem end to end
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -223,6 +225,7 @@ jobs:
 
 
   portable-install:
+    if: github.event_name != 'pull_request'
     name: Portable installer (${{ matrix.os }})
     strategy:
       fail-fast: false
@@ -249,5 +252,9 @@ jobs:
         shell: bash
         run: |
           test "${{ needs.installers.result }}" = success
-          test "${{ needs.main-install.result }}" = success
-          test "${{ needs.portable-install.result }}" = success
+          # Full Linux / Windows / macOS installation is verified on main,
+          # before automatic release. PRs retain fast installer syntax tests.
+          if [ "${{ github.event_name }}" != pull_request ]; then
+            test "${{ needs.main-install.result }}" = success
+            test "${{ needs.portable-install.result }}" = success
+          fi

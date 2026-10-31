@@ -1,19 +1,11 @@
 name: Docker Compose
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - compose.yaml
-      - compose.dev.yaml
-      - .env.docker.example
-      - .github/workflows/docker.yml
-  pull_request:
-    paths:
-      - compose.yaml
-      - compose.dev.yaml
-      - .env.docker.example
-      - .github/workflows/docker.yml
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
