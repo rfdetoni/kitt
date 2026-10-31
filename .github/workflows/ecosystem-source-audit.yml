@@ -6,6 +6,10 @@ on:
       - scripts/audit_ecosystem_sources.py
       - tests/test_ecosystem_source_audit.py
       - .github/workflows/ecosystem-source-audit.yml
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 jobs:

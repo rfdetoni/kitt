@@ -11,13 +11,16 @@ on:
       - installer/cli.py
       - scripts/validate_ecosystem_main.py
       - scripts/validate_architecture.py
-      - docs/ECOSYSTEM_ARCHITECTURE.md
       - tests/test_ecosystem_architecture.py
       - tests/test_ecosystem_release_pins.py
       - tests/test_installer.py
       - tests/test_installer_update.py
       - .github/workflows/ecosystem-main.yml
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
