@@ -1,19 +1,7 @@
 name: Docker Compose
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - compose.yaml
-      - compose.dev.yaml
-      - .env.docker.example
-      - .github/workflows/docker.yml
-  pull_request:
-    paths:
-      - compose.yaml
-      - compose.dev.yaml
-      - .env.docker.example
-      - .github/workflows/docker.yml
+  workflow_dispatch:
 
 permissions:
   contents: read

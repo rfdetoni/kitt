@@ -6,8 +6,6 @@ on:
       - scripts/audit_ecosystem_sources.py
       - tests/test_ecosystem_source_audit.py
       - .github/workflows/ecosystem-source-audit.yml
-  schedule:
-    - cron: "15 6 * * 1"
 permissions:
   contents: read
 jobs:

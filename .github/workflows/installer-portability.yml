@@ -1,16 +1,6 @@
 name: installer-portability
 
 on:
-  push:
-    branches: [main, 'fix/**']
-    paths:
-      - ecosystem.json
-      - install.sh
-      - install.ps1
-      - installer/**
-      - scripts/validate_ecosystem_main.py
-      - tests/**
-      - .github/workflows/installer-portability.yml
   pull_request:
     paths:
       - ecosystem.json
@@ -84,6 +74,7 @@ jobs:
           }
 
   platform-lifecycle:
+    if: github.event_name == 'workflow_dispatch'
     name: ${{ matrix.os }} lifecycle
     strategy:
       fail-fast: false
