@@ -15,7 +15,7 @@ docker compose --profile decision exec ollaya ollaya pull laya
 
 Em `.env`, configure `KITT_DECISION_MODE=shadow` para observar decisões sem alterar as solicitações, ou `assist` para acrescentar os sinais ao contexto da LLM. Defina `KITT_TEMPORARY_CHAT=supported` para exigir uma conversa temporária verificada no ChatGPT antes de enviar prompts. O proxy não envia o prompt se a UI não comprovar o modo temporário; demais provedores mantêm o comportamento atual. Deixe as opções desligadas até validar a UI autenticada em seu ambiente.
 
-Consulte [a especificação de implementação](https://github.com/rfdetoni/kitt-reverse-proxy/blob/feat/decision-llm-temporary-chats/docs/DECISION_TEMPORARY.md). A funcionalidade deve ser compilada da branch correspondente ou obtida em uma futura release; o tag `latest` no Compose pode ainda não incluí-la.
+Consulte [a especificação de implementação](https://github.com/rfdetoni/kitt-reverse-proxy/blob/main/docs/DECISION_TEMPORARY.md). A funcionalidade deve ser compilada da branch correspondente ou obtida em uma futura release; o tag `latest` no Compose pode ainda não incluí-la.
 
 ## Instalação
 
