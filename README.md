@@ -2,6 +2,18 @@
 
 Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.74**.
 
+## Nova interface Rune (Desktop + WebGPU, opt-in)
+
+A UI unificada em Rust com [Rune](https://github.com/anomalyco/rune)
+está disponível no componente `kitt-assistant/apps/kitt-rune`, com
+painel de status, navegação por módulos e HUD nativo opcional.
+O build nativo e wasm passou no CI. As telas de operações sensíveis,
+configurações, sessões e aprovações continuam usando os clientes
+originais até a migração atingir paridade funcional.
+
+Leia o [guia de UI Rune](docs/RUNE_UI.md). O canal de release permanece
+inalterado até a validação e empacotamento completos.
+
 ## Projeto Córtex (incremental, opt-in)
 
 O KITT já disponibiliza no canal edge um plano de eventos e estado contextual,
