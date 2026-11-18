@@ -16,6 +16,17 @@ services:
       - "127.0.0.1:${KITT_BROWSER_UI_PORT:-6080}:6080"
     restart: unless-stopped
 
+  # Optional local typed-decision runtime. No host port is published.
+  # Start with: docker compose --profile decision up -d ollaya
+  ollaya:
+    profiles: ["decision"]
+    image: "${KITT_OLLAYA_IMAGE:-ghcr.io/ollaya-dev/ollaya:latest}"
+    environment:
+      OLLAYA_API_KEY: "${KITT_DECISION_API_KEY:-}"
+    volumes:
+      - kitt-decision-models:/home/ollaya/.ollaya
+    restart: unless-stopped
+
   reverse-proxy:
     image: "${KITT_REVERSE_PROXY_IMAGE:-ghcr.io/rfdetoni/kitt-reverse-proxy}:${KITT_REVERSE_PROXY_VERSION:-latest}"
     build:
@@ -24,6 +35,12 @@ services:
     environment:
       PROXY_API_KEY: "${KITT_PROXY_API_KEY:?Set KITT_PROXY_API_KEY in .env before starting K.I.T.T.}"
       CDP_URL: http://browser:9222
+      PROXY_TEMPORARY_CHAT: "${KITT_TEMPORARY_CHAT:-off}"
+      PROXY_DECISION_MODE: "${KITT_DECISION_MODE:-off}"
+      PROXY_DECISION_URL: "${KITT_DECISION_URL:-http://ollaya:11435}"
+      PROXY_DECISION_MODEL: "${KITT_DECISION_MODEL:-laya}"
+      PROXY_DECISION_TIMEOUT_MS: "${KITT_DECISION_TIMEOUT_MS:-2500}"
+      PROXY_DECISION_API_KEY: "${KITT_DECISION_API_KEY:-}"
     command:
       - start
       - "${KITT_PROXY_PROVIDER:-chatgpt}"
@@ -99,6 +116,7 @@ services:
         condition: service_healthy
 
 volumes:
+  kitt-decision-models:
   kitt-sandbox-socket:
   kitt-agent-state:
   kitt-browser-profile:
