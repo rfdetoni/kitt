@@ -2,6 +2,18 @@
 
 Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.74**.
 
+## Projeto Córtex (incremental, opt-in)
+
+O KITT já disponibiliza no canal edge um plano de eventos e estado contextual,
+mantendo o Agent como autoridade de ferramentas e o NodexLM como executor local
+de modelos de decisão. O comando `kitt-cortex` usa o runtime Python do
+Assistant com eventos duráveis, preflight e IPC autenticado. Sensores, planos
+autônomos e ações físicas **não são habilitados automaticamente**.
+
+Consulte o [guia de integração do Córtex](docs/CORTEX_INTEGRATION.md).
+O canal `release` continua fixado em commits anteriores até a publicação
+coordenada de nova versão.
+
 ## Modelos de decisão + chats temporários (opcional)
 
 O Reverse Proxy pode classificar solicitações com o Ollaya antes de chamar a LLM. A classificação é auxiliar: não altera permissões de ferramentas nem substitui a geração de texto. O Compose inclui um serviço Ollaya em perfil opcional `decision`; nenhuma porta Ollaya é publicada no host.
