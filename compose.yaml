@@ -10,7 +10,6 @@ services:
       KITT_BROWSER_MODE: "${KITT_BROWSER_MODE:-headless}"
       KITT_BROWSER_PROFILE: /data/browser
     volumes:
-  kitt-decision-models:
       - kitt-browser-profile:/data/browser
     shm_size: "1gb"
     ports:
@@ -117,6 +116,7 @@ services:
         condition: service_healthy
 
 volumes:
+  kitt-decision-models:
   kitt-sandbox-socket:
   kitt-agent-state:
   kitt-browser-profile:
