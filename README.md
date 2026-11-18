@@ -2,6 +2,21 @@
 
 Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.74**.
 
+## Modelos de decisão + chats temporários (opcional)
+
+O Reverse Proxy pode classificar solicitações com o Ollaya antes de chamar a LLM. A classificação é auxiliar: não altera permissões de ferramentas nem substitui a geração de texto. O Compose inclui um serviço Ollaya em perfil opcional `decision`; nenhuma porta Ollaya é publicada no host.
+
+Após atualizar o Reverse Proxy para uma versão que contenha a funcionalidade:
+
+```bash
+docker compose --profile decision up -d ollaya
+docker compose --profile decision exec ollaya ollaya pull laya
+```
+
+Em `.env`, configure `KITT_DECISION_MODE=shadow` para observar decisões sem alterar as solicitações, ou `assist` para acrescentar os sinais ao contexto da LLM. Defina `KITT_TEMPORARY_CHAT=supported` para exigir uma conversa temporária verificada no ChatGPT antes de enviar prompts. O proxy não envia o prompt se a UI não comprovar o modo temporário; demais provedores mantêm o comportamento atual. Deixe as opções desligadas até validar a UI autenticada em seu ambiente.
+
+Consulte [a especificação de implementação](https://github.com/rfdetoni/kitt-reverse-proxy/blob/feat/decision-llm-temporary-chats/docs/DECISION_TEMPORARY.md). A funcionalidade deve ser compilada da branch correspondente ou obtida em uma futura release; o tag `latest` no Compose pode ainda não incluí-la.
+
 ## Instalação
 
 O entrypoint do instalador é [`install.sh`](install.sh). Consulte as opções e os pré-requisitos no script e na documentação correspondente antes de instalar ou reinstalar componentes.
