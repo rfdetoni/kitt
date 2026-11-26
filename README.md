@@ -1,6 +1,22 @@
 # K.I.T.T. — Ecossistema
 
-Instalador e manifesto de versões do ecossistema K.I.T.T. A versão atual do canal release é **0.16.74**.
+Instalador e manifesto de versões do ecossistema K.I.T.T. O manifesto do canal release fixa a versão **0.16.75**. A publicação depende da validação integrada do instalador.
+
+## Ambientes de execução e artefatos (opt-in)
+
+O Agent CLI 0.89.13 oferece runtimes vinculados à conversa, recuperação
+idempotente, hibernação de containers, montagens somente leitura, WASM
+opcional e transferência de artefatos com verificação SHA-256. O Assistant
+oferece worker remoto dedicado, seleção por recursos configurados, cache
+remoto e visualização autenticada do ambiente. O Reverse Proxy 5.4.32
+oferece transferências pequenas de bytes no navegador, desativadas por padrão.
+
+Consulte o [guia de runtime](https://github.com/rfdetoni/kitt-agent-cli/blob/main/docs/COMPUTER_RUNTIME.md),
+o [guia do worker](https://github.com/rfdetoni/kitt-assistant/blob/main/docs/REMOTE_RUNTIME_WORKER.md)
+e o [guia de transferências pelo navegador](https://github.com/rfdetoni/kitt-reverse-proxy/blob/main/docs/BROWSER_FILE_TRANSFER.md).
+A seleção de GPU usa a capacidade configurada, sem descoberta de VRAM.
+O provisionamento Debian automático, montagens GitHub/S3 e controle nativo
+Rune de ambientes ainda não fazem parte desta versão.
 
 ## Nova interface Rune (Desktop + WebGPU, opt-in)
 
