@@ -129,6 +129,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Confirm Windows licensing and consent to Microsoft media downloads")
     parser.add_argument("--with-vm-lab", action="store_true", help="check Linux VM prerequisites; provision only with --vm-image-sha512")
     parser.add_argument("--vm-image-sha512", help="Trusted SHA512 pin of Debian cloud image for explicit provisioning")
+    parser.add_argument("--vm-image-url", help="Official Debian cloud image URL override")
+    parser.add_argument("--vm-gpg-keyring", type=Path, help="Trusted GPG keyring for SHA512SUMS.sign verification")
     parser.add_argument("--vm-gateway-port", type=int, default=3000, help="Host model gateway port (0 disables)")
     parser.add_argument("--with-vm-containers", action="store_true",
         help="check Docker/Podman QEMU support; include KITT Agent CLI")
@@ -165,6 +167,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--dry-run", "--plan", action="store_true", help="resolve and validate the plan without changing the system")
     parser.add_argument("--no-start-services", action="store_true", help="install services without starting them")
+    parser.add_argument("--update", action="store_true", help="update existing K.I.T.T. installation preserving N-1 rollback snapshot")
+    parser.add_argument("--repair", action="store_true", help="clean interrupted staging and repair managed lockfile drift")
+    parser.add_argument("--rollback", action="store_true", help="restore previous N-1 installation state and launchers")
+    parser.add_argument("--capabilities", action="store_true", help="print honest host OS and hardware capabilities as JSON, then exit")
     parser.add_argument("--uninstall", action="store_true", help="remove the complete managed K.I.T.T. installation")
     parser.add_argument("--list", action="store_true", help="list modules and presets, then exit")
     parser.add_argument("--semantic-help", action="store_true", help="show explicit offline-capable local semantic model setup instructions without making changes")
@@ -309,6 +315,9 @@ def main(argv: list[str] | None = None) -> int:
             component_refs = load_release_refs(source_root, catalog)
 
         platform = PlatformAdapter.detect()
+        if args.capabilities:
+            print(json.dumps(platform.host_capabilities(), indent=2, sort_keys=True))
+            return 0
         if args.re_oracle_bootstrap and not args.with_re_lab:
             raise InstallerError("--re-oracle-bootstrap requires --with-re-lab")
         if args.re_oracle_recreate:
@@ -361,6 +370,14 @@ def main(argv: list[str] | None = None) -> int:
             ),
         )
         installer = SourceFreeEcosystemInstaller(catalog, platform, options)
+        if args.repair:
+            report = installer.repair_interrupted_install()
+            print(json.dumps(report, indent=2, sort_keys=True))
+            return 0
+        if args.rollback:
+            report = installer.rollback_to_previous()
+            print(json.dumps(report, indent=2, sort_keys=True))
+            return 0
         if args.uninstall:
             from .rea_cli import remove_rea_launcher
             remove_rea_launcher(root, bin_dir)
@@ -479,7 +496,13 @@ def main(argv: list[str] | None = None) -> int:
         if args.with_vm_lab and args.vm_image_sha512 and not args.dry_run:
             from .vm_lab import prepare_guest, VMLabPrerequisiteError
             try:
-                profile = prepare_guest(root, image_sha512=args.vm_image_sha512, gateway_port=args.vm_gateway_port)
+                profile = prepare_guest(
+                    root,
+                    image_sha512=args.vm_image_sha512,
+                    gateway_port=args.vm_gateway_port,
+                    image_url=args.vm_image_url,
+                    gpg_keyring=args.vm_gpg_keyring,
+                )
                 print(f"Debian guest ready: {profile}")
             except (VMLabPrerequisiteError, OSError, subprocess.SubprocessError) as error:
                 print(f"K.I.T.T. installed; Debian guest not provisioned: {error}", file=sys.stderr)

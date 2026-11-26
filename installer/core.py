@@ -75,7 +75,13 @@ class EcosystemInstaller:
         if self.options.dry_run:
             print(f"Would remove {self.options.root}")
             return
+        self.platform.stop_kitt_services(self.options.root, self.options.bin_dir)
+        self.platform.unregister_kitt_services(self.options.root, self.options.bin_dir)
         launchers = self._state_launchers()
+        for name in self.platform._KNOWN_LAUNCHERS:
+            candidate = str(self._launcher_path(name))
+            if candidate not in launchers:
+                launchers.append(candidate)
         for value in launchers:
             path = Path(value)
             try:
@@ -83,9 +89,81 @@ class EcosystemInstaller:
                     path.unlink()
             except OSError:
                 pass
+        self.platform.remove_user_path(self.options.bin_dir)
         if self.options.root.exists():
             shutil.rmtree(self.options.root)
         print("K.I.T.T. ecosystem removed.")
+
+    def _save_n_minus_one_backup(self) -> None:
+        """Persist previous installed-state and launchers under <root>/.rollback/previous."""
+        state_file = self.options.root / "installed-state.json"
+        if not state_file.is_file():
+            return
+        backup_dir = self.options.root / ".rollback" / "previous"
+        stage = self.options.root / ".rollback" / ".previous.tmp"
+        if stage.exists():
+            shutil.rmtree(stage)
+        (stage / "bin").mkdir(parents=True, exist_ok=True)
+        shutil.copy2(state_file, stage / "installed-state.json")
+        copied_launchers: list[str] = []
+        for raw in self._state_launchers():
+            src = Path(raw)
+            if src.is_file() and not src.is_symlink():
+                shutil.copy2(src, stage / "bin" / src.name)
+                copied_launchers.append(str(src))
+        (stage / "manifest.json").write_text(
+            json.dumps({"launchers": copied_launchers}, indent=2),
+            encoding="utf-8",
+        )
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+        stage.rename(backup_dir)
+
+    def rollback_to_previous(self) -> dict[str, object]:
+        """Restore the previously recorded N-1 installation state and launchers."""
+        backup_dir = self.options.root / ".rollback" / "previous"
+        state_src = backup_dir / "installed-state.json"
+        manifest_src = backup_dir / "manifest.json"
+        if not state_src.is_file():
+            raise InstallerError("No previous N-1 rollback snapshot is available")
+        if self.options.dry_run:
+            return {"status": "dry-run", "snapshot": str(backup_dir)}
+        self.platform.stop_kitt_services(self.options.root, self.options.bin_dir)
+        restored: list[str] = []
+        if manifest_src.is_file():
+            manifest = json.loads(manifest_src.read_text(encoding="utf-8"))
+            for raw in manifest.get("launchers", []):
+                dest = Path(raw)
+                src = backup_dir / "bin" / dest.name
+                if src.is_file():
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, dest)
+                    if self.platform.posix:
+                        dest.chmod(0o755)
+                    restored.append(str(dest))
+        shutil.copy2(state_src, self.options.root / "installed-state.json")
+        return {"status": "rolled_back", "restored_launchers": restored}
+
+    def repair_interrupted_install(self) -> dict[str, object]:
+        """Clean interrupted staging directories and repair known managed metadata drift."""
+        from .managed_drift import repair_known_managed_drift
+
+        repaired_drift = [str(p) for p in repair_known_managed_drift(self.options.root)]
+        cleaned_staging: list[str] = []
+        staging = self.options.root / ".staging"
+        if staging.is_dir():
+            for child in list(staging.iterdir()):
+                if child.is_dir():
+                    shutil.rmtree(child, ignore_errors=True)
+                else:
+                    child.unlink(missing_ok=True)
+                cleaned_staging.append(str(child))
+            try:
+                if not any(staging.iterdir()):
+                    staging.rmdir()
+            except OSError:
+                pass
+        return {"status": "repaired", "repaired_drift": repaired_drift, "cleaned_staging": cleaned_staging}
 
     def _validate_platforms(self, modules: Iterable[ModuleSpec]) -> None:
         unsupported = [

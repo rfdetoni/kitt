@@ -38,7 +38,14 @@ def check_vm_lab(*, provision: bool = False) -> dict:
     }
 
 
-def prepare_guest(root: Path, *, image_sha512: str, gateway_port: int = 3000) -> Path:
+def prepare_guest(
+    root: Path,
+    *,
+    image_sha512: str,
+    gateway_port: int = 3000,
+    image_url: str | None = None,
+    gpg_keyring: Path | None = None,
+) -> Path:
     """Delegate to the installed Agent; never fetch a moving Agent ref."""
     check_vm_lab(provision=True)
     if not isinstance(image_sha512, str) or not re.fullmatch(r"[a-f0-9]{128}", image_sha512):
@@ -46,6 +53,9 @@ def prepare_guest(root: Path, *, image_sha512: str, gateway_port: int = 3000) ->
     if type(gateway_port) is not int or not 0 <= gateway_port <= 65535:
         raise VMLabPrerequisiteError("Invalid model gateway port")
     root = root.expanduser().resolve(strict=True)
+    usage = shutil.disk_usage(root)
+    if usage.free < 4 * 1024 * 1024 * 1024:
+        raise VMLabPrerequisiteError("Insufficient free disk space (< 4 GiB) for Debian VM image")
     state_path = root / "installed-state.json"
     if state_path.is_symlink() or state_path.stat().st_size > 1024 * 1024:
         raise VMLabPrerequisiteError("Unsafe installation state")
@@ -71,9 +81,15 @@ def prepare_guest(root: Path, *, image_sha512: str, gateway_port: int = 3000) ->
         "--destination", str(destination), "--gateway-port", str(gateway_port),
         "--agent-sha", sha, "--image-sha512", image_sha512,
     ]
+    if image_url:
+        command.extend(["--image-url", image_url])
+    if gpg_keyring is not None:
+        command.extend(["--gpg-keyring", str(gpg_keyring)])
     result = subprocess.run(command, cwd=root, stdin=subprocess.DEVNULL, check=False, timeout=2700)
     if result.returncode:
-        raise VMLabPrerequisiteError(f"Debian VM bootstrap failed (exit {result.returncode})")
+        diag = destination / "last-qemu-bootstrap-error.log"
+        hint = f"; inspect {diag}" if diag.is_file() else ""
+        raise VMLabPrerequisiteError(f"Debian VM bootstrap failed (exit {result.returncode}{hint})")
     profile = destination / "profile.json"
     if profile.is_symlink() or not profile.is_file():
         raise VMLabPrerequisiteError("Debian VM profile missing after bootstrap")

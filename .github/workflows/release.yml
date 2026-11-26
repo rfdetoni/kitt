@@ -13,6 +13,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 concurrency:
   group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
@@ -58,6 +60,37 @@ jobs:
             echo "Release tag must be strict semantic version vMAJOR.MINOR.PATCH" >&2
             exit 1
           fi
+      - name: Build multi-platform installer artifacts and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist-release
+          stage="$(mktemp -d)"
+          trap 'rm -rf "$stage"' EXIT
+          pkg_dir="$stage/kitt-installer-${RELEASE_TAG}"
+          mkdir -p "$pkg_dir"
+          cp -R installer VERSION ecosystem.json ecosystem.release.json install.sh install.ps1 "$pkg_dir/"
+          tar -czf "dist-release/kitt-installer-${RELEASE_TAG}-linux.tar.gz" -C "$stage" "kitt-installer-${RELEASE_TAG}"
+          tar -czf "dist-release/kitt-installer-${RELEASE_TAG}-macos.tar.gz" -C "$stage" "kitt-installer-${RELEASE_TAG}"
+          python - "$stage" "dist-release/kitt-installer-${RELEASE_TAG}-windows.zip" <<'PYZIP'
+          import sys, zipfile
+          from pathlib import Path
+          src = Path(sys.argv[1])
+          out = Path(sys.argv[2])
+          with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+              for path in sorted(src.rglob("*")):
+                  if path.is_file():
+                      zf.write(path, path.relative_to(src).as_posix())
+          PYZIP
+          cp ecosystem.release.json dist-release/ecosystem.release.json
+          (cd dist-release && sha256sum ecosystem.release.json "kitt-installer-${RELEASE_TAG}-linux.tar.gz" "kitt-installer-${RELEASE_TAG}-macos.tar.gz" "kitt-installer-${RELEASE_TAG}-windows.zip" > SHA256SUMS.txt)
+          (cd dist-release && sha256sum -c SHA256SUMS.txt)
+
+      - name: Attest release artifact provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: dist-release/*
+
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -75,14 +108,14 @@ jobs:
               --verify-tag \
               --generate-notes \
               --title "$RELEASE_TAG" \
-              ecosystem.release.json
+              dist-release/*
           elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             gh release create "$RELEASE_TAG" \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --generate-notes \
               --title "$RELEASE_TAG" \
-              ecosystem.release.json
+              dist-release/*
           else
             echo "Expected release tag $RELEASE_TAG was not found." >&2
             exit 1
