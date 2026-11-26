@@ -1,5 +1,13 @@
 # Changelog — K.I.T.T. Ecosystem
 
+## 0.16.75 — governed computer runtimes and coordinated immutable pins
+
+- Pin all seven merged component mains after their PR validation, including Agent CLI 0.89.13, Protocol 0.14.3, Memory 0.10.3 and Reverse Proxy 5.4.32.
+- Include optional WASM, durable runtime fences/receipts, idempotent reconnect, idle container hibernation, explicit read-only mounts, streamed/compressed artifact primitives, authenticated remote worker/cache integration and resource-aware selection.
+- Include browser byte transfers (opt-in), native workspace reader memory improvements and a bounded worker CPU/RAM/latency benchmark.
+- Align Assistant native, HUD and Python locks to the same Protocol revision, new Memory revision and Agent 0.89.13. Real Docker/Podman lifecycle regression tests now run before Agent merge.
+- Preserve release gates and existing immutable tags. Actual network/GPU laboratory validation, automatic Debian provisioning, GitHub/S3 mounts and native Rune environment management are not included as completed features.
+
 ## 0.16.74 — policy-governed directory discovery in read-only flows
 
 - Pin merged Agent CLI 0.89.10 (`3b9cde3505cda1b452b76c89d528b3d1dac75bd4`) after successful CI for critical contracts, Docker, Podman, Windows and container builds.
