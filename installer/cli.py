@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -126,7 +127,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Legacy option (rejected); use kitt re lab recreate with a scoped token")
     parser.add_argument("--accept-windows-license", action="store_true",
         help="Confirm Windows licensing and consent to Microsoft media downloads")
-    parser.add_argument("--with-vm-lab", action="store_true", help="require and verify Linux QEMU/SSH prerequisites for isolated KITT autonomy (no host packages installed)")
+    parser.add_argument("--with-vm-lab", action="store_true", help="check Linux VM prerequisites; provision only with --vm-image-sha512")
+    parser.add_argument("--vm-image-sha512", help="Trusted SHA512 pin of Debian cloud image for explicit provisioning")
+    parser.add_argument("--vm-gateway-port", type=int, default=3000, help="Host model gateway port (0 disables)")
     parser.add_argument("--with-vm-containers", action="store_true",
         help="check Docker/Podman QEMU support; include KITT Agent CLI")
     parser.add_argument("--vm-container-runtime", choices=["auto", "docker", "podman"], default="auto")
@@ -319,9 +322,17 @@ def main(argv: list[str] | None = None) -> int:
             from .re_lab import check_re_lab
             check_re_lab(runtime=args.re_runtime, profile=args.re_profile,
                          windows=args.re_windows, version=args.re_windows_version)
+        if args.vm_image_sha512 is not None:
+            if not args.with_vm_lab or not re.fullmatch(r"[a-f0-9]{128}", args.vm_image_sha512):
+                raise InstallerError("--vm-image-sha512 requires --with-vm-lab and a trusted 128-digit hex checksum")
+            if not 0 <= args.vm_gateway_port <= 65535:
+                raise InstallerError("Invalid VM gateway port")
         if args.with_vm_lab and not args.uninstall:
             from .vm_lab import check_vm_lab
-            check_vm_lab()
+            if args.vm_image_sha512:
+                check_vm_lab(provision=True)
+            else:
+                check_vm_lab()
         if args.vm_pull_images and not args.with_vm_containers:
             raise InstallerError("--vm-pull-images requires --with-vm-containers")
         if args.with_vm_containers and not args.uninstall:
@@ -464,6 +475,14 @@ def main(argv: list[str] | None = None) -> int:
                 print("  Oracle ready: UNVERIFIED until authenticated guest verification")
             except (ReLabError, OSError, subprocess.SubprocessError) as error:
                 print(f"K.I.T.T. installed; RE lab incomplete: {error}", file=sys.stderr)
+                optional_failed = True
+        if args.with_vm_lab and args.vm_image_sha512 and not args.dry_run:
+            from .vm_lab import prepare_guest, VMLabPrerequisiteError
+            try:
+                profile = prepare_guest(root, image_sha512=args.vm_image_sha512, gateway_port=args.vm_gateway_port)
+                print(f"Debian guest ready: {profile}")
+            except (VMLabPrerequisiteError, OSError, subprocess.SubprocessError) as error:
+                print(f"K.I.T.T. installed; Debian guest not provisioned: {error}", file=sys.stderr)
                 optional_failed = True
         return 1 if optional_failed else 0
     except UserCancelled as exc:
