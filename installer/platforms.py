@@ -51,6 +51,7 @@ class PlatformAdapter:
         "kitt",
         "kittctl",
         "kittd",
+        "kitt-memoryd",
         "kitt-reverse-proxy",
         "kitt-agent-gateway",
     )
@@ -604,8 +605,8 @@ class PlatformAdapter:
             command = " ".join(quote(str(v)) for v in argv)
             self._atomic_write_text(
                 path,
-                f"@echo off\r\n{command} %*\r\n",
-                encoding="ascii",
+                f"@echo off\r\nchcp 65001 >nul\r\n{command} %*\r\n",
+                encoding="utf-8",
             )
             return path
 
@@ -622,3 +623,87 @@ class PlatformAdapter:
             mode=0o755,
         )
         return path
+
+    def unregister_kitt_services(self, root: Path, bin_dir: Path) -> None:
+        """Best-effort service unregistration across Linux systemd, macOS launchd, and Windows."""
+        suffix = ".exe" if self.name == "windows" else ""
+        launcher_suffix = ".cmd" if self.name == "windows" else ""
+        kittctl = self._first_existing_command(
+            root / "runtime" / "assistant" / "bin" / f"kittctl{suffix}",
+            bin_dir / f"kittctl{launcher_suffix}",
+            shutil.which("kittctl"),
+        )
+        if kittctl:
+            _run_capture((kittctl, "service", "uninstall"))
+        if self.name == "windows":
+            ps = shutil.which("powershell") or shutil.which("pwsh")
+            if ps:
+                _run_capture((
+                    ps, "-NoProfile", "-NonInteractive", "-Command",
+                    "foreach($t in @('KITT Daemon','KITT Assistant','KITT Reverse Proxy','KITT Agent Gateway')){"
+                    "Unregister-ScheduledTask -TaskName $t -Confirm:$false -ErrorAction SilentlyContinue}",
+                ))
+        elif self.name == "macos":
+            agents = Path.home() / "Library" / "LaunchAgents"
+            launchctl = shutil.which("launchctl")
+            for label in ("com.kitt.daemon", "com.kitt.assistant", "com.kitt.reverse-proxy", "com.kitt.agent-gateway"):
+                plist = agents / f"{label}.plist"
+                if plist.exists():
+                    if launchctl:
+                        _run_capture((launchctl, "unload", str(plist)))
+                    plist.unlink(missing_ok=True)
+        elif self.name == "linux":
+            unit_dir = Path.home() / ".config" / "systemd" / "user"
+            systemctl = shutil.which("systemctl")
+            for unit in ("kitt-daemon.service", "kitt-assistant.service", "kitt-reverse-proxy.service", "kitt-agent-gateway.service"):
+                if systemctl:
+                    _run_capture((systemctl, "--user", "disable", unit))
+                (unit_dir / unit).unlink(missing_ok=True)
+            if systemctl:
+                _run_capture((systemctl, "--user", "daemon-reload"))
+
+    def remove_user_path(self, bin_dir: Path) -> bool:
+        """Remove KITT managed launcher directory from Windows user PATH if present."""
+        if self.name != "windows":
+            return True
+        try:
+            import winreg  # type: ignore
+            with winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                "Environment",
+                0,
+                winreg.KEY_READ | winreg.KEY_WRITE,
+            ) as key:
+                try:
+                    value, _ = winreg.QueryValueEx(key, "Path")
+                except FileNotFoundError:
+                    return True
+                parts = [p for p in str(value).split(";") if p and not self._same_path(p, bin_dir)]
+                winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, ";".join(parts))
+            return True
+        except Exception:
+            return False
+
+    def host_capabilities(self) -> dict[str, object]:
+        """Return honest host OS and hardware capabilities; never claim unsupported stacks."""
+        import socket
+        nvidia = shutil.which("nvidia-smi") is not None
+        rocm = (self.name == "linux") and (Path("/dev/kfd").exists() or shutil.which("rocminfo") is not None)
+        intel_drm = (self.name == "linux") and any(
+            (p / "device" / "vendor").is_file() and (p / "device" / "vendor").read_text(encoding="ascii", errors="ignore").strip() == "0x8086"
+            for p in Path("/sys/class/drm").glob("renderD*")
+        )
+        qemu = (self.name == "linux") and (shutil.which("qemu-system-x86_64") is not None)
+        kvm = (self.name == "linux") and os.access("/dev/kvm", os.R_OK | os.W_OK)
+        ports_busy: list[int] = []
+        for port in (41827, 41828, 3000, 8000):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                if s.connect_ex(("127.0.0.1", port)) == 0:
+                    ports_busy.append(port)
+        return {
+            "os": self.name,
+            "posix": self.posix,
+            "qemu_debian_vm": {"supported": self.name == "linux", "available": qemu, "kvm": kvm},
+            "gpu": {"nvidia": nvidia, "rocm": rocm, "intel_drm": intel_drm},
+            "busy_ports": ports_busy,
+        }
